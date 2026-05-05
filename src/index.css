@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface2: #f8f9fb;
+  --border: #e5e7eb;
+  --border2: #d1d5db;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --pink: #e91e8c;
+  --pink-light: #fce7f3;
+  --pink-dark: #c4177a;
+  --sidebar-bg: #1e2235;
+  --sidebar-text: #c9cdd8;
+  --sidebar-active: #e91e8c;
+  --font-syne: "Syne", system-ui, sans-serif;
+  --font-epilogue: "Epilogue", system-ui, sans-serif;
+  --font-serif: "Times New Roman", "Georgia", serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+p, span, label, input, textarea, select, button, a, li, td, th {
+  font-family: var(--font-serif);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-syne);
+}
+
+input, textarea, select {
+  font-family: var(--font-epilogue);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
