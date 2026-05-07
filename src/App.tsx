@@ -6,7 +6,11 @@ import Dashboard from "@/pages/admin/Dashboard";
 import FilaRevisao from "@/pages/admin/FilaRevisao";
 import BancoTalentos from "@/pages/admin/BancoTalentos";
 import TalentoDetalhe from "@/pages/admin/TalentoDetalhe";
+import RecursosAlocados from "@/pages/admin/RecursosAlocados";
+import Forms from "@/pages/admin/Forms";
 import AdminLayout from "@/components/AdminLayout";
+import RecursoLayout from "@/components/RecursoLayout";
+import MeuHistorico from "@/pages/MeuHistorico";
 
 function ProtectedRoute({ children, role }: { children: React.ReactNode; role?: string }) {
   const { user, loading } = useAuth();
@@ -22,9 +26,12 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/meu-perfil" element={
-            <ProtectedRoute><MeuPerfil /></ProtectedRoute>
-          } />
+          <Route path="/" element={
+            <ProtectedRoute><RecursoLayout /></ProtectedRoute>
+          }>
+            <Route path="meu-perfil" element={<MeuPerfil />} />
+            <Route path="meu-historico" element={<MeuHistorico />} />
+          </Route>
           <Route path="/admin" element={
             <ProtectedRoute role="ADMIN"><AdminLayout /></ProtectedRoute>
           }>
@@ -33,6 +40,8 @@ export default function App() {
             <Route path="fila" element={<FilaRevisao />} />
             <Route path="talentos" element={<BancoTalentos />} />
             <Route path="talentos/:id" element={<TalentoDetalhe />} />
+            <Route path="alocados" element={<RecursosAlocados />} />
+            <Route path="forms" element={<Forms />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
