@@ -1,25 +1,30 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
+  fullWidth?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, Props>(
-  ({ variant = "primary", size = "md", loading, children, disabled, className = "", ...props }, ref) => {
-    const base = "inline-flex items-center justify-center font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed";
-    const sizes = { sm: "px-3 py-1.5 text-xs", md: "px-4 py-2 text-sm", lg: "px-6 py-2.5 text-sm" };
+  ({ variant = "primary", size = "md", loading, fullWidth, children, disabled, className = "", ...props }, ref) => {
+    const base = "inline-flex items-center justify-center font-semibold rounded-lg transition-all active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:shadow-focus-pink";
+    const sizes = {
+      sm:  "px-3 py-1.5 text-xs",
+      md:  "px-5 py-2.5 text-sm",
+      lg:  "w-full py-3 text-base",
+    };
     const variants = {
-      primary: "bg-[var(--pink)] hover:bg-[var(--pink-dark)] text-white",
-      ghost: "bg-transparent hover:bg-gray-100 text-gray-600 border border-gray-200",
-      danger: "bg-transparent hover:bg-red-50 text-red-500 border border-red-200",
+      primary:   "bg-pink hover:bg-pink-dark text-white shadow-none",
+      secondary: "bg-white border border-slate-300 text-slate-700 font-medium hover:bg-slate-50",
+      danger:    "bg-white border border-red-200 text-red-600 hover:bg-red-50",
     };
 
     return (
       <button
         ref={ref}
-        className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
+        className={`${base} ${sizes[size]} ${variants[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
         disabled={disabled || loading}
         {...props}
       >

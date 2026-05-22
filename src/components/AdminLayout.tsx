@@ -1,17 +1,21 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useVagas } from "@/contexts/VagasContext";
 
-const navItems = [
-  { to: "/admin/dashboard", label: "Dashboard", exact: true },
-  { to: "/admin/fila", label: "Fila de revisão" },
-  { to: "/admin/talentos", label: "People", exact: true },
-  { to: "/admin/alocados", label: "Alocados", exact: true },
-  { to: "/admin/forms", label: "Forms", exact: true },
+const staticNavItems = [
+  { to: "/admin/dashboard", label: "Dashboard" },
+  { to: "/admin/fila",      label: "Fila de revisão" },
+  { to: "/admin/talentos",  label: "People" },
+  { to: "/admin/alocados",  label: "Alocados" },
+  { to: "/admin/usuarios",  label: "Usuários" },
+  { to: "/admin/forms",     label: "Forms" },
 ];
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { vagas } = useVagas();
+  const vagasAbertas = vagas.filter((v) => v.status === "Aberta" || v.status === "Em andamento").length;
 
   function handleLogout() {
     logout();
@@ -19,43 +23,70 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
-      <aside className="w-52 flex flex-col shrink-0" style={{ background: "var(--sidebar-bg)" }}>
-        <div className="px-5 py-5 border-b border-white/10">
-          <div className="flex items-center gap-1.5">
-            <span style={{ fontFamily: "var(--font-syne)", fontWeight: 800, color: "#fff", fontSize: 18, letterSpacing: "-0.5px" }}>VILT</span>
-            <span style={{ color: "var(--pink)", fontSize: 18, fontWeight: 900 }}>›</span>
-          </div>
+    <div className="flex h-screen overflow-hidden bg-slate-50">
+      {/* Sidebar */}
+      <aside className="w-40 shrink-0 flex flex-col bg-slate-950 h-screen">
+        {/* Logo */}
+        <div className="px-5 py-5 border-b border-white/[0.06]">
+          <span className="font-bold text-lg tracking-tight text-white">VILT</span>
+          <span className="text-pink text-lg font-bold">.</span>
         </div>
 
-        <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
-          <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/30">Menu</p>
-          {navItems.map(({ to, label, exact }) => (
+        {/* Nav */}
+        <nav className="flex-1 py-4">
+          <p className="px-5 pt-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-slate-500">Menu</p>
+          {staticNavItems.map(({ to, label }) => (
             <NavLink
               key={to}
               to={to}
-              end={exact}
-              className="flex items-center px-3 py-2 rounded-lg text-sm transition-all"
-              style={({ isActive }) => isActive
-                ? { background: "rgba(233,30,140,0.15)", color: "var(--pink)", fontWeight: 500 }
-                : { color: "var(--sidebar-text)" }}
+              end={to === "/admin/talentos" || to === "/admin/dashboard"}
+              className={({ isActive }) =>
+                `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${
+                  isActive
+                    ? "border-l-pink bg-white/5 text-white font-medium"
+                    : "border-l-transparent text-white/55 hover:text-white/80"
+                }`
+              }
             >
               {label}
             </NavLink>
           ))}
+          <NavLink
+            to="/admin/vagas"
+            end
+            className={({ isActive }) =>
+              `flex items-center justify-between px-5 py-[9px] text-sm transition-colors border-l-[3px] ${
+                isActive
+                  ? "border-l-pink bg-white/5 text-white font-medium"
+                  : "border-l-transparent text-white/55 hover:text-white/80"
+              }`
+            }
+          >
+            <span>Vagas</span>
+            {vagasAbertas > 0 && (
+              <span className="bg-pink text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
+                {vagasAbertas}
+              </span>
+            )}
+          </NavLink>
         </nav>
 
-        <div className="px-4 py-4 border-t border-white/10">
-          <p className="text-xs truncate font-medium text-white mb-0.5">{user?.name}</p>
-          <p className="text-xs truncate text-white/40 mb-3">{user?.email}</p>
-          <button onClick={handleLogout} className="text-xs text-white/40 hover:text-white/70 transition-colors">
+        {/* Footer */}
+        <div className="px-5 py-5 border-t border-white/[0.06]">
+          <p className="text-xs font-medium text-white truncate mb-0.5">{user?.name}</p>
+          <p className="text-xs text-white/40 truncate mb-3">{user?.email}</p>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-white/40 hover:text-white/70 transition-colors"
+          >
             Sair
           </button>
         </div>
       </aside>
 
+      {/* Main */}
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-8">
+        <div className="px-8 py-8">
           <Outlet />
         </div>
       </main>

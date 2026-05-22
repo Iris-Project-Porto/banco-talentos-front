@@ -28,6 +28,26 @@ export const api = {
   login: (email: string, password: string) =>
     http.post("/auth/login", { email, password }).then((r) => r.data),
 
+  register: (name: string, email: string, password: string, role: "ADMIN" | "RECURSO") =>
+    http.post("/auth/register", { name, email, password, role }).then((r) => r.data),
+
+  verifyEmail: (email: string, code: string) =>
+    http.post("/auth/verify", { email, code }).then((r) => r.data),
+
+  forgotPassword: (email: string) =>
+    http.post(`/auth/forgot-password?email=${encodeURIComponent(email)}`).then((r) => r.data),
+
+  resetPassword: (email: string, token: string, newPassword: string) =>
+    http.post("/auth/reset-password", { email, token, newPassword }).then((r) => r.data),
+
+  getPendingUsers: () => http.get("/admin/users/pending").then((r) => r.data),
+
+  approveUser: (id: string) =>
+    http.post(`/admin/users/${id}/approve`).then((r) => r.data),
+
+  rejectUser: (id: string) =>
+    http.post(`/admin/users/${id}/reject`).then((r) => r.data),
+
   getMyProfile: () => http.get("/profile/me").then((r) => r.data),
   submitProfile: (data: unknown) => http.post("/profile", data).then((r) => r.data),
 
@@ -38,4 +58,9 @@ export const api = {
   getProfileById: (id: string) => http.get(`/admin/profiles/${id}`).then((r) => r.data),
   updateProfile: (id: string, data: unknown) =>
     http.patch(`/admin/profiles/${id}`, data).then((r) => r.data),
+
+  getVagas: () => http.get("/admin/vagas").then((r) => r.data),
+  createVaga: (data: unknown) => http.post("/admin/vagas", data).then((r) => r.data),
+  updateVaga: (id: string, data: unknown) => http.put(`/admin/vagas/${id}`, data).then((r) => r.data),
+  deleteVaga: (id: string) => http.delete(`/admin/vagas/${id}`).then((r) => r.data),
 };

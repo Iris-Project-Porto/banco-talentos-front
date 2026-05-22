@@ -1,18 +1,26 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, ReactNode } from "react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  labelRight?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, Props>(
-  ({ label, error, className = "", ...props }, ref) => (
+  ({ label, error, labelRight, className = "", ...props }, ref) => (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-xs font-medium text-gray-600">{label}</label>}
+      {(label || labelRight) && (
+        <div className="flex items-center justify-between">
+          {label && <label className="text-xs font-medium text-slate-600">{label}</label>}
+          {labelRight}
+        </div>
+      )}
       <input
         ref={ref}
-        className={`w-full rounded-lg px-3 py-2 text-sm outline-none transition-all bg-white border focus:border-pink-500 focus:ring-1 focus:ring-pink-500 ${error ? "border-red-400" : "border-gray-200"} ${className}`}
-        style={{ color: "var(--text)" }}
+        className={`w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border
+          ${error ? "border-red-400" : "border-slate-300"}
+          focus:border-pink focus:shadow-focus-pink
+          placeholder:text-slate-400 text-slate-900 ${className}`}
         {...props}
       />
       {error && <p className="text-xs text-red-500">{error}</p>}

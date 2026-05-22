@@ -1,13 +1,23 @@
+import { PageHeader } from "@/components/ui/PageHeader";
+
+const FORM_BUILDER_URL = import.meta.env.VITE_FORM_BUILDER_URL ?? "http://localhost:3000";
+
 export default function Forms() {
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900" style={{ fontFamily: "var(--font-syne)" }}>Forms</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Criação e gestão de formulários</p>
-      </div>
+    <div className="flex flex-col gap-4 h-full">
+      <PageHeader
+        title="Forms"
+        subtitle="Criação e gestão de formulários"
+      />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-16 flex flex-col items-center justify-center gap-3 text-center">
-        <p className="text-lg font-semibold text-gray-800">Em breve</p>
+      <div className="flex-1 bg-white border border-slate-200 rounded-xl shadow-card overflow-hidden" style={{ minHeight: "calc(100vh - 180px)" }}>
+        <iframe
+          src={FORM_BUILDER_URL}
+          title="Form Builder"
+          className="w-full h-full border-0"
+          style={{ minHeight: "calc(100vh - 180px)" }}
+          allow="clipboard-write"
+        />
       </div>
     </div>
   );
