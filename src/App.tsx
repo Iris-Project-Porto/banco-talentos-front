@@ -4,7 +4,7 @@ import { VagasProvider } from "@/contexts/VagasContext";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import VerifyEmail from "@/pages/VerifyEmail";
-import ForgotPassword from "@/pages/ForgotPassword";
+import ForgotPassword from "@/pages/ForgotPassWord";
 import ResetPassword from "@/pages/ResetPassword";
 import MeuPerfil from "@/pages/MeuPerfil";
 import Dashboard from "@/pages/admin/Dashboard";
