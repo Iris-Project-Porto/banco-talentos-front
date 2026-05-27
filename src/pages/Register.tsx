@@ -1,15 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
+interface Group {
+  id: string;
+  name: string;
+}
+
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "RECURSO" as "ADMIN" | "RECURSO" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "RECURSO" as "ADMIN" | "RECURSO",
+    groupId: "",
+  });
+  const [groups, setGroups] = useState<Group[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    api.getGroups().then((data) => {
+      const list: Group[] = Array.isArray(data) ? data : data.content ?? [];
+      setGroups(list);
+      if (list.length > 0) {
+        setForm((prev) => ({ ...prev, groupId: list[0].id }));
+      }
+    });
+  }, []);
 
   function set(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -20,7 +42,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await api.register(form.name, form.email, form.password, form.role);
+      await api.register(form.name, form.email, form.password, form.role, form.groupId);
       navigate(`/verify?email=${encodeURIComponent(form.email)}`);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -83,6 +105,23 @@ export default function Register() {
           {form.role === "ADMIN" && (
             <p className="text-xs text-amber-600">Contas de admin precisam de aprovação antes do primeiro acesso.</p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-slate-600">Grupo</label>
+          <select
+            value={form.groupId}
+            onChange={(e) => set("groupId", e.target.value)}
+            required
+            className="w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900"
+          >
+            {groups.length === 0 && (
+              <option value="" disabled>Carregando grupos...</option>
+            )}
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
         </div>
 
         {error && (

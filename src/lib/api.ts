@@ -28,8 +28,8 @@ export const api = {
   login: (email: string, password: string) =>
     http.post("/auth/login", { email, password }).then((r) => r.data),
 
-  register: (name: string, email: string, password: string, role: "ADMIN" | "RECURSO") =>
-    http.post("/auth/register", { name, email, password, role }).then((r) => r.data),
+  register: (name: string, email: string, password: string, role: "ADMIN" | "RECURSO", groupId: string) =>
+    http.post("/auth/register", { name, email, password, role, groupId }).then((r) => r.data),
 
   verifyEmail: (email: string, code: string) =>
     http.post("/auth/verify", { email, code }).then((r) => r.data),
@@ -63,4 +63,16 @@ export const api = {
   createVaga: (data: unknown) => http.post("/admin/vagas", data).then((r) => r.data),
   updateVaga: (id: string, data: unknown) => http.put(`/admin/vagas/${id}`, data).then((r) => r.data),
   deleteVaga: (id: string) => http.delete(`/admin/vagas/${id}`).then((r) => r.data),
+
+  // Admin Groups
+  getActiveGroups: () => http.get("/admin/groups/active").then((r) => r.data),
+  getInactiveGroups: () => http.get("/admin/groups/inactive").then((r) => r.data),
+  getGroupById: (id: string) => http.get(`/admin/groups/${id}`).then((r) => r.data),
+  createGroup: (data: unknown) => http.post("/admin/groups", data).then((r) => r.data),
+  updateGroup: (id: string, data: unknown) => http.put(`/admin/groups/${id}`, data).then((r) => r.data),
+  activateGroup: (id: string) => http.patch(`/admin/groups/${id}/activate`).then((r) => r.data),
+  inactivateGroup: (id: string) => http.patch(`/admin/groups/${id}/inactivate`).then((r) => r.data),
+
+  // Public Groups
+  getGroups: () => http.get("/v1/groups").then((r) => r.data),
 };

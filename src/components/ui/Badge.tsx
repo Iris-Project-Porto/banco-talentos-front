@@ -5,13 +5,13 @@ interface Props {
 }
 
 const styles: Record<Props["variant"], string> = {
-  senior:  "bg-[#FEF9C3] text-[#854D0E]",
-  pleno:   "bg-[#DCFCE7] text-[#166534]",
-  junior:  "bg-[#EFF6FF] text-[#1E40AF]",
+  senior: "bg-[#FEF9C3] text-[#854D0E]",
+  pleno: "bg-[#DCFCE7] text-[#166534]",
+  junior: "bg-[#EFF6FF] text-[#1E40AF]",
   success: "bg-[#DCFCE7] text-[#166534]",
-  info:    "bg-[#DBEAFE] text-[#1E40AF]",
+  info: "bg-[#DBEAFE] text-[#1E40AF]",
   warning: "bg-[#FEF9C3] text-[#92400E]",
-  alert:   "bg-[#FEF3C7] text-[#B45309]",
+  alert: "bg-[#FEF3C7] text-[#B45309]",
   pending: "bg-amber-100 text-amber-700",
 };
 
