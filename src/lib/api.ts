@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const BASE = import.meta.env.VITE_API_URL ?? "/api";
+const BASE = import.meta.env.VITE_API_URL || "/api";
+const apiBase = BASE.endsWith("/") ? BASE.slice(0, -1) : BASE;
 
-export const http = axios.create({ baseURL: BASE });
+export const http = axios.create({ baseURL: apiBase });
 
 http.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -15,7 +16,11 @@ http.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       const url = err.config?.url ?? "";
-      if (!url.includes("/profile/me")) {
+      // Não redireciona se for uma rota de auth ou o profile check inicial
+      const isAuthRoute = url.includes("/auth/");
+      const isProfileMe = url.includes("/profile/me");
+
+      if (!isAuthRoute && !isProfileMe) {
         localStorage.removeItem("token");
         window.location.href = "/login";
       }
