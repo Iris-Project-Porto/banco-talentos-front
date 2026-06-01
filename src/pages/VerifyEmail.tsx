@@ -13,9 +13,14 @@ export default function VerifyEmail() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Novos estados para controlar o reenvio do código
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMsg, setResendMsg] = useState("");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setResendMsg(""); // Limpa mensagem de reenvio se houver
     setLoading(true);
     try {
       await api.verifyEmail(email, code);
@@ -25,6 +30,26 @@ export default function VerifyEmail() {
       setError(msg ?? "Código inválido. Tente novamente.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Função para lidar com o reenvio do código
+  async function handleResend() {
+    if (!email) {
+      setError("Por favor, preencha o e-mail para reenviar o código.");
+      return;
+    }
+    setError("");
+    setResendMsg("");
+    setResendLoading(true);
+    try {
+      await api.resendVerificationCode(email);
+      setResendMsg("Novo código enviado! Verifique sua caixa de entrada (e o spam).");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(msg ?? "Erro ao reenviar o código. Tente novamente mais tarde.");
+    } finally {
+      setResendLoading(false);
     }
   }
 
@@ -58,8 +83,14 @@ export default function VerifyEmail() {
           className="tracking-widest text-center font-mono"
         />
 
+        {/* Exibição de Erros */}
         {error && (
           <p className="rounded-lg px-3 py-2 text-xs bg-red-50 text-red-600 border border-red-100">{error}</p>
+        )}
+
+        {/* Exibição de Sucesso ao Reenviar */}
+        {resendMsg && (
+          <p className="rounded-lg px-3 py-2 text-xs bg-green-50 text-green-700 border border-green-100">{resendMsg}</p>
         )}
 
         <Button
@@ -67,11 +98,23 @@ export default function VerifyEmail() {
           variant="primary"
           size="lg"
           loading={loading}
-          disabled={code.length !== 6}
+          disabled={code.length !== 6 || resendLoading}
           className="mt-1"
         >
           {loading ? "Verificando..." : "Verificar"}
         </Button>
+
+        {/* Botão de Reenvio de Código */}
+        <div className="text-center mt-2">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendLoading || loading}
+            className="text-xs text-slate-500 hover:text-pink font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {resendLoading ? "Reenviando..." : "Não recebeu o código? Reenviar"}
+          </button>
+        </div>
       </form>
     </AuthLayout>
   );
