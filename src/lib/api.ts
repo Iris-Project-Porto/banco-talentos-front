@@ -39,6 +39,9 @@ export const api = {
   verifyEmail: (email: string, code: string) =>
     http.post("/auth/verify", { email, code }).then((r) => r.data),
 
+  resendVerificationCode: (email: string) =>
+    http.post("/auth/resend-verification-code", { email }).then((r) => r.data),
+
   forgotPassword: (email: string) =>
     http.post(`/auth/forgot-password?email=${encodeURIComponent(email)}`).then((r) => r.data),
 
