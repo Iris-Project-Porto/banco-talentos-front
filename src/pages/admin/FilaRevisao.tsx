@@ -60,13 +60,7 @@ export default function FilaRevisao() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-4">
-                {p.cargo && (
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Cargo</p>
-                    <p className="text-sm text-slate-700">{p.cargo}</p>
-                  </div>
-                )}
+              <div className="grid grid-cols-2 gap-4">
                 {p.area && (
                   <div>
                     <p className="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Área</p>
@@ -77,12 +71,6 @@ export default function FilaRevisao() {
                   <div>
                     <p className="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Alocação</p>
                     <p className="text-sm text-slate-700">{p.alocacaoStatus}</p>
-                  </div>
-                )}
-                {p.autonomia && (
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Autonomia</p>
-                    <p className="text-sm text-slate-700">{p.autonomia}</p>
                   </div>
                 )}
               </div>

@@ -9,7 +9,6 @@ interface Props {
   id: string;
   name: string;
   email?: string;
-  cargo?: string;
   photoUrl?: string;
   area?: string;
   nivel?: string;
@@ -24,20 +23,20 @@ const NIVEL_BADGE: Record<string, "senior" | "pleno" | "junior"> = {
 };
 
 const ALOC_TAG: Record<string, "status-success" | "status-info" | "status-warning" | "status-alert"> = {
-  "Disponível (Bench)":               "status-success",
-  "Alocado Integral (100%)":          "status-info",
-  "Alocado Parcial":                  "status-warning",
+  "Disponível (Bench)": "status-success",
+  "Alocado Integral (100%)": "status-info",
+  "Alocado Parcial": "status-warning",
   "Em Transição (saindo de projeto)": "status-alert",
 };
 
 const ALOC_LABEL: Record<string, string> = {
-  "Disponível (Bench)":               "Disponível",
-  "Alocado Integral (100%)":          "Integral",
-  "Alocado Parcial":                  "Parcial",
+  "Disponível (Bench)": "Disponível",
+  "Alocado Integral (100%)": "Integral",
+  "Alocado Parcial": "Parcial",
   "Em Transição (saindo de projeto)": "Em Transição",
 };
 
-export function PersonCard({ id, name, email, cargo, photoUrl, area, nivel, alocacaoStatus, skills, createdAt, href }: Props) {
+export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoStatus, skills, createdAt, href }: Props) {
   const badgeVariant = nivel ? NIVEL_BADGE[nivel] : undefined;
   const tagKind = alocacaoStatus ? ALOC_TAG[alocacaoStatus] : undefined;
   const tagLabel = alocacaoStatus ? (ALOC_LABEL[alocacaoStatus] ?? alocacaoStatus.split(" ")[0]) : undefined;
@@ -51,7 +50,7 @@ export function PersonCard({ id, name, email, cargo, photoUrl, area, nivel, aloc
         <Avatar name={name} photoUrl={photoUrl} size={44} />
         <div className="min-w-0 flex-1">
           <p className="font-bold text-base text-slate-900 truncate">{name}</p>
-          {cargo && <p className="text-xs text-slate-500 truncate mt-0.5">{cargo}</p>}
+          {/* {area && <p className="text-xs text-slate-500 truncate mt-0.5">{area}</p>} */}
           {email && <p className="text-xs text-slate-400 truncate">{email}</p>}
         </div>
         {badgeVariant && nivel && (

@@ -33,7 +33,7 @@ export default function RecursosAlocados() {
     const q = search.toLowerCase();
     return (
       (!q || p.user?.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) ||
-        p.cargo?.toLowerCase().includes(q) || p.skills?.some((s: any) => s.skill?.name?.toLowerCase().includes(q))) &&
+        p.skills?.some((s: any) => s.skill?.name?.toLowerCase().includes(q))) &&
       (!area || p.area === area) &&
       (!statusFilter || p.alocacaoStatus === statusFilter)
     );
@@ -113,7 +113,6 @@ export default function RecursosAlocados() {
               id={p.id}
               name={p.user?.name ?? "?"}
               email={p.user?.email}
-              cargo={p.cargo}
               photoUrl={p.photoUrl}
               area={p.area}
               nivel={p.nivelOverride ?? p.nivel}

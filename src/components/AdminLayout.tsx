@@ -4,11 +4,11 @@ import { useVagas } from "@/contexts/VagasContext";
 
 const staticNavItems = [
   { to: "/admin/dashboard", label: "Dashboard" },
-  { to: "/admin/fila",      label: "Fila de revisão" },
-  { to: "/admin/talentos",  label: "People" },
-  { to: "/admin/alocados",  label: "Alocados" },
-  { to: "/admin/usuarios",  label: "Usuários" },
-  { to: "/admin/forms",     label: "Forms" },
+  { to: "/admin/fila", label: "Fila de revisão" },
+  { to: "/admin/talentos", label: "People" },
+  { to: "/admin/alocados", label: "Alocados" },
+  { to: "/admin/usuarios", label: "Usuários" },
+  // { to: "/admin/forms",     label: "Forms" },
 ];
 
 export default function AdminLayout() {
@@ -41,17 +41,16 @@ export default function AdminLayout() {
               to={to}
               end={to === "/admin/talentos" || to === "/admin/dashboard"}
               className={({ isActive }) =>
-                `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${
-                  isActive
-                    ? "border-l-pink bg-white/5 text-white font-medium"
-                    : "border-l-transparent text-white/55 hover:text-white/80"
+                `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
+                  ? "border-l-pink bg-white/5 text-white font-medium"
+                  : "border-l-transparent text-white/55 hover:text-white/80"
                 }`
               }
             >
               {label}
             </NavLink>
           ))}
-          <NavLink
+          {/* <NavLink
             to="/admin/vagas"
             end
             className={({ isActive }) =>
@@ -68,7 +67,7 @@ export default function AdminLayout() {
                 {vagasAbertas}
               </span>
             )}
-          </NavLink>
+          </NavLink> */}
         </nav>
 
         {/* Footer */}
