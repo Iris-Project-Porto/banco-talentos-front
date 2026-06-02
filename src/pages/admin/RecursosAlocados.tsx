@@ -23,7 +23,7 @@ export default function RecursosAlocados() {
         const all = Array.isArray(data) ? data : [];
         setProfiles(all.filter((p) => STATUS_ALOCADO.has(p.alocacaoStatus)));
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -40,8 +40,8 @@ export default function RecursosAlocados() {
   }), [profiles, search, area, statusFilter]);
 
   const counts = useMemo(() => ({
-    integral:  profiles.filter((p) => p.alocacaoStatus === "Alocado Integral (100%)").length,
-    parcial:   profiles.filter((p) => p.alocacaoStatus === "Alocado Parcial").length,
+    integral: profiles.filter((p) => p.alocacaoStatus === "Alocado Integral (100%)").length,
+    parcial: profiles.filter((p) => p.alocacaoStatus === "Alocado Parcial").length,
     transicao: profiles.filter((p) => p.alocacaoStatus === "Em Transição (saindo de projeto)").length,
   }), [profiles]);
 
@@ -119,6 +119,7 @@ export default function RecursosAlocados() {
               alocacaoStatus={p.alocacaoStatus}
               skills={p.skills}
               createdAt={p.createdAt}
+              registrationStatus={p.registrationStatus}
             />
           ))}
         </div>

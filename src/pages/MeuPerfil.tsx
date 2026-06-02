@@ -15,6 +15,7 @@ const schema = z.object({
   experienceYears: z.coerce.number().optional(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
+  registrationNumber: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -25,10 +26,11 @@ const AREA_OPTIONS = [
   { value: "Backend", label: "Backend" },
   { value: "Fullstack", label: "Fullstack" },
   { value: "Mobile", label: "Mobile" },
-  { value: "Outros (QA, DevOps, Dados, Infra)", label: "Outros (QA, DevOps, Dados, Infra)" },
+  { value: "QA", label: "QA" },
+  { value: "DevOps", label: "DevOps" },
+  { value: "Infra", label: "Infra" },
+  { value: "Outros", label: "Outros" },
 ];
-
-
 
 const EXPERIENCE_OPTIONS = [
   { value: "", label: "Selecione..." },
@@ -59,8 +61,8 @@ export default function MeuPerfil() {
           experienceYears: p.experienceYears ?? "",
           linkedinUrl: p.linkedinUrl ?? "",
           githubUrl: p.githubUrl ?? "",
+          registrationNumber: p.registrationNumber ?? "",
         });
-        // Populate stacks with level from existing profile
         if (p.skills?.length) {
           setStacks(
             p.skills.map((ps: any) => ({
@@ -109,16 +111,14 @@ export default function MeuPerfil() {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
 
-            {/* Seção 1 — Identificação */}
             <Section title="Identificação" subtitle="Dados que vão aparecer no seu card.">
               <Input label="URL da foto de perfil" placeholder="https://..." {...register("photoUrl")} />
+              <Input label="Matrícula" placeholder="Sua matrícula corporativa" {...register("registrationNumber")} />
             </Section>
 
-            {/* Seção 2 — Perfil Técnico */}
             <Section title="Perfil Técnico">
               <Select label="Área de atuação *" options={AREA_OPTIONS} {...register("area")} error={errors.area?.message} />
 
-              {/* Stack Tecnológica com nível */}
               <StackInput value={stacks} onChange={setStacks} />
 
               <div>
@@ -133,7 +133,6 @@ export default function MeuPerfil() {
               <Select label="Anos de experiência na área *" options={EXPERIENCE_OPTIONS} {...register("experienceYears")} />
             </Section>
 
-            {/* Links */}
             <Section title="Links">
               <Input label="LinkedIn" placeholder="https://linkedin.com/in/..." {...register("linkedinUrl")} />
               <Input label="GitHub" placeholder="https://github.com/..." {...register("githubUrl")} />
@@ -176,6 +175,14 @@ function ProfileReadOnly({ profile }: { profile: any }) {
   };
   const ns = nivel ? nivelStyle[nivel] : null;
 
+  const statusLabels: Record<string, string> = {
+    APPROVED: "Aprovada",
+    AWAITING_APPROVAL: "Aguardando aprovação",
+    REQUESTED: "Solicitada",
+    NOT_REQUESTED: "Não solicitada",
+  };
+  const regStatus = profile.registrationStatus ? (statusLabels[profile.registrationStatus] || profile.registrationStatus) : "";
+
   return (
     <div className="flex flex-col gap-5">
       <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -200,6 +207,9 @@ function ProfileReadOnly({ profile }: { profile: any }) {
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Suas respostas</p>
         </div>
         <div className="p-6 grid grid-cols-2 gap-4">
+          {profile.registrationNumber && (
+            <ReadField label="Matrícula" value={`${profile.registrationNumber} (${regStatus})`} />
+          )}
           {profile.area && <ReadField label="Área" value={profile.area} />}
 
           {profile.experienceYears != null && (

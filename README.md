@@ -128,14 +128,6 @@ Abaixo está o mapeamento dos endpoints consumidos pelo front-end (via `src/lib/
 | **GET** | `/admin/profiles/:id` | Tela `TalentoDetalhe.tsx` (Abre o modal/tela detalhada de um talento). |
 | **PATCH**| `/admin/profiles/:id` | Utilizado para edições rápidas de status pelo admin no talento. |
 
-### 💼 Gestão de Vagas (Admin)
-| Método | Endpoint | Função na Interface (Onde é usado) |
-| :--- | :--- | :--- |
-| **GET** | `/admin/vagas` | Tela `Vagas.tsx` (Carrega as vagas). |
-| **POST** | `/admin/vagas` | Tela `Vagas.tsx` (Cria uma nova requisição de vaga). |
-| **PUT** | `/admin/vagas/:id` | Tela `Vagas.tsx` (Edita uma vaga existente). |
-| **DELETE**| `/admin/vagas/:id` | Tela `Vagas.tsx` (Deleta uma vaga). |
-
 ### 🏢 Grupos
 | Método | Endpoint | Função na Interface (Onde é usado) |
 | :--- | :--- | :--- |

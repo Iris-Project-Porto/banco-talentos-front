@@ -16,6 +16,7 @@ interface Props {
   skills?: Skill[];
   createdAt?: string;
   href?: string;
+  registrationStatus?: string;
 }
 
 const NIVEL_BADGE: Record<string, "senior" | "pleno" | "junior"> = {
@@ -36,10 +37,28 @@ const ALOC_LABEL: Record<string, string> = {
   "Em Transição (saindo de projeto)": "Em Transição",
 };
 
-export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoStatus, skills, createdAt, href }: Props) {
+const REG_STATUS_TAG: Record<string, "status-success" | "status-info" | "status-warning" | "status-alert"> = {
+  "APPROVED": "status-success",
+  "REQUESTED": "status-info",
+  "AWAITING_APPROVAL": "status-warning",
+  "REJECTED": "status-alert",
+};
+
+const REG_STATUS_LABEL: Record<string, string> = {
+  "NOT_REQUESTED": "Matrícula Não Solicitada",
+  "REQUESTED": "Matrícula Solicitada",
+  "AWAITING_APPROVAL": "Matrícula Pendente",
+  "APPROVED": "Matrícula Aprovada",
+  "REJECTED": "Matrícula Recusada",
+};
+
+export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoStatus, skills, createdAt, href, registrationStatus }: Props) {
   const badgeVariant = nivel ? NIVEL_BADGE[nivel] : undefined;
   const tagKind = alocacaoStatus ? ALOC_TAG[alocacaoStatus] : undefined;
   const tagLabel = alocacaoStatus ? (ALOC_LABEL[alocacaoStatus] ?? alocacaoStatus.split(" ")[0]) : undefined;
+
+  const regLabel = registrationStatus ? REG_STATUS_LABEL[registrationStatus] : undefined;
+  const regTagKind = registrationStatus ? REG_STATUS_TAG[registrationStatus] : undefined;
 
   return (
     <Link
@@ -50,7 +69,6 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoSta
         <Avatar name={name} photoUrl={photoUrl} size={44} />
         <div className="min-w-0 flex-1">
           <p className="font-bold text-base text-slate-900 truncate">{name}</p>
-          {/* {area && <p className="text-xs text-slate-500 truncate mt-0.5">{area}</p>} */}
           {email && <p className="text-xs text-slate-400 truncate">{email}</p>}
         </div>
         {badgeVariant && nivel && (
@@ -61,6 +79,11 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoSta
       <div className="flex flex-wrap gap-1.5">
         {area && <Tag kind="area">{area}</Tag>}
         {tagKind && tagLabel && <Tag kind={tagKind}>{tagLabel}</Tag>}
+        {regLabel && regTagKind ? (
+          <Tag kind={regTagKind}>{regLabel}</Tag>
+        ) : regLabel ? (
+          <span className="inline-flex items-center text-xs bg-slate-100 text-slate-500 rounded-full px-2.5 py-[3px] font-semibold">{regLabel}</span>
+        ) : null}
       </div>
 
       {skills && skills.length > 0 && (

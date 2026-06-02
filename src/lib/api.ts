@@ -18,9 +18,9 @@ http.interceptors.response.use(
       const url = err.config?.url ?? "";
       // Não redireciona se for uma rota de auth ou o profile check inicial
       const isAuthRoute = url.includes("/auth/");
-      const isProfileMe = url.includes("/profile/me");
+      const isProfileRoute = url.endsWith("/profile");
 
-      if (!isAuthRoute && !isProfileMe) {
+      if (!isAuthRoute && !isProfileRoute) {
         localStorage.removeItem("token");
         window.location.href = "/login";
       }
@@ -56,22 +56,24 @@ export const api = {
   rejectUser: (id: string) =>
     http.post(`/admin/users/${id}/reject`).then((r) => r.data),
 
-  getMyProfile: () => http.get("/profile/me").then((r) => r.data),
+
+  getMyProfile: () => http.get("/profile").then((r) => r.data),
   submitProfile: (data: unknown) => http.post("/profile", data).then((r) => r.data),
 
   getDashboard: () => http.get("/admin/dashboard").then((r) => r.data),
-  getPendentes: () => http.get("/admin/profiles/pendentes").then((r) => r.data),
-  getAtivos: () => http.get("/admin/profiles/ativos").then((r) => r.data),
+
+
+  getPendentes: () => http.get("/admin/profiles/pending").then((r) => r.data),
+  getAtivos: () => http.get("/admin/profiles/active").then((r) => r.data),
   getAllProfiles: () => http.get("/admin/profiles").then((r) => r.data),
   getProfileById: (id: string) => http.get(`/admin/profiles/${id}`).then((r) => r.data),
   updateProfile: (id: string, data: unknown) =>
     http.patch(`/admin/profiles/${id}`, data).then((r) => r.data),
 
-  getVagas: () => http.get("/admin/vagas").then((r) => r.data),
-  createVaga: (data: unknown) => http.post("/admin/vagas", data).then((r) => r.data),
-  updateVaga: (id: string, data: unknown) => http.put(`/admin/vagas/${id}`, data).then((r) => r.data),
-  deleteVaga: (id: string) => http.delete(`/admin/vagas/${id}`).then((r) => r.data),
-
+  getVagas: () => http.get("/admin/job-postings").then((r) => r.data),
+  createVaga: (data: unknown) => http.post("/admin/job-postings", data).then((r) => r.data),
+  updateVaga: (id: string, data: unknown) => http.put(`/admin/job-postings/${id}`, data).then((r) => r.data),
+  deleteVaga: (id: string) => http.delete(`/admin/job-postings/${id}`).then((r) => r.data),
 
   // Public Groups
   getGroups: () => http.get("/v1/groups").then((r) => r.data),

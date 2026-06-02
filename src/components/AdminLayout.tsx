@@ -1,11 +1,11 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useVagas } from "@/contexts/VagasContext";
+// import { useVagas } from "@/contexts/VagasContext";
 
 const staticNavItems = [
   { to: "/admin/dashboard", label: "Dashboard" },
   { to: "/admin/fila", label: "Fila de revisão" },
-  { to: "/admin/talentos", label: "People" },
+  { to: "/admin/talentos", label: "Recursos" },
   { to: "/admin/alocados", label: "Alocados" },
   { to: "/admin/usuarios", label: "Usuários" },
   // { to: "/admin/forms",     label: "Forms" },
@@ -14,8 +14,8 @@ const staticNavItems = [
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { vagas } = useVagas();
-  const vagasAbertas = vagas.filter((v) => v.status === "Aberta" || v.status === "Em andamento").length;
+  // const { vagas } = useVagas();
+  // const vagasAbertas = vagas.filter((v) => v.status === "Aberta" || v.status === "Em andamento").length;
 
   function handleLogout() {
     logout();

@@ -8,27 +8,39 @@ import { Tag } from "@/components/ui/Tag";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const SENIORIDADE_BADGE: Record<Senioridade, "junior" | "pleno" | "senior"> = {
-  Jr: "junior", Pleno: "pleno", Sr: "senior",
+const SENIORIDADE_BADGE: Record<Senioridade, "info" | "junior" | "pleno" | "senior" | "warning"> = {
+  INTERN: "info",
+  JUNIOR: "junior",
+  MID_LEVEL: "pleno",
+  SENIOR: "senior",
+  SPECIALIST: "warning",
+};
+
+const SENIORIDADE_LABEL: Record<Senioridade, string> = {
+  INTERN: "Estagiário",
+  JUNIOR: "Júnior",
+  MID_LEVEL: "Pleno",
+  SENIOR: "Sênior",
+  SPECIALIST: "Especialista",
 };
 
 const PRIORIDADE_COLOR: Record<Prioridade, string> = {
-  Baixa:   "bg-slate-100 text-slate-600",
-  Média:   "bg-[#DBEAFE] text-[#1E40AF]",
-  Alta:    "bg-[#FEF9C3] text-[#92400E]",
+  Baixa: "bg-slate-100 text-slate-600",
+  Média: "bg-[#DBEAFE] text-[#1E40AF]",
+  Alta: "bg-[#FEF9C3] text-[#92400E]",
   Urgente: "bg-red-100 text-red-700",
 };
 
 const STATUS_COLOR: Record<Status, string> = {
-  "Aberta":       "bg-[#DCFCE7] text-[#166534]",
+  "Aberta": "bg-[#DCFCE7] text-[#166534]",
   "Em andamento": "bg-[#DBEAFE] text-[#1E40AF]",
-  "Fechada":      "bg-slate-100 text-slate-500",
-  "Cancelada":    "bg-red-50 text-red-500",
+  "Fechada": "bg-slate-100 text-slate-500",
+  "Cancelada": "bg-red-50 text-red-500",
 };
 
 const EMPTY: Omit<Vaga, "id"> = {
-  titulo: "", senioridade: "Pleno", time: "", solicitante: "",
-  tempoContratacao: "", numeroVagas: 1, area: "", skills: [],
+  titulo: "", senioridade: "MID_LEVEL", time: "", solicitante: "",
+  tempoContratacao: "", area: "", skills: [],
   descricao: "", status: "Aberta", prioridade: "Média",
   dataAbertura: new Date().toISOString().slice(0, 10),
 };
@@ -72,7 +84,7 @@ function VagaCard({
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5">
-        <Badge variant={SENIORIDADE_BADGE[vaga.senioridade]}>{vaga.senioridade}</Badge>
+        <Badge variant={SENIORIDADE_BADGE[vaga.senioridade]}>{SENIORIDADE_LABEL[vaga.senioridade]}</Badge>
         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_COLOR[vaga.status]}`}>
           {vaga.status}
         </span>
@@ -96,7 +108,7 @@ function VagaCard({
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-xs text-slate-400">
-        <span>{vaga.numeroVagas} vaga{vaga.numeroVagas !== 1 ? "s" : ""} · {vaga.tempoContratacao}</span>
+        <span>{vaga.tempoContratacao}</span>
         <span>{new Date(vaga.dataAbertura).toLocaleDateString("pt-BR")}</span>
       </div>
     </div>
@@ -177,9 +189,11 @@ function VagaModal({
             <div className="grid grid-cols-2 gap-4">
               <Field label="Senioridade">
                 <select className={inputCls} value={form.senioridade} onChange={(e) => set("senioridade", e.target.value as Senioridade)}>
-                  <option value="Jr">Júnior</option>
-                  <option value="Pleno">Pleno</option>
-                  <option value="Sr">Sênior</option>
+                  <option value="INTERN">Estagiário</option>
+                  <option value="JUNIOR">Júnior</option>
+                  <option value="MID_LEVEL">Pleno</option>
+                  <option value="SENIOR">Sênior</option>
+                  <option value="SPECIALIST">Especialista</option>
                 </select>
               </Field>
               <Field label="Área">
@@ -196,15 +210,7 @@ function VagaModal({
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Número de vagas">
-                <input
-                  type="number" min={1} className={inputCls}
-                  value={form.numeroVagas}
-                  onChange={(e) => set("numeroVagas", Number(e.target.value))}
-                  required
-                />
-              </Field>
+            <div className="grid grid-cols-1 gap-4">
               <Field label="Tempo de contratação">
                 <input className={inputCls} placeholder="ex: CLT, PJ 3 meses" value={form.tempoContratacao} onChange={(e) => set("tempoContratacao", e.target.value)} />
               </Field>
@@ -365,11 +371,10 @@ export default function Vagas() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                statusFilter === s
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${statusFilter === s
                   ? "bg-pink text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
+                }`}
             >
               {s}
             </button>

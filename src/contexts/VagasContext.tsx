@@ -1,8 +1,9 @@
+// src/contexts/VagasContext.tsx
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type Senioridade = "Jr" | "Pleno" | "Sr";
-export type StatusVaga  = "Aberta" | "Em andamento" | "Fechada" | "Cancelada";
-export type Prioridade  = "Baixa" | "Média" | "Alta" | "Urgente";
+export type Senioridade = "INTERN" | "JUNIOR" | "MID_LEVEL" | "SENIOR" | "SPECIALIST";
+export type StatusVaga = "Aberta" | "Em andamento" | "Fechada" | "Cancelada";
+export type Prioridade = "Baixa" | "Média" | "Alta" | "Urgente";
 
 export interface Vaga {
   id: string;
@@ -11,7 +12,6 @@ export interface Vaga {
   time: string;
   solicitante: string;
   tempoContratacao: string;
-  numeroVagas: number;
   area: string;
   skills: string[];
   descricao: string;

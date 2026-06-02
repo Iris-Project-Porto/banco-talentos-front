@@ -13,7 +13,7 @@ export default function BancoTalentos() {
   useEffect(() => {
     api.getAtivos()
       .then((data) => setProfiles(Array.isArray(data) ? data : []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -33,7 +33,7 @@ export default function BancoTalentos() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="People" subtitle="Talentos disponíveis (bench)" />
+      <PageHeader title="Recursos" subtitle="Talentos disponíveis (bench)" />
 
       {/* Filtros */}
       <Card padding="sm" className="flex items-center gap-4 flex-wrap">
@@ -75,6 +75,7 @@ export default function BancoTalentos() {
               alocacaoStatus={p.alocacaoStatus}
               skills={p.skills}
               createdAt={p.createdAt}
+              registrationStatus={p.registrationStatus}
             />
           ))}
         </div>
