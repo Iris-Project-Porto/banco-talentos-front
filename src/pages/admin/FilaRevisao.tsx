@@ -14,7 +14,7 @@ export default function FilaRevisao() {
   useEffect(() => {
     api.getPendentes()
       .then((data) => setProfiles(Array.isArray(data) ? data : []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -79,7 +79,7 @@ export default function FilaRevisao() {
                 <div className="flex flex-wrap gap-1.5">
                   {p.skills.map((ps: any, i: number) => (
                     <Tag key={i} kind="skill">
-                      {ps.skill?.name}{ps.level && <span className="text-slate-400 ml-1">· {ps.level}</span>}
+                      {ps.skill?.name}{(ps.proficiencyLevel ?? ps.level) && <span className="text-slate-400 ml-1">· {ps.proficiencyLevel ?? ps.level}</span>}
                     </Tag>
                   ))}
                 </div>

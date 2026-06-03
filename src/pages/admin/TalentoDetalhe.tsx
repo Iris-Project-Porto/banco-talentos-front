@@ -77,7 +77,29 @@ export default function TalentoDetalhe() {
 
   useEffect(() => {
     api.getProfileById(id!).then((p: any) => {
+      let loadedStacks: StackItem[] = [];
+      let loadedSofts: any[] = [];
+
+      // Separa as skills baseando-se na lista de SOFTSKILLS_LIST
+      if (p.skills?.length) {
+        p.skills.forEach((ps: any) => {
+          const skillName = ps.skill?.name ?? ps.name ?? "";
+          const level = Number(ps.proficiencyLevel ?? ps.level ?? 5);
+
+          const softMatch = SOFTSKILLS_LIST.find(
+            (soft) => soft.toUpperCase() === skillName.toUpperCase()
+          );
+
+          if (softMatch) {
+            loadedSofts.push({ name: softMatch, level });
+          } else {
+            loadedStacks.push({ name: skillName, level });
+          }
+        });
+      }
+
       setProfile(p);
+      setStacks(loadedStacks);
       setForm({
         area: p.area ?? "",
         sobre: p.sobre ?? "",
@@ -87,19 +109,10 @@ export default function TalentoDetalhe() {
         linkedinUrl: p.linkedinUrl ?? "",
         githubUrl: p.githubUrl ?? "",
         nivelOverride: p.nivelOverride ?? "",
-        softSkills: p.softSkills ?? {},
+        softSkills: loadedSofts,
         registrationNumber: p.registrationNumber ?? "",
         registrationStatus: p.registrationStatus ?? "NOT_REQUESTED",
       });
-      // Populate stacks with level
-      if (p.skills?.length) {
-        setStacks(
-          p.skills.map((ps: any) => ({
-            name: ps.skill?.name ?? ps.name ?? "",
-            level: typeof ps.level === "number" ? ps.level : 5,
-          }))
-        );
-      }
     }).catch(() => { });
   }, [id]);
 
@@ -111,10 +124,10 @@ export default function TalentoDetalhe() {
     if (selectedSoftSkill && selectedSoftLevel) {
       setForm((f: any) => ({
         ...f,
-        softSkills: {
-          ...f.softSkills,
-          [selectedSoftSkill]: Number(selectedSoftLevel),
-        },
+        softSkills: [
+          ...(f.softSkills || []),
+          { name: selectedSoftSkill, level: Number(selectedSoftLevel) }
+        ],
       }));
       setSelectedSoftSkill("");
       setSelectedSoftLevel("");
@@ -122,22 +135,29 @@ export default function TalentoDetalhe() {
   }
 
   function handleRemoveSoftSkill(skillName: string) {
-    setForm((f: any) => {
-      const updated = { ...f.softSkills };
-      delete updated[skillName];
-      return { ...f, softSkills: updated };
-    });
+    setForm((f: any) => ({
+      ...f,
+      softSkills: (f.softSkills || []).filter((s: any) => s.name !== skillName)
+    }));
   }
 
   async function handleSave(activate = false) {
     setSaving(true);
-    const skillList = stacks.map((s) => ({ name: s.name, level: s.level }));
+
+    // Prepara as duas listas para juntar em uma só (como o backend espera)
+    const hardSkillsToSave = stacks.map((s) => ({ name: s.name, level: s.level }));
+    const softSkillsToSave = (form.softSkills || []).map((s: any) => ({ name: s.name, level: s.level }));
+    const allSkills = [...hardSkillsToSave, ...softSkillsToSave];
 
     const payload: any = {
       ...form,
       nivelOverride: form.nivelOverride || null,
-      skills: skillList,
+      skills: allSkills,
     };
+
+    // Removemos softSkills do payload raiz para não enviar dado sujo ao backend
+    delete payload.softSkills;
+
     if (activate) payload.status = "ATIVO";
 
     const updated = await api.updateProfile(id!, payload);
@@ -161,9 +181,9 @@ export default function TalentoDetalhe() {
     (o) => String(o.value) === String(form.experienceYears)
   )?.label ?? "";
 
-  // Filtra as soft skills que ainda não foram adicionadas
+  // Filtra as soft skills que ainda não foram adicionadas baseando-se no array de objetos
   const availableSoftSkills = SOFTSKILLS_LIST.filter(
-    (skill) => !(form.softSkills && form.softSkills[skill])
+    (skill) => !(form.softSkills && form.softSkills.some((s: any) => s.name === skill))
   );
 
   return (
@@ -328,17 +348,17 @@ export default function TalentoDetalhe() {
               </button>
             </div>
 
-            {/* Lista de Soft Skills Adicionadas */}
-            {form.softSkills && Object.keys(form.softSkills).length > 0 && (
+            {/* Lista de Soft Skills Adicionadas (como array) */}
+            {form.softSkills && form.softSkills.length > 0 && (
               <div className="flex flex-col gap-2 mt-2">
-                {Object.entries(form.softSkills).map(([skill, level]) => (
-                  <div key={skill} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-2">
-                    <span className="text-sm font-medium text-slate-700">{skill}</span>
+                {form.softSkills.map((skillObj: any) => (
+                  <div key={skillObj.name} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-2">
+                    <span className="text-sm font-medium text-slate-700">{skillObj.name}</span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-bold text-pink">{String(level)} / 10</span>
+                      <span className="text-sm font-bold text-pink">{String(skillObj.level)} / 10</span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveSoftSkill(skill)}
+                        onClick={() => handleRemoveSoftSkill(skillObj.name)}
                         className="text-slate-400 hover:text-red-500 transition-colors text-lg leading-none"
                         title="Remover"
                       >

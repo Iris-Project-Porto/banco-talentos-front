@@ -76,7 +76,7 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, alocacaoSta
         )}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1">
         {area && <Tag kind="area">{area}</Tag>}
         {tagKind && tagLabel && <Tag kind={tagKind}>{tagLabel}</Tag>}
         {regLabel && regTagKind ? (

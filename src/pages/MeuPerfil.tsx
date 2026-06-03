@@ -67,7 +67,7 @@ export default function MeuPerfil() {
           setStacks(
             p.skills.map((ps: any) => ({
               name: ps.skill?.name ?? ps.name ?? "",
-              level: typeof ps.level === "number" ? ps.level : 5,
+              level: Number(ps.proficiencyLevel ?? ps.level ?? 5),
             }))
           );
         }
@@ -248,7 +248,7 @@ function ProfileReadOnly({ profile }: { profile: any }) {
             <div className="flex flex-wrap gap-2.5">
               {profile.skills.map((ps: any, i: number) => {
                 const skillName = ps.skill?.name ?? ps.name ?? "";
-                const skillLevel = typeof ps.level === "number" ? ps.level : null;
+                const skillLevel = ps.proficiencyLevel !== undefined ? Number(ps.proficiencyLevel) : (ps.level !== undefined ? Number(ps.level) : null);
                 const { color, bg } = skillLevel ? getLevelStyle(skillLevel) : { color: "#6b7280", bg: "#f3f4f6" };
                 return (
                   <div key={i} className="flex items-stretch bg-white border border-gray-200 rounded-full overflow-hidden shadow-sm">

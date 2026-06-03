@@ -50,6 +50,16 @@ export default function Dashboard() {
   // Quantidade de recursos disponíveis (Bench)
   const disponiveisBench = alocacaoMap["Disponível (Bench)"] ?? 0;
 
+  // Cálculo de níveis pelo frontend com tipagem explícita para evitar o erro ts(7053)
+  const nivelCalculado: Record<"Jr" | "Pleno" | "Sr", number> = { Jr: 0, Pleno: 0, Sr: 0 };
+  allProfiles.forEach((p) => {
+    // Usa o override se tiver, se não usa o nível original calculado
+    const n = p.nivelOverride || p.nivel;
+    if (n === "Jr" || n === "Pleno" || n === "Sr") {
+      nivelCalculado[n as "Jr" | "Pleno" | "Sr"]++;
+    }
+  });
+
   const nivelRows: { label: string; key: "Jr" | "Pleno" | "Sr"; variant: "senior" | "pleno" | "junior" }[] = [
     { label: "Sênior", key: "Sr", variant: "senior" },
     { label: "Pleno", key: "Pleno", variant: "pleno" },
@@ -211,7 +221,7 @@ export default function Dashboard() {
             {nivelRows.map(({ label, key, variant }) => (
               <div key={key} className="flex items-center justify-between">
                 <Badge variant={variant}>{label}</Badge>
-                <span className="text-sm font-semibold text-slate-800">{data.nivelCount[key]}</span>
+                <span className="text-sm font-semibold text-slate-800">{nivelCalculado[key]}</span>
               </div>
             ))}
           </div>

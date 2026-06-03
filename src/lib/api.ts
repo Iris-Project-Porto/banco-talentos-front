@@ -61,7 +61,13 @@ export const api = {
   submitProfile: (data: unknown) => http.post("/profile", data).then((r) => r.data),
 
   getDashboard: () => http.get("/admin/dashboard").then((r) => r.data),
-
+  // --- Admin Skills ---
+  getSkillById: (id: string) => http.get(`/admin/skills/${id}`).then((r) => r.data),
+  updateSkill: (id: string, data: unknown) => http.put(`/admin/skills/${id}`, data).then((r) => r.data),
+  activateSkill: (id: string) => http.patch(`/admin/skills/${id}/activate`).then((r) => r.data),
+  inactivateSkill: (id: string) => http.patch(`/admin/skills/${id}/inactivate`).then((r) => r.data),
+  getActiveSkills: () => http.get("/admin/skills/active").then((r) => r.data),
+  getInactiveSkills: () => http.get("/admin/skills/inactive").then((r) => r.data),
 
   getPendentes: () => http.get("/admin/profiles/pending").then((r) => r.data),
   getAtivos: () => http.get("/admin/profiles/active").then((r) => r.data),

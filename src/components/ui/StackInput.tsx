@@ -55,10 +55,10 @@ export function StackInput({ value, onChange }: Props) {
 
   const filtered = inputVal.trim()
     ? STACK_SUGGESTIONS.filter(
-        (s) =>
-          s.toLowerCase().includes(inputVal.toLowerCase()) &&
-          !value.find((v) => v.name.toLowerCase() === s.toLowerCase())
-      ).slice(0, 8)
+      (s) =>
+        s.toLowerCase().includes(inputVal.toLowerCase()) &&
+        !value.find((v) => v.name.toLowerCase() === s.toLowerCase())
+    ).slice(0, 8)
     : [];
 
   // Close suggestions on outside click
@@ -81,7 +81,7 @@ export function StackInput({ value, onChange }: Props) {
     setSelectedStack(name);
     setInputVal(name);
     setShowSuggestions(false);
-    setPendingLevel(5);
+    // setPendingLevel(5);
   }
 
   function confirmAdd() {
@@ -93,7 +93,7 @@ export function StackInput({ value, onChange }: Props) {
     onChange([...value, { name, level: pendingLevel }]);
     setInputVal("");
     setSelectedStack(null);
-    setPendingLevel(5);
+    // setPendingLevel(5);
     inputRef.current?.focus();
   }
 
