@@ -63,9 +63,13 @@ export default function MeuPerfil() {
           githubUrl: p.githubUrl ?? "",
           registrationNumber: p.registrationNumber ?? "",
         });
+
         if (p.skills?.length) {
+          // Filtra skills garantindo que não sejam do tipo SOFT (assumindo HARD como padrão)
+          const hardSkills = p.skills.filter((ps: any) => ps.skill?.type !== "SOFT" && ps.type !== "SOFT");
+
           setStacks(
-            p.skills.map((ps: any) => ({
+            hardSkills.map((ps: any) => ({
               name: ps.skill?.name ?? ps.name ?? "",
               level: Number(ps.proficiencyLevel ?? ps.level ?? 5),
             }))
@@ -175,17 +179,12 @@ function ProfileReadOnly({ profile }: { profile: any }) {
   };
   const ns = nivel ? nivelStyle[nivel] : null;
 
-  const statusLabels: Record<string, string> = {
-    APPROVED: "Aprovada",
-    AWAITING_APPROVAL: "Aguardando aprovação",
-    REQUESTED: "Solicitada",
-    NOT_REQUESTED: "Não solicitada",
-  };
-  const regStatus = profile.registrationStatus ? (statusLabels[profile.registrationStatus] || profile.registrationStatus) : "";
+  // Filtramos as Soft Skills usando a propriedade 'type' retornada pela API
+  const hardSkills = profile.skills?.filter((ps: any) => ps.skill?.type !== "SOFT" && ps.type !== "SOFT") || [];
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-semibold text-gray-900" style={{ fontFamily: "var(--font-syne)" }}>
             {isAtivo ? "Seu perfil está ativo no banco de talentos" : "Perfil enviado — aguardando revisão do RH"}
@@ -203,12 +202,13 @@ function ProfileReadOnly({ profile }: { profile: any }) {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Suas respostas</p>
         </div>
-        <div className="p-6 grid grid-cols-2 gap-4">
+        <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Exibe apenas a matrícula crua, sem o status da mesma */}
           {profile.registrationNumber && (
-            <ReadField label="Matrícula" value={`${profile.registrationNumber} (${regStatus})`} />
+            <ReadField label="Matrícula" value={profile.registrationNumber} />
           )}
           {profile.area && <ReadField label="Área" value={profile.area} />}
 
@@ -237,16 +237,18 @@ function ProfileReadOnly({ profile }: { profile: any }) {
           )}
         </div>
         {profile.sobre && (
-          <div className="px-6 pb-5">
+          <div className="px-4 sm:px-6 pb-5">
             <p className="text-xs text-gray-400 mb-1">Sobre você</p>
             <p className="text-sm text-gray-700 leading-relaxed">{profile.sobre}</p>
           </div>
         )}
-        {profile.skills?.length > 0 && (
-          <div className="px-6 pb-5">
+
+        {/* Renderiza apenas a lista hardSkills filtrada */}
+        {hardSkills.length > 0 && (
+          <div className="px-4 sm:px-6 pb-5">
             <p className="text-xs text-gray-400 mb-3">Stack tecnológica</p>
             <div className="flex flex-wrap gap-2.5">
-              {profile.skills.map((ps: any, i: number) => {
+              {hardSkills.map((ps: any, i: number) => {
                 const skillName = ps.skill?.name ?? ps.name ?? "";
                 const skillLevel = ps.proficiencyLevel !== undefined ? Number(ps.proficiencyLevel) : (ps.level !== undefined ? Number(ps.level) : null);
                 const { color, bg } = skillLevel ? getLevelStyle(skillLevel) : { color: "#6b7280", bg: "#f3f4f6" };

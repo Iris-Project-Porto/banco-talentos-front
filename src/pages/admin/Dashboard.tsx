@@ -82,7 +82,7 @@ export default function Dashboard() {
       <PageHeader title="Dashboard" subtitle="Visão geral do banco de talentos" />
 
       {/* Stat cards — pessoas */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Recursos Disponíveis" value={disponiveisBench} accentColor="#10B981" to="/admin/talentos" />
         <StatCard label="Total de cadastros" value={data.total} to="/admin/usuarios" />
         <StatCard label="Perfis ativos" value={data.ativos} accentColor="#E11D48" to="/admin/alocados" />
@@ -100,9 +100,9 @@ export default function Dashboard() {
           <p className="text-slate-400 text-sm">Nenhum perfil cadastrado ainda.</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Distribuição por status */}
-          <Card className="col-span-2">
+          <Card className="col-span-1 lg:col-span-2">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500 mb-4">
               Distribuição por Status de Alocação
             </p>
@@ -179,8 +179,8 @@ export default function Dashboard() {
         <div className="flex-1 h-px bg-slate-200" />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="col-span-1 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Top Skills</p>
             <div className="flex bg-slate-100 p-0.5 rounded-lg">

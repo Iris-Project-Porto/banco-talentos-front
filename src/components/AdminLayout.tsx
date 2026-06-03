@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 // import { useVagas } from "@/contexts/VagasContext";
@@ -14,6 +15,7 @@ const staticNavItems = [
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // const { vagas } = useVagas();
   // const vagasAbertas = vagas.filter((v) => v.status === "Aberta" || v.status === "Em andamento").length;
 
@@ -22,73 +24,97 @@ export default function AdminLayout() {
     navigate("/login");
   }
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-40 shrink-0 flex flex-col bg-slate-950 h-screen">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-white/[0.06]">
+  const sidebarContent = (
+    <>
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/[0.06] flex items-center justify-between">
+        <div>
           <span className="font-bold text-lg tracking-tight text-white">VILT</span>
           <span className="text-pink text-lg font-bold">.</span>
         </div>
+        <button 
+          className="md:hidden text-white/50 hover:text-white p-1"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-4">
-          <p className="px-5 pt-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-slate-500">Menu</p>
-          {staticNavItems.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/admin/talentos" || to === "/admin/dashboard"}
-              className={({ isActive }) =>
-                `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
-                  ? "border-l-pink bg-white/5 text-white font-medium"
-                  : "border-l-transparent text-white/55 hover:text-white/80"
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-          {/* <NavLink
-            to="/admin/vagas"
-            end
+      {/* Nav */}
+      <nav className="flex-1 py-4 overflow-y-auto">
+        <p className="px-5 pt-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-slate-500">Menu</p>
+        {staticNavItems.map(({ to, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={() => setIsMobileMenuOpen(false)}
+            end={to === "/admin/talentos" || to === "/admin/dashboard"}
             className={({ isActive }) =>
-              `flex items-center justify-between px-5 py-[9px] text-sm transition-colors border-l-[3px] ${
-                isActive
-                  ? "border-l-pink bg-white/5 text-white font-medium"
-                  : "border-l-transparent text-white/55 hover:text-white/80"
+              `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
+                ? "border-l-pink bg-white/5 text-white font-medium"
+                : "border-l-transparent text-white/55 hover:text-white/80"
               }`
             }
           >
-            <span>Vagas</span>
-            {vagasAbertas > 0 && (
-              <span className="bg-pink text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
-                {vagasAbertas}
-              </span>
-            )}
-          </NavLink> */}
-        </nav>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
 
-        {/* Footer */}
-        <div className="px-5 py-5 border-t border-white/[0.06]">
-          <p className="text-xs font-medium text-white truncate mb-0.5">{user?.name}</p>
-          <p className="text-xs text-white/40 truncate mb-3">{user?.email}</p>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-white/40 hover:text-white/70 transition-colors"
-          >
-            Sair
-          </button>
+      {/* Footer */}
+      <div className="px-5 py-5 border-t border-white/[0.06] mt-auto">
+        <p className="text-xs font-medium text-white truncate mb-0.5">{user?.name}</p>
+        <p className="text-xs text-white/40 truncate mb-3">{user?.email}</p>
+        <button
+          onClick={handleLogout}
+          className="text-xs text-white/40 hover:text-white/70 transition-colors flex items-center gap-1.5"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Sair
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-50">
+      
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 flex md:hidden">
+          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <aside className="relative w-64 max-w-[80%] flex flex-col bg-slate-950 h-full shadow-2xl">
+            {sidebarContent}
+          </aside>
         </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-52 lg:w-60 shrink-0 flex-col bg-slate-950 h-screen">
+        {sidebarContent}
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="px-8 py-8">
-          <Outlet />
-        </div>
-      </main>
+      {/* Main Container */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        {/* Mobile Header */}
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0">
+          <div className="flex items-center">
+            <span className="font-bold text-lg tracking-tight text-slate-900">VILT</span>
+            <span className="text-pink text-lg font-bold">.</span>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -mr-2 text-slate-600 hover:text-slate-900 focus:outline-none">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-8">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

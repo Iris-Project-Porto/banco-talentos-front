@@ -52,7 +52,7 @@ export default function RecursosAlocados() {
       <PageHeader title="Recursos Alocados" subtitle="Colaboradores atualmente em projetos" />
 
       {/* Alloc stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-card px-6 py-5">
           <span className="text-xs font-semibold text-[#2563EB]">Alocado Integral</span>
           <p className="text-3xl font-bold text-slate-900 mt-1">{counts.integral}</p>
@@ -68,7 +68,7 @@ export default function RecursosAlocados() {
       </div>
 
       {/* Filtros */}
-      <Card padding="sm" className="flex items-center gap-4 flex-wrap">
+      <Card padding="sm" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-slate-500">Business Unit:</span>
           <select
@@ -106,7 +106,7 @@ export default function RecursosAlocados() {
           <p className="text-slate-400 text-sm">Nenhum recurso alocado encontrado.</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((p) => (
             <PersonCard
               key={p.id}

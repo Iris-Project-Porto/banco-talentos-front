@@ -44,7 +44,7 @@ export default function FilaRevisao() {
               to={`/admin/talentos/${p.id}`}
               className="bg-white border border-slate-200 rounded-xl shadow-card p-6 flex flex-col gap-5 transition-all hover:shadow-card-hover hover:-translate-y-px"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <Avatar name={p.user?.name ?? "?"} size={40} />
                   <div>
@@ -60,7 +60,7 @@ export default function FilaRevisao() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {p.area && (
                   <div>
                     <p className="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Área</p>

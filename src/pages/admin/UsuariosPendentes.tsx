@@ -76,8 +76,8 @@ export default function UsuariosPendentes() {
       ) : (
         <div className="flex flex-col gap-3">
           {users.map((u) => (
-            <div key={u.id} className="bg-white border border-slate-200 rounded-xl shadow-card p-5 flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
+            <div key={u.id} className="bg-white border border-slate-200 rounded-xl shadow-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex-1 min-w-0 w-full">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-sm text-slate-900 truncate">{u.name}</span>
                   <Badge variant={u.role === "ADMIN" ? "warning" : "success"}>
@@ -93,7 +93,7 @@ export default function UsuariosPendentes() {
                 </p>
               </div>
 
-              <div className="flex gap-2 shrink-0">
+              <div className="flex gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                 <Button
                   variant="secondary"
                   size="sm"

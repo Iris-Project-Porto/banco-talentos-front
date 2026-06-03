@@ -36,7 +36,7 @@ export default function BancoTalentos() {
       <PageHeader title="Recursos" subtitle="Talentos disponíveis (bench)" />
 
       {/* Filtros */}
-      <Card padding="sm" className="flex items-center gap-4 flex-wrap">
+      <Card padding="sm" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-slate-500">Business Unit:</span>
           <select
@@ -62,7 +62,7 @@ export default function BancoTalentos() {
           <p className="text-slate-400 text-sm">Nenhum talento encontrado.</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((p) => (
             <PersonCard
               key={p.id}
