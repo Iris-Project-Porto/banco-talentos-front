@@ -14,7 +14,7 @@ export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
             <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                     <h2 className="text-base font-semibold text-gray-900" style={{ fontFamily: "var(--font-syne)" }}>
-                        {isAtivo ? "Seu perfil está ativo no banco de talentos" : "Perfil enviado — aguardando revisão do RH"}
+                        {isAtivo ? "Seu perfil está ativo no banco de talentos" : "Perfil enviado - aguardando revisão do RH"}
                     </h2>
                     <div className="flex items-center gap-2">
                         {ns && nivel && (

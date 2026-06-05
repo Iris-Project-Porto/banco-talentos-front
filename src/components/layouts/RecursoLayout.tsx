@@ -69,7 +69,6 @@ export default function RecursoLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
 
-      {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
@@ -79,15 +78,12 @@ export default function RecursoLayout() {
         </div>
       )}
 
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-52 lg:w-60 shrink-0 flex-col bg-slate-950 h-screen">
         {sidebarContent}
       </aside>
 
-      {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center">
             <span className="font-bold text-lg tracking-tight text-slate-900">VILT</span>
@@ -98,7 +94,6 @@ export default function RecursoLayout() {
           </button>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 md:p-8">
             <Suspense fallback={<div className="flex h-full items-center justify-center py-20 text-sm text-slate-400">Carregando módulo...</div>}>

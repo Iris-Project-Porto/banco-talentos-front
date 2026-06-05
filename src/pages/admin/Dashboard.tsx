@@ -16,7 +16,6 @@ export default function Dashboard() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Dashboard" subtitle="Visão geral do banco de talentos" />
 
-      {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Recursos Disponíveis" value={stats.disponiveisBench} accentColor="#10B981" to="/admin/talentos" />
         <StatCard label="Total de cadastros" value={stats.dashData.total} to="/admin/usuarios" />

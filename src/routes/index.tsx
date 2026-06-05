@@ -1,19 +1,15 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { lazy } from "react"; // ← IMPORTAÇÃO DO LAZY
+import { lazy } from "react";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
 import { UserRole } from "@/features/auth";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // IMPORTAÇÕES SÍNCRONAS (Layouts devem carregar de imediato)
-// ─────────────────────────────────────────────────────────────────────────────
 import AdminLayout from "@/components/layouts/AdminLayout";
 import RecursoLayout from "@/components/layouts/RecursoLayout";
 
 
-// ─────────────────────────────────────────────────────────────────────────────
 // IMPORTAÇÕES ASSÍNCRONAS (Lazy Loading - Separação do Bundle)
-// ─────────────────────────────────────────────────────────────────────────────
 
 // Páginas Públicas
 const Login = lazy(() => import("@/pages/public/Login"));
@@ -36,9 +32,7 @@ const UsuariosPendentes = lazy(() => import("@/pages/admin/UsuariosPendentes"));
 // const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 
-// ─────────────────────────────────────────────────────────────────────────────
 // DEFINIÇÃO DAS ROTAS
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const router = createBrowserRouter([
     // Rotas Públicas

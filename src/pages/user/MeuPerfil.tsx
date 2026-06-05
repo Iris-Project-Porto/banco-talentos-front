@@ -10,7 +10,6 @@ export default function MeuPerfil() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header Global */}
       <div>
         <h1 className="text-xl font-bold text-gray-900" style={{ fontFamily: "var(--font-syne)" }}>Meu Perfil</h1>
         {profile && (
@@ -20,7 +19,6 @@ export default function MeuPerfil() {
         )}
       </div>
 
-      {/* Conteúdo Dinâmico */}
       <div>
         {loading ? (
           <p className="text-gray-400 text-sm">Carregando...</p>
@@ -35,7 +33,6 @@ export default function MeuPerfil() {
             </Section>
 
             <Section title="Perfil Técnico">
-              {/* Opções importadas diretamente das constantes globais */}
               <Select label="Área de atuação *" options={[{ value: "", label: "Selecione..." }, ...AREA_OPTIONS]} {...register("area")} error={errors.area?.message} />
 
               <StackInput value={stacks} onChange={setStacks} />

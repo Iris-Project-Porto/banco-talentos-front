@@ -47,7 +47,6 @@ export default function RecursosAlocados() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Recursos Alocados" subtitle="Colaboradores atualmente em projetos" />
 
-      {/* Alloc stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-card px-6 py-5">
           <span className="text-xs font-semibold text-[#2563EB]">Alocado Integral</span>
@@ -63,7 +62,6 @@ export default function RecursosAlocados() {
         </div>
       </div>
 
-      {/* Filtros */}
       <Card padding="sm" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-slate-500">Business Unit:</span>

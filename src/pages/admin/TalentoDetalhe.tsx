@@ -101,8 +101,8 @@ export default function TalentoDetalhe() {
 
           <Section title="Identificação">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select label="Área" value={form.area} onChange={(e) => updateField("area", e.target.value)} options={[{ value: "", label: "—" }, ...AREA_OPTIONS]} />
-              <Select label="Anos de exp." value={String(form.experienceYears)} onChange={(e) => updateField("experienceYears", e.target.value)} options={[{ value: "", label: "—" }, ...EXPERIENCE_OPTIONS]} />
+              <Select label="Área" value={form.area} onChange={(e) => updateField("area", e.target.value)} options={[{ value: "", label: "-" }, ...AREA_OPTIONS]} />
+              <Select label="Anos de exp." value={String(form.experienceYears)} onChange={(e) => updateField("experienceYears", e.target.value)} options={[{ value: "", label: "-" }, ...EXPERIENCE_OPTIONS]} />
             </div>
             <div className="mt-2">
               <label className="text-xs text-gray-400 block mb-1">Sobre</label>
@@ -130,10 +130,10 @@ export default function TalentoDetalhe() {
             <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 mb-5">
               <p className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wider">Legenda da Escala (1 a 10)</p>
               <ul className="text-xs text-slate-500 space-y-1">
-                <li><strong className="text-slate-700">1 a 3</strong> — Em desenvolvimento inicial</li>
-                <li><strong className="text-slate-700">4 a 6</strong> — Pratica com regularidade</li>
-                <li><strong className="text-slate-700">7 a 8</strong> — Domínio e aplicação consistente</li>
-                <li><strong className="text-slate-700">9 a 10</strong> — Referência no time</li>
+                <li><strong className="text-slate-700">1 a 3</strong> - Em desenvolvimento inicial</li>
+                <li><strong className="text-slate-700">4 a 6</strong> - Pratica com regularidade</li>
+                <li><strong className="text-slate-700">7 a 8</strong> - Domínio e aplicação consistente</li>
+                <li><strong className="text-slate-700">9 a 10</strong> - Referência no time</li>
               </ul>
             </div>
 
@@ -151,7 +151,7 @@ export default function TalentoDetalhe() {
                   label="Nota (1 a 10)"
                   value={String(selectedSoftLevel)}
                   onChange={(e) => setSelectedSoftLevel(Number(e.target.value) || "")}
-                  options={[{ value: "", label: "—" }, ...Array.from({ length: 10 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))]}
+                  options={[{ value: "", label: "-" }, ...Array.from({ length: 10 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))]}
                 />
               </div>
               <button

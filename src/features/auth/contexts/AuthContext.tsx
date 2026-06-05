@@ -36,7 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setLoading(false);
 
-        // Listener para expirar a sessão de forma suave
         const handleUnauthorized = () => logout();
         window.addEventListener("unauthorized", handleUnauthorized);
 

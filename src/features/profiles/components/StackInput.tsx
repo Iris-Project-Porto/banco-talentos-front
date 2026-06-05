@@ -39,7 +39,7 @@ function LevelBadge({ level }: { level: number }) {
       style={{ color, background: bg }}
     >
       <span className="font-bold">{level}</span>
-      <span className="hidden sm:inline">— {label}</span>
+      <span className="hidden sm:inline">- {label}</span>
     </span>
   );
 }
@@ -81,7 +81,6 @@ export function StackInput({ value, onChange }: Props) {
     setSelectedStack(name);
     setInputVal(name);
     setShowSuggestions(false);
-    // setPendingLevel(5);
   }
 
   function confirmAdd() {
@@ -93,7 +92,6 @@ export function StackInput({ value, onChange }: Props) {
     onChange([...value, { name, level: pendingLevel }]);
     setInputVal("");
     setSelectedStack(null);
-    // setPendingLevel(5);
     inputRef.current?.focus();
   }
 
@@ -116,10 +114,10 @@ export function StackInput({ value, onChange }: Props) {
   const { label: levelLabel } = getLevelLabel(pendingLevel);
 
   const LEGEND = [
-    { range: "1 – 3", desc: "Em desenvolvimento inicial, requer apoio frequente", color: "#9333ea", bg: "#f3e8ff" },
-    { range: "4 – 6", desc: "Pratico com regularidade, ainda em aprimoramento", color: "#2563eb", bg: "#dbeafe" },
-    { range: "7 – 8", desc: "Domínio e aplicação de forma consistente", color: "#059669", bg: "#d1fae5" },
-    { range: "9 – 10", desc: "Referência no time, capaz de orientar outros", color: "#b45309", bg: "#fef3c7" },
+    { range: "1 - 3", desc: "Em desenvolvimento inicial, requer apoio frequente", color: "#9333ea", bg: "#f3e8ff" },
+    { range: "4 - 6", desc: "Pratico com regularidade, ainda em aprimoramento", color: "#2563eb", bg: "#dbeafe" },
+    { range: "7 - 8", desc: "Domínio e aplicação de forma consistente", color: "#059669", bg: "#d1fae5" },
+    { range: "9 - 10", desc: "Referência no time, capaz de orientar outros", color: "#b45309", bg: "#fef3c7" },
   ];
 
   return (
@@ -128,7 +126,7 @@ export function StackInput({ value, onChange }: Props) {
         Stack tecnológica *
       </label>
 
-      {/* Input + suggestions */}
+
       <div className="relative">
         <div className="flex gap-2">
           <div className="relative flex-1">
@@ -153,7 +151,7 @@ export function StackInput({ value, onChange }: Props) {
               placeholder="Ex: React, Python, Docker..."
               className="w-full rounded-lg px-3 py-2 text-sm outline-none bg-white border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
             />
-            {/* Suggestions dropdown */}
+
             {showSuggestions && filtered.length > 0 && (
               <div
                 ref={suggestionRef}
@@ -174,7 +172,6 @@ export function StackInput({ value, onChange }: Props) {
           </div>
         </div>
 
-        {/* Nível slider — aparece quando há algo digitado */}
         {hasInput && (
           <div className="mt-3 bg-gray-50 rounded-xl border border-gray-100 p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -209,7 +206,6 @@ export function StackInput({ value, onChange }: Props) {
         )}
       </div>
 
-      {/* Stacks adicionadas */}
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2.5">
           {value.map((stack, i) => {
@@ -240,7 +236,6 @@ export function StackInput({ value, onChange }: Props) {
                   <span className="text-xs leading-none">✕</span>
                 </button>
 
-                {/* Inline edit popover */}
                 {editingStackName === stack.name && (
                   <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-20 w-64 p-4 border border-gray-100 shadow-xl rounded-2xl bg-white flex flex-col gap-3">
                     <div className="flex items-center justify-between mb-1">
@@ -268,7 +263,6 @@ export function StackInput({ value, onChange }: Props) {
         </div>
       )}
 
-      {/* Legenda */}
       <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
           Escala de nível
