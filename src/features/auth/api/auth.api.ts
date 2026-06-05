@@ -10,7 +10,7 @@ export const authApi = {
     resendVerificationCode: (email: string) =>
         http.post("/auth/resend-verification-code", { email }).then((r) => r.data),
     forgotPassword: (email: string) =>
-        http.post(`/auth/forgot-password?email=${encodeURIComponent(email)}`).then((r) => r.data),
+        http.post("/auth/forgot-password", { email }).then((r) => r.data),
     resetPassword: (email: string, token: string, newPassword: string) =>
         http.post("/auth/reset-password", { email, token, newPassword }).then((r) => r.data),
     getGroups: () => http.get("/v1/groups").then((r) => r.data),
