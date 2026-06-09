@@ -1,17 +1,17 @@
 import { z } from "zod";
 
 export const vagaSchema = z.object({
-    titulo: z.string().min(3, "O título é obrigatório"),
-    senioridade: z.enum(["INTERN", "JUNIOR", "MID_LEVEL", "SENIOR", "SPECIALIST"]),
-    area: z.string().min(1, "A área é obrigatória"),
-    time: z.string().min(1, "O time é obrigatório"),
-    solicitante: z.string().min(1, "O solicitante é obrigatório"),
-    tempoContratacao: z.string().optional(),
-    status: z.enum(["Aberta", "Em andamento", "Fechada", "Cancelada"]),
-    prioridade: z.enum(["Baixa", "Média", "Alta", "Urgente"]),
-    dataAbertura: z.string().min(1, "A data é obrigatória"),
-    skillsInput: z.string().optional(), // Gerenciaremos a string separada por vírgula aqui
-    descricao: z.string().optional(),
+    projectId: z.string().min(1, "O ID do projeto é obrigatório"),
+    squadId: z.string().min(1, "O ID da squad é obrigatório"),
+    experienceLevel: z.enum(["JUNIOR", "PLENO", "SENIOR", "ESPECIALISTA"]),
+    description: z.string().optional(),
+    requirements: z.string().optional(),
+    recruiter: z.string().min(1, "O recrutador é obrigatório"),
+    estimatedAllocationWeeks: z.coerce.number().min(0, "Deve ser zero ou maior"),
+    status: z.string().min(1, "O status é obrigatório"),
+    notes: z.string().optional(),
+    openingDate: z.string().min(1, "A data de abertura é obrigatória"),
+    isUrgent: z.boolean().default(false),
 });
 
 export type VagaFormData = z.infer<typeof vagaSchema>;

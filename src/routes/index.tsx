@@ -5,8 +5,8 @@ import { PublicRoute } from "./PublicRoute";
 import { UserRole } from "@/features/auth";
 
 // IMPORTAÇÕES SÍNCRONAS (Layouts devem carregar de imediato)
-import AdminLayout from "@/components/layouts/AdminLayout";
-import RecursoLayout from "@/components/layouts/RecursoLayout";
+import AdminLayout from "@/components/layouts/AdminLayout/AdminLayout";
+import RecursoLayout from "@/components/layouts/RecursoLayout/RecursoLayout";
 
 
 // IMPORTAÇÕES ASSÍNCRONAS (Lazy Loading - Separação do Bundle)
@@ -29,7 +29,7 @@ const BancoTalentos = lazy(() => import("@/pages/admin/BancoTalentos"));
 const TalentoDetalhe = lazy(() => import("@/pages/admin/TalentoDetalhe"));
 const RecursosAlocados = lazy(() => import("@/pages/admin/RecursosAlocados"));
 const UsuariosPendentes = lazy(() => import("@/pages/admin/UsuariosPendentes"));
-// const Vagas = lazy(() => import("@/pages/admin/Vagas"));
+const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 
 // DEFINIÇÃO DAS ROTAS
@@ -78,7 +78,7 @@ export const router = createBrowserRouter([
                     { path: "talentos/:id", element: <TalentoDetalhe /> },
                     { path: "alocados", element: <RecursosAlocados /> },
                     { path: "usuarios", element: <UsuariosPendentes /> },
-                    // { path: "vagas", element: <Vagas /> },
+                    { path: "vagas", element: <Vagas /> },
                     { path: "forms", element: <Forms /> },
                 ],
             },

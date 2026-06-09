@@ -8,8 +8,8 @@ const staticNavItems = [
   { to: "/admin/talentos", label: "Recursos" },
   { to: "/admin/alocados", label: "Alocados" },
   { to: "/admin/usuarios", label: "Usuários" },
+  { to: "/admin/vagas", label: "Vagas" },
 ];
-
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

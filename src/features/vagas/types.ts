@@ -1,18 +1,26 @@
-export type Senioridade = "INTERN" | "JUNIOR" | "MID_LEVEL" | "SENIOR" | "SPECIALIST";
-export type Prioridade = "Baixa" | "Média" | "Alta" | "Urgente";
-export type StatusVaga = "Aberta" | "Em andamento" | "Fechada" | "Cancelada";
+export type ExperienceLevel = "JUNIOR" | "PLENO" | "SENIOR" | "ESPECIALISTA";
 
-export interface Vaga {
+export interface JobPosting {
   id: string;
-  titulo: string;
-  senioridade: Senioridade;
-  time: string;
-  solicitante: string;
-  tempoContratacao: string;
-  area: string;
-  skills: string[];
-  descricao: string;
-  status: StatusVaga;
-  prioridade: Prioridade;
-  dataAbertura: string;
+  projectName?: string;
+  projectId: string;
+  squadName?: string;
+  squadId: string;
+  experienceLevel: ExperienceLevel;
+  experienceLevelDescription?: string;
+  description: string;
+  requirements: string;
+  recruiter: string;
+  estimatedAllocationWeeks: number;
+  status: string;
+  notes: string;
+  openingDate: string;
+  isUrgent: boolean;
+  active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
+
+export type JobPostingPayload = Omit<JobPosting, "id" | "projectName" | "squadName" | "active" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "experienceLevelDescription">;
