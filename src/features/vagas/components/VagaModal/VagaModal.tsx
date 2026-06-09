@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui";
-import { type JobPostingPayload } from "../types";
-import { vagaSchema, type VagaFormData } from "../validations";
-import { vagasApi } from "../api/vagas.api";
+import { type JobPostingPayload } from "../../types";
+import { vagaSchema, type VagaFormData } from "../../validations";
+import { vagasApi } from "../../api/vagas.api";
 
 const inputCls = "w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900 placeholder:text-slate-400 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed";
 const ErrorMsg = ({ msg }: { msg?: string }) => msg ? <span className="text-xs text-red-500">{msg}</span> : null;

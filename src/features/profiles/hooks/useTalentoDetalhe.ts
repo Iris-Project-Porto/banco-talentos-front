@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import type { StackItem } from "../components/StackInput";
+import type { StackItem } from "../components/StackInput/StackInput";
 import { SOFTSKILLS_LIST } from "../profile";
 import { profilesApi } from "../api/profiles.api";
 import type { ProfileFormState, UserProfile } from "../types/profile";

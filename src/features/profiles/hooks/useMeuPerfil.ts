@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { StackItem } from "../components/StackInput";
+import type { StackItem } from "../components/StackInput/StackInput";
 import type { UserProfile } from "../types/profile";
 import { profilesApi } from "../api/profiles.api";
 

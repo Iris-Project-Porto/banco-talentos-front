@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui";
-import { PersonCard } from "./PersonCard";
-import { useBancoTalentos } from "../hooks/useBancoTalentos";
+import { PersonCard } from "../PersonCard/PersonCard";
+import { useBancoTalentos } from "../../hooks/useBancoTalentos/useBancoTalentos";
 
 export function BancoTalentosList() {
     const { search, setSearch, area, setArea, areas, filtered, loading } = useBancoTalentos();

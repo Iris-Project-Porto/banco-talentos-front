@@ -1,5 +1,5 @@
 import { Badge, Tag } from "@/components/ui";
-import { type JobPosting, type ExperienceLevel } from "../types";
+import { type JobPosting, type ExperienceLevel } from "../../types";
 import { Pencil, PauseCircle, PlayCircle, Clock, Calendar } from "lucide-react";
 
 const SENIORIDADE_BADGE: Record<ExperienceLevel, "junior" | "pleno" | "senior" | "warning"> = {
