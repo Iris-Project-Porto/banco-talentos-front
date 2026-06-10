@@ -90,7 +90,7 @@ export function VagaModal({ initial, saving, onSave, onClose }: Props) {
 
                         <div className="grid grid-cols-2 gap-4">
                             <Field label="Projeto">
-                                <select className={`${inputCls} ${errors.projectId ? 'border-red-400' : ''}`} {...register("projectId")} disabled={loadingProjects}>
+                                <select value={selectedProjectId} className={`${inputCls} ${errors.projectId ? 'border-red-400' : ''}`} {...register("projectId")} disabled={loadingProjects}>
                                     <option value="">{loadingProjects ? "Carregando..." : "Selecione um projeto"}</option>
                                     {projects.map((p: any) => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -100,7 +100,7 @@ export function VagaModal({ initial, saving, onSave, onClose }: Props) {
                             </Field>
 
                             <Field label="Squad">
-                                <select className={`${inputCls} ${errors.squadId ? 'border-red-400' : ''}`} {...register("squadId")} disabled={!selectedProjectId || loadingSquads}>
+                                <select value={selectedSquadId} className={`${inputCls} ${errors.squadId ? 'border-red-400' : ''}`} {...register("squadId")} disabled={!selectedProjectId || loadingSquads}>
                                     <option value="">
                                         {!selectedProjectId
                                             ? "Selecione o projeto primeiro"

@@ -221,8 +221,10 @@ describe('Componente VagaModal', () => {
         const projectSelect = selects[0];
         const squadSelect = selects[1];
 
-        expect(projectSelect).toHaveValue('proj-1');
-        expect(squadSelect).toHaveValue('sq-1');
+        await waitFor(() => {
+            expect(projectSelect).toHaveValue('proj-1');
+            expect(squadSelect).toHaveValue('sq-1');
+        });
 
         // Modifica para o Projeto Beta (proj-2), onde a squad anterior (sq-1) não pertence
         fireEvent.change(projectSelect, { target: { value: 'proj-2' } });
