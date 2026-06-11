@@ -1,13 +1,18 @@
-import { useAuth } from "@/features/auth";
-import { Suspense, useState } from "react";
+import { useState, Suspense } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth";
+import { Menu, X, LogOut } from "lucide-react";
 
-const navItems = [
-  { to: "/meu-perfil", label: "Meu Perfil" },
-  { to: "/meu-historico", label: "Meu Histórico" },
+const staticNavItems = [
+  { to: "/admin/dashboard", label: "Dashboard" },
+  { to: "/admin/fila", label: "Fila de revisão" },
+  { to: "/admin/talentos", label: "Recursos" },
+  { to: "/admin/alocados", label: "Alocados" },
+  { to: "/admin/usuarios", label: "Usuários" },
+  // { to: "/admin/vagas", label: "Vagas" },
 ];
 
-export default function RecursoLayout() {
+export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,18 +33,18 @@ export default function RecursoLayout() {
           className="md:hidden text-white/50 hover:text-white p-1"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          <X className="w-5 h-5" />
         </button>
       </div>
 
       <nav className="flex-1 py-4 overflow-y-auto">
         <p className="px-5 pt-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-slate-500">Menu</p>
-        {navItems.map(({ to, label }) => (
+        {staticNavItems.map(({ to, label }) => (
           <NavLink
             key={to}
             to={to}
-            end
             onClick={() => setIsMobileMenuOpen(false)}
+            end={to === "/admin/talentos" || to === "/admin/dashboard"}
             className={({ isActive }) =>
               `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
                 ? "border-l-pink bg-white/5 text-white font-medium"
@@ -55,11 +60,8 @@ export default function RecursoLayout() {
       <div className="px-5 py-5 border-t border-white/[0.06] mt-auto">
         <p className="text-xs font-medium text-white truncate mb-0.5">{user?.name}</p>
         <p className="text-xs text-white/40 truncate mb-3">{user?.email}</p>
-        <button
-          onClick={handleLogout}
-          className="text-xs text-white/40 hover:text-white/70 transition-colors flex items-center gap-1.5"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+        <button onClick={handleLogout} className="text-xs text-white/40 hover:text-white/70 transition-colors flex items-center gap-1.5">
+          <LogOut className="w-3.5 h-3.5" />
           Sair
         </button>
       </div>
@@ -68,7 +70,6 @@ export default function RecursoLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
@@ -77,23 +78,19 @@ export default function RecursoLayout() {
           </aside>
         </div>
       )}
-
       <aside className="hidden md:flex w-52 lg:w-60 shrink-0 flex-col bg-slate-950 h-screen">
         {sidebarContent}
       </aside>
-
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
         <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center">
             <span className="font-bold text-lg tracking-tight text-slate-900">VILT</span>
             <span className="text-pink text-lg font-bold">.</span>
           </div>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -mr-2 text-slate-600 hover:text-slate-900 focus:outline-none">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <Menu className="w-6 h-6" />
           </button>
         </header>
-
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 md:p-8">
             <Suspense fallback={<div className="flex h-full items-center justify-center py-20 text-sm text-slate-400">Carregando módulo...</div>}>

@@ -1,5 +1,7 @@
 import { PageHeader, StatCard, Card, Badge } from "@/components/ui";
 import { useDashboardStats, ALOCACAO_COLORS } from "@/features/profiles";
+// import { vagasApi } from "@/features/vagas";
+// import { useQuery } from "@tanstack/react-query";
 
 const NIVEL_ROWS = [
   { label: "Sênior", key: "Sr", variant: "senior" },
@@ -8,7 +10,17 @@ const NIVEL_ROWS = [
 ] as const;
 
 export default function Dashboard() {
-  const { loading, skillView, setSkillView, stats, allProfilesLength } = useDashboardStats();
+  const { loading: loadingProfiles, skillView, setSkillView, stats, allProfilesLength } = useDashboardStats();
+
+  // Query para buscar o número de Vagas Ativas
+  /*
+  const { data: vagasAtivas, isLoading: loadingVagas } = useQuery({
+    queryKey: ['dashboard-vagas-ativas'],
+    queryFn: vagasApi.getActive
+  });
+  */
+
+  const loading = loadingProfiles; // || loadingVagas;
 
   if (loading || !stats) return <p className="text-slate-400 text-sm">Carregando...</p>;
 
@@ -16,11 +28,12 @@ export default function Dashboard() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Dashboard" subtitle="Visão geral do banco de talentos" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard label="Recursos Disponíveis" value={stats.disponiveisBench} accentColor="#10B981" to="/admin/talentos" />
         <StatCard label="Total de cadastros" value={stats.dashData.total} to="/admin/usuarios" />
         <StatCard label="Perfis ativos" value={stats.dashData.ativos} accentColor="#E11D48" to="/admin/alocados" />
         <StatCard label="Aguardando revisão" value={stats.dashData.pendentes} accentColor={stats.dashData.pendentes > 0 ? "#D97706" : undefined} to="/admin/fila" />
+        {/* <StatCard label="Vagas Ativas" value={vagasAtivas?.length ?? 0} accentColor="#8B5CF6" to="/admin/vagas" /> */}
       </div>
 
       <div className="flex items-center gap-2 pt-2">

@@ -5,8 +5,8 @@ import { PublicRoute } from "./PublicRoute";
 import { UserRole } from "@/features/auth";
 
 // IMPORTAÇÕES SÍNCRONAS (Layouts devem carregar de imediato)
-import AdminLayout from "@/components/layouts/AdminLayout";
-import RecursoLayout from "@/components/layouts/RecursoLayout";
+import AdminLayout from "@/components/layouts/AdminLayout/AdminLayout";
+import RecursoLayout from "@/components/layouts/RecursoLayout/RecursoLayout";
 
 
 // IMPORTAÇÕES ASSÍNCRONAS (Lazy Loading - Separação do Bundle)

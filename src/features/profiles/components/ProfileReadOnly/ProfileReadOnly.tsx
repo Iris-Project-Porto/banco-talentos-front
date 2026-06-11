@@ -1,6 +1,6 @@
-import type { UserProfile } from "../types/profile";
-import { getLevelStyle, getLevelLabel, getRegistrationStatusLabel } from "../utils/profileUtils";
-import { NIVEL_STYLE } from "../profile";
+import type { UserProfile } from "../../types/profile";
+import { getLevelStyle, getLevelLabel, getRegistrationStatusLabel } from "../../utils/profileUtils";
+import { NIVEL_STYLE } from "../../profile";
 
 export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
     const isAtivo = profile.status === "ATIVO";

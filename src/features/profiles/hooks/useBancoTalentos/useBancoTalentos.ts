@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { profilesApi } from "../api/profiles.api";
-import type { UserProfile } from "../types/profile";
+import { profilesApi } from "../../api/profiles.api";
+import type { UserProfile } from "../../types/profile";
 
 export function useBancoTalentos() {
     const [search, setSearch] = useState("");

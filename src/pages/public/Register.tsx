@@ -3,9 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Select } from "@/components/ui";
-import AuthLayout from "@/components/layouts/AuthLayout";
+import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { authApi, UserRole } from "@/features/auth";
-import { registerSchema, type RegisterFormData } from "@/features/auth/validations";
+import { registerSchema, type RegisterFormData } from "@/features/auth/validations/validations";
 import { getApiError } from "@/lib/axios";
 
 interface Group { id: string; name: string; }

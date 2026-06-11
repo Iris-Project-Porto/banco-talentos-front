@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Avatar, Badge, Tag } from "@/components/ui";
-import type { ProfileSkill } from "../types/profile";
+import type { ProfileSkill } from "../../types/profile";
 
 interface Props {
   id: string;
