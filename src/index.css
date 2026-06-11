@@ -3,11 +3,33 @@
 @tailwind utilities;
 
 @layer base {
-  html { font-family: 'Inter', system-ui, sans-serif; }
-  body { @apply bg-slate-50 text-slate-900 antialiased; }
-  * { box-sizing: border-box; }
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full;
+}
+
+/* Oculta o ícone de revelar senha nativo do Edge */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
