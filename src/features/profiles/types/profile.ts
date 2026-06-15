@@ -1,11 +1,11 @@
 export interface ProfileSkill {
     name?: string;
     level?: string | number;
-    type?: string;
+    type?: "HARD" | "SOFT";
     proficiencyLevel?: string | number;
     skill?: {
         name: string;
-        type?: string;
+        type?: "HARD" | "SOFT";
     };
 }
 
@@ -13,7 +13,10 @@ export interface UserProfile {
     id: string;
     status: "PENDING" | "ACTIVE" | string;
     nivel?: string;
+    level?: string;
     levelOverride?: string;
+    levelScore?: number; // NOVO
+    levelJustification?: string; // NOVO
     photoUrl?: string;
     area?: string;
     about?: string;
@@ -26,10 +29,10 @@ export interface UserProfile {
     registrationStatus?: string;
     skills?: ProfileSkill[];
     createdAt?: string;
-    user?: {
-        name: string;
-        email: string;
-    };
+    name?: string;
+    email?: string;
+    groupName?: string;
+    jobTitle?: string;
 }
 
 export interface ProfileFormState {

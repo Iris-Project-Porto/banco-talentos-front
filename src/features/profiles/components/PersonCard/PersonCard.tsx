@@ -53,9 +53,10 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, allocationS
   const badgeVariant = nivel ? NIVEL_BADGE[nivel] : undefined;
   const tagKind = allocationStatus ? ALOC_TAG[allocationStatus] : undefined;
   const tagLabel = allocationStatus ? (ALOC_LABEL[allocationStatus] ?? allocationStatus.split(" ")[0]) : undefined;
-
   const regLabel = registrationStatus ? REG_STATUS_LABEL[registrationStatus] : undefined;
   const regTagKind = registrationStatus ? REG_STATUS_TAG[registrationStatus] : undefined;
+
+  const hardSkills = skills?.filter((ps) => ps.type !== "SOFT" && ps.skill?.type !== "SOFT") || [];
 
   return (
     <Link
@@ -83,19 +84,19 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, allocationS
         ) : null}
       </div>
 
-      {skills && skills.length > 0 && (
+      {hardSkills.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {skills.slice(0, 4).map((ps, i) => (
-            <Tag key={i} kind="skill">{ps.skill?.name}</Tag>
+          {hardSkills.slice(0, 4).map((ps, i) => (
+            <Tag key={i} kind="skill">{ps.skill?.name || ps.name}</Tag>
           ))}
-          {skills.length > 4 && (
-            <span className="text-xs text-slate-400 px-2 py-0.5">+{skills.length - 4}</span>
+          {hardSkills.length > 4 && (
+            <span className="text-xs text-slate-400 px-2 py-0.5">+{hardSkills.length - 4}</span>
           )}
         </div>
       )}
 
       {createdAt && (
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-400 mt-auto pt-1">
           Desde {new Date(createdAt).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
         </p>
       )}

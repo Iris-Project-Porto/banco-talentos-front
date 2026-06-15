@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { profilesApi } from "../../api/profiles.api"
+import { profilesApi } from "../../api/profiles.api";
 import type { UserProfile } from "../../types/profile";
 
 export interface DashData {
-    total: number; ativos: number; pendentes: number; skillsCount: number;
+    total: number;
+    active: number;
+    pending: number;
     topSkillsByProficiency?: { name: string; score: number }[];
     topSkillsByImportance?: { name: string; score: number }[];
+    levelCount?: Record<string, number>;
 }
 
 export const ALOCACAO_COLORS: Record<string, string> = {
@@ -30,7 +33,6 @@ export function useDashboardStats() {
         queryKey: ['profiles-todos'],
         queryFn: async (): Promise<UserProfile[]> => {
             const d = await profilesApi.getAllProfiles();
-
             if (Array.isArray(d)) return d;
             return (d as any)?.content || (d as any)?.data || [];
         }
@@ -40,16 +42,10 @@ export function useDashboardStats() {
         if (!dashData) return null;
 
         const alocacaoMap: Record<string, number> = {};
-        const nivelCalculado: Record<"Jr" | "Pleno" | "Sr", number> = { Jr: 0, Pleno: 0, Sr: 0 };
 
         allProfiles.forEach((p) => {
             const s = p.allocationStatus ?? "Sem status";
             alocacaoMap[s] = (alocacaoMap[s] ?? 0) + 1;
-
-            const n = p.levelOverride || p.nivel;
-            if (n === "Jr" || n === "Pleno" || n === "Sr") {
-                nivelCalculado[n as "Jr" | "Pleno" | "Sr"]++;
-            }
         });
 
         const alocacaoEntries = Object.entries(alocacaoMap).sort((a, b) => b[1] - a[1]);
@@ -59,8 +55,13 @@ export function useDashboardStats() {
         const skillsToRender = skillView === "proficiency"
             ? (dashData.topSkillsByProficiency || [])
             : (dashData.topSkillsByImportance || []);
-
         const maxSkill = skillsToRender.reduce((m: number, s: any) => Math.max(m, s.score), 1);
+
+        const nivelCalculado = {
+            Jr: dashData.levelCount?.Jr || dashData.levelCount?.JUNIOR || 0,
+            Pleno: dashData.levelCount?.Pleno || dashData.levelCount?.PLENO || 0,
+            Sr: dashData.levelCount?.Sr || dashData.levelCount?.SENIOR || 0,
+        };
 
         return {
             dashData, alocacaoMap, alocacaoEntries, maxAlocacao, disponiveisBench,

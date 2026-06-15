@@ -68,15 +68,15 @@ export default function TalentoDetalhe() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4">
-        <Avatar name={profile.user?.name ?? "?"} photoUrl={profile.photoUrl} size={56} />
+        <Avatar name={profile.name ?? "?"} photoUrl={profile.photoUrl} size={56} />
 
         <div className="flex-1 min-w-0 w-full">
           <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900" style={{ fontFamily: "var(--font-syne)" }}>
-                {profile.user?.name}
+                {profile.name}
               </h1>
-              <p className="text-sm text-gray-400">{profile.user?.email}</p>
+              <p className="text-sm text-gray-400">{profile.email}</p>
               {form.area && <p className="text-sm text-gray-500 mt-0.5">{form.area}</p>}
             </div>
 

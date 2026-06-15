@@ -23,7 +23,7 @@ export function useBancoTalentos() {
     const filtered = useMemo(() => disponíveis.filter((p) => {
         const q = search.toLowerCase();
         return (
-            (!q || p.user?.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) ||
+            (!q || p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) ||
                 p.skills?.some((s: any) => (s.skill?.name || s.name)?.toLowerCase().includes(q))) &&
             (!area || p.area === area)
         );
