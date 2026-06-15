@@ -42,10 +42,10 @@ export default function FilaRevisao() {
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <Avatar name={p.user?.name ?? "?"} size={40} />
+                  <Avatar name={p.name ?? ""} size={40} />
                   <div>
-                    <p className="font-bold text-base text-slate-900">{p.user?.name}</p>
-                    <p className="text-xs text-slate-400">{p.user?.email}</p>
+                    <p className="font-bold text-base text-slate-900">{p.name}</p>
+                    <p className="text-xs text-slate-400">{p.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">

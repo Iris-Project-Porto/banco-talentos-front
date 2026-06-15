@@ -110,8 +110,8 @@ export function useTalentoDetalhe(id: string | undefined) {
         const payload = {
             ...form,
             levelOverride: form.levelOverride || null,
-            skills: stacks.map((s) => ({ name: s.name, proficiencyLevel: s.level })),
-            softSkills: form.softSkills.map((s) => ({ name: s.name, proficiencyLevel: s.level })),
+            skills: stacks.map((s) => ({ name: s.name, type: "HARD", proficiencyLevel: s.level })),
+            softSkills: form.softSkills.map((s) => ({ name: s.name, type: "SOFT", proficiencyLevel: s.level })),
             status: activate ? "ACTIVE" : profile?.status,
         };
         saveMutation.mutate({ id, payload });

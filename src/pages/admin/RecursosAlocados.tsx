@@ -33,7 +33,7 @@ export default function RecursosAlocados() {
   const filtered = useMemo(() => profiles.filter((p) => {
     const q = search.toLowerCase();
     return (
-      (!q || p.user?.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) ||
+      (!q || p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) ||
         p.skills?.some((s: any) => (s.skill?.name || s.name)?.toLowerCase().includes(q))) &&
       (!area || p.area === area) &&
       (!statusFilter || p.allocationStatus === statusFilter)
@@ -110,8 +110,8 @@ export default function RecursosAlocados() {
             <PersonCard
               key={p.id}
               id={p.id}
-              name={p.user?.name ?? "?"}
-              email={p.user?.email}
+              name={p.name ?? "?"}
+              email={p.email}
               photoUrl={p.photoUrl}
               area={p.area}
               nivel={p.levelOverride ?? p.nivel}

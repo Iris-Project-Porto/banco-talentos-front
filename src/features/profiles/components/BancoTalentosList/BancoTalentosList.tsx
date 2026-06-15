@@ -31,7 +31,7 @@ export function BancoTalentosList() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filtered.map((p) => (
                         <PersonCard
-                            key={p.id} id={p.id} name={p.user?.name ?? "?"} email={p.user?.email} photoUrl={p.photoUrl} area={p.area} nivel={p.levelOverride ?? p.nivel} allocationStatus={p.allocationStatus} skills={p.skills} createdAt={p.createdAt} registrationStatus={p.registrationStatus}
+                            key={p.id} id={p.id} name={p.name ?? ""} email={p.email} photoUrl={p.photoUrl} area={p.area} nivel={p.levelOverride ?? p.nivel} allocationStatus={p.allocationStatus} skills={p.skills} createdAt={p.createdAt} registrationStatus={p.registrationStatus}
                         />
                     ))}
                 </div>

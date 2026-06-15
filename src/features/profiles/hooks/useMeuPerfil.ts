@@ -73,7 +73,7 @@ export function useMeuPerfil() {
     });
 
     const onSubmit = async (data: ProfileFormData) => {
-        const skillList = stacks.map((s) => ({ name: s.name, proficiencyLevel: s.level }));
+        const skillList = stacks.map((s) => ({ name: s.name, type: "HARD", proficiencyLevel: s.level }));
         const payload = {
             ...data,
             experienceYears: data.experienceYears ? Number(data.experienceYears) : undefined,
