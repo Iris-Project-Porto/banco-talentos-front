@@ -30,7 +30,6 @@ describe('AdminLayout Component', () => {
                 <AdminLayout />
             </MemoryRouter>
         );
-
         expect(screen.getAllByText('Admin Silva').length).toBeGreaterThan(0);
         expect(screen.getAllByText('admin@vilt-group.com').length).toBeGreaterThan(0);
     });
@@ -49,8 +48,8 @@ describe('AdminLayout Component', () => {
         expect(screen.getAllByText('Alocados').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Usuários').length).toBeGreaterThan(0);
 
-        // A rota de "Vagas" está comentada no componente original, então esta asserção foi removida.
-        // expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
+        // Correção: A rota de "Vagas" agora existe no componente, logo o comentário deve ser ignorado e testado em vigor.
+        expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
     });
 
     it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', () => {
@@ -59,7 +58,6 @@ describe('AdminLayout Component', () => {
                 <AdminLayout />
             </MemoryRouter>
         );
-
         const logoutButtons = screen.getAllByRole('button', { name: /Sair/i });
         fireEvent.click(logoutButtons[0]);
 

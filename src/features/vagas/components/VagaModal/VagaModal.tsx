@@ -149,7 +149,11 @@ export function VagaModal({ initial, saving, onSave, onClose }: Props) {
 
                         <div className="grid grid-cols-2 gap-4">
                             <Field label="Status">
-                                <input className={inputCls} placeholder="Ex: Aberta, Entrevistas..." {...register("status")} />
+                                <select className={inputCls} {...register("status")}>
+                                    <option value="PENDING">Pendente</option>
+                                    <option value="ACTIVE">Aberta</option>
+                                    <option value="INACTIVE">Fechada</option>
+                                </select>
                                 <ErrorMsg msg={errors.status?.message} />
                             </Field>
                             <div className="flex items-center mt-6">

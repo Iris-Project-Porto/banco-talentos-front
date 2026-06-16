@@ -21,8 +21,7 @@ export const registerSchema = z.object({
         .min(1, "A senha é obrigatória")
         .min(6, "A senha deve ter no mínimo 6 caracteres"),
     role: z.nativeEnum(UserRole, {
-        required_error: "O nível de acesso é obrigatório",
-        invalid_type_error: "Selecione um nível válido"
+        errorMap: () => ({ message: "O perfil é obrigatório" })
     }),
     groupId: z.string({ required_error: "O grupo é obrigatório" })
         .min(1, "Selecione um grupo"),
@@ -53,8 +52,8 @@ export const verifyEmailSchema = z.object({
     email: z.string({ required_error: "O e-mail é obrigatório" })
         .min(1, "O e-mail é obrigatório")
         .email("Formato de e-mail inválido"),
-    code: z.string({ required_error: "O código é obrigatório" })
-        .length(6, "O código deve ter exatamente 6 dígitos"),
+    code: z.string({ required_error: "Digite o código de verificação" })
+        .length(6, "Digite o código de verificação"),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

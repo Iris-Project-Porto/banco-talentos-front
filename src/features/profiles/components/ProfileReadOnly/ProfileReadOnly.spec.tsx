@@ -6,7 +6,7 @@ import type { UserProfile } from '../../types/profile';
 describe('ProfileReadOnly Component', () => {
     const mockProfileBase: UserProfile = {
         id: '123',
-        status: 'ACTIVE', // Ajustado de 'ATIVO' para 'ACTIVE' para corresponder à lógica do componente
+        status: 'ACTIVE',
         nivel: 'Pleno',
         registrationStatus: 'APPROVED',
         registrationNumber: 'MAT-999',
@@ -21,7 +21,8 @@ describe('ProfileReadOnly Component', () => {
             { name: 'Comunicação', type: 'SOFT', proficiencyLevel: 9 },
             { skill: { name: 'Proatividade', type: 'SOFT' }, proficiencyLevel: 8 }
         ],
-        user: { name: 'João Silva', email: 'joao@vilt-group.com' }
+        name: 'João Silva',
+        email: 'joao@vilt-group.com'
     };
 
     it('deve renderizar o cabeçalho e badge corretamente quando o perfil está ATIVO', () => {

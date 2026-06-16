@@ -5,9 +5,10 @@ import { PersonCard } from './PersonCard';
 import type { UserProfile } from '../../types/profile';
 
 describe('Componente PersonCard', () => {
+    // Atualizado: Removida a propriedade `user` aninhada e passado direto para a raiz (name e email)
     const mockProfile: UserProfile = {
         id: "perf-123",
-        status: "ATIVO",
+        status: "ACTIVE",
         nivel: "Sr",
         area: "Frontend",
         allocationStatus: "Disponível (Bench)",
@@ -17,12 +18,10 @@ describe('Componente PersonCard', () => {
             { skill: { name: "TypeScript" } },
             { skill: { name: "Tailwind" } },
             { skill: { name: "Vitest" } },
-            { skill: { name: "Node.js" } } // 5ª skill para testar o limitador (+1)
+            { skill: { name: "Node.js" } }
         ],
-        user: {
-            name: "Nuno Silva",
-            email: "nuno.silva@vilt-group.com"
-        }
+        name: "Nuno Silva",
+        email: "nuno.silva@vilt-group.com"
     };
 
     it('deve renderizar corretamente os dados identificadores, nível e área do talento', () => {
@@ -30,8 +29,8 @@ describe('Componente PersonCard', () => {
             <MemoryRouter>
                 <PersonCard
                     id={mockProfile.id}
-                    name={mockProfile.user!.name}
-                    email={mockProfile.user!.email}
+                    name={mockProfile.name!}
+                    email={mockProfile.email}
                     area={mockProfile.area}
                     nivel={mockProfile.nivel}
                     allocationStatus={mockProfile.allocationStatus}
@@ -52,7 +51,7 @@ describe('Componente PersonCard', () => {
             <MemoryRouter>
                 <PersonCard
                     id={mockProfile.id}
-                    name={mockProfile.user!.name}
+                    name={mockProfile.name!}
                     allocationStatus="Em Transição (saindo de projeto)"
                     registrationStatus="AWAITING_APPROVAL"
                 />
@@ -68,19 +67,16 @@ describe('Componente PersonCard', () => {
             <MemoryRouter>
                 <PersonCard
                     id={mockProfile.id}
-                    name={mockProfile.user!.name}
+                    name={mockProfile.name!}
                     skills={mockProfile.skills}
                 />
             </MemoryRouter>
         );
 
-        // Primeiras 4 skills devem ser renderizadas
         expect(screen.getByText('React')).toBeInTheDocument();
         expect(screen.getByText('TypeScript')).toBeInTheDocument();
         expect(screen.getByText('Tailwind')).toBeInTheDocument();
         expect(screen.getByText('Vitest')).toBeInTheDocument();
-
-        // A 5ª skill não deve estar explícita, mas sim no indicador "+1"
         expect(screen.queryByText('Node.js')).not.toBeInTheDocument();
         expect(screen.getByText('+1')).toBeInTheDocument();
     });

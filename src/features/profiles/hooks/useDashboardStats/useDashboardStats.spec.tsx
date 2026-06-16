@@ -35,7 +35,13 @@ describe('Hook useDashboardStats', () => {
         topSkillsByImportance: [
             { name: "Node.js", score: 95 },
             { name: "Docker", score: 85 }
-        ]
+        ],
+        // Correção: Adicionado `levelCount` ao mock, já que o componente lê estas chaves
+        levelCount: {
+            Jr: 1,
+            Pleno: 2,
+            Sr: 1
+        }
     };
 
     const mockAllProfiles = [
@@ -48,7 +54,8 @@ describe('Hook useDashboardStats', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(profilesApi.getDashboard).mockResolvedValue(mockDashData);
-        vi.mocked(profilesApi.getAllProfiles).mockResolvedValue(mockAllProfiles);
+        // Correção: O componente extrai data.content, logo a promessa tem de retornar num objeto envelopado
+        vi.mocked(profilesApi.getAllProfiles).mockResolvedValue({ content: mockAllProfiles } as any);
     });
 
     it('deve indicar loading enquanto as chamadas estão em curso', () => {
@@ -59,14 +66,12 @@ describe('Hook useDashboardStats', () => {
 
     it('deve agregar corretamente as contagens de alocação e níveis ao terminar de carregar', async () => {
         const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
-
         await waitFor(() => expect(result.current.loading).toBe(false));
 
         expect(result.current.allProfilesLength).toBe(4);
 
         const stats = result.current.stats!;
         expect(stats).not.toBeNull();
-
         expect(stats.alocacaoMap['Disponível (Bench)']).toBe(2);
         expect(stats.alocacaoMap['Alocado Integral (100%)']).toBe(1);
         expect(stats.disponiveisBench).toBe(2);
@@ -80,12 +85,10 @@ describe('Hook useDashboardStats', () => {
 
     it('deve exibir inicialmente as Top Skills por "proficiency" e permitir mudar para "importance"', async () => {
         const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
-
         await waitFor(() => expect(result.current.loading).toBe(false));
 
         expect(result.current.skillView).toBe("proficiency");
         expect(result.current.stats!.skillsToRender).toEqual(mockDashData.topSkillsByProficiency);
-
         expect(result.current.stats!.maxSkill).toBe(90);
 
         act(() => {

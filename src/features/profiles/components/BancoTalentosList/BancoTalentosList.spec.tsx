@@ -47,26 +47,28 @@ describe('BancoTalentosList Component', () => {
             setArea: mockSetArea,
             areas: ['Frontend', 'Backend'],
             filtered: [],
+            totalElements: 0,
             loading: false
         } as any);
 
         renderComponent();
-
         expect(screen.getByText('Nenhum talento encontrado.')).toBeInTheDocument();
-        expect(screen.getByText('0 pessoas')).toBeInTheDocument();
+        expect(screen.getByText(/0 pessoas/i)).toBeInTheDocument();
     });
 
     it('deve renderizar a grelha de talentos (PersonCard) e as opções de Business Unit (áreas)', () => {
         const mockFiltered = [
             {
                 id: '1',
-                user: { name: 'João Silva', email: 'joao@vilt-group.com' },
+                name: 'João Silva',
+                email: 'joao@vilt-group.com',
                 area: 'Frontend',
                 allocationStatus: 'Disponível (Bench)'
             },
             {
                 id: '2',
-                user: { name: 'Maria Souza', email: 'maria@vilt-group.com' },
+                name: 'Maria Souza',
+                email: 'maria@vilt-group.com',
                 area: 'Backend',
                 allocationStatus: 'Disponível (Bench)'
             }
@@ -79,14 +81,14 @@ describe('BancoTalentosList Component', () => {
             setArea: mockSetArea,
             areas: ['Frontend', 'Backend'],
             filtered: mockFiltered,
+            totalElements: 2,
             loading: false
         } as any);
 
         renderComponent();
-
         expect(screen.getByText('João Silva')).toBeInTheDocument();
         expect(screen.getByText('Maria Souza')).toBeInTheDocument();
-        expect(screen.getByText('2 pessoas')).toBeInTheDocument();
+        expect(screen.getByText(/2 pessoas/i)).toBeInTheDocument();
 
         expect(screen.getByRole('option', { name: 'Frontend' })).toBeInTheDocument();
         expect(screen.getByRole('option', { name: 'Backend' })).toBeInTheDocument();
@@ -104,7 +106,6 @@ describe('BancoTalentosList Component', () => {
         } as any);
 
         renderComponent();
-
         const searchInput = screen.getByPlaceholderText('Buscar por nome, área ou skill...');
         fireEvent.change(searchInput, { target: { value: 'React' } });
 
@@ -124,7 +125,6 @@ describe('BancoTalentosList Component', () => {
         } as any);
 
         renderComponent();
-
         const areaSelect = screen.getByRole('combobox');
         fireEvent.change(areaSelect, { target: { value: 'DevOps' } });
 

@@ -17,7 +17,6 @@ export default function Register() {
 
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: UserRole.RESOURCE }
   });
 
   const selectedRole = watch("role");
@@ -65,6 +64,7 @@ export default function Register() {
         <Select
           label="Perfil"
           options={[
+            { value: "", label: "Selecione o Perfil" },
             { value: UserRole.RESOURCE, label: "Recurso" },
             { value: UserRole.ADMIN, label: "Administrador" }
           ]}

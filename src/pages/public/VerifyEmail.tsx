@@ -60,7 +60,14 @@ export default function VerifyEmail() {
       <p className="text-sm text-slate-400 mb-7">Enviamos um código de 6 dígitos. Insira abaixo para confirmar sua conta.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} />
+        <Input
+          label="E-mail"
+          type="email"
+          readOnly
+          className="bg-slate-50 cursor-not-allowed text-slate-500"
+          {...register("email")}
+          error={errors.email?.message}
+        />
 
         <Input
           label="Código de verificação"

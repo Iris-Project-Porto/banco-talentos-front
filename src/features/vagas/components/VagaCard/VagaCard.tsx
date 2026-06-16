@@ -16,6 +16,17 @@ const SENIORIDADE_LABEL: Record<ExperienceLevel, string> = {
     ESPECIALISTA: "Especialista"
 };
 
+const STATUS_LABEL: Record<string, string> = {
+    PENDING: "Pendente",
+    ACTIVE: "Aberta",
+    INACTIVE: "Fechada"
+};
+
+const STATUS_COLOR: Record<string, "status-warning" | "status-success" | "status-info"> = {
+    PENDING: "status-warning",
+    ACTIVE: "status-success",
+    INACTIVE: "status-info"
+};
 interface Props {
     vaga: JobPosting;
     onEdit: (v: JobPosting) => void;
@@ -25,6 +36,10 @@ interface Props {
 export function VagaCard({ vaga, onEdit, onToggleActive }: Props) {
     const title = vaga.projectName || vaga.projectId;
     const squad = vaga.squadName || vaga.squadId;
+
+    const normalizedStatus = vaga.status?.toUpperCase() || "";
+    const displayStatus = STATUS_LABEL[normalizedStatus] || vaga.status;
+    const tagKind = STATUS_COLOR[normalizedStatus] || "status-info";
 
     return (
         <div className={`bg-white border border-slate-200 rounded-xl shadow-card p-5 flex flex-col transition-all hover:shadow-card-hover hover:-translate-y-px ${!vaga.active && 'opacity-60 grayscale-[0.5]'}`}>
@@ -38,7 +53,6 @@ export function VagaCard({ vaga, onEdit, onToggleActive }: Props) {
                         Squad: {squad} • Recrutador: {vaga.recruiter}
                     </p>
                 </div>
-
                 <div className="flex items-center gap-1 shrink-0 -mt-1 -mr-1">
                     <button
                         onClick={() => onEdit(vaga)}
@@ -47,7 +61,6 @@ export function VagaCard({ vaga, onEdit, onToggleActive }: Props) {
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
-
                     <button
                         onClick={() => onToggleActive(vaga.id, vaga.active)}
                         className={`p-1.5 rounded-md transition-colors ${vaga.active
@@ -69,13 +82,14 @@ export function VagaCard({ vaga, onEdit, onToggleActive }: Props) {
                 <Badge variant={SENIORIDADE_BADGE[vaga.experienceLevel]}>
                     {SENIORIDADE_LABEL[vaga.experienceLevel]}
                 </Badge>
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600">
-                    {vaga.status}
-                </span>
+
+
                 {vaga.isUrgent && <Tag kind="status-alert">Urgente</Tag>}
-                <Tag kind={vaga.active ? "status-success" : "skill"}>
-                    {vaga.active ? "Ativa" : "Inativa"}
+
+                <Tag kind={tagKind}>
+                    {displayStatus}
                 </Tag>
+
             </div>
 
             {vaga.description && (
@@ -94,6 +108,7 @@ export function VagaCard({ vaga, onEdit, onToggleActive }: Props) {
                     {new Date(vaga.openingDate).toLocaleDateString("pt-BR")}
                 </span>
             </div>
+
         </div>
     );
 }
