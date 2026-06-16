@@ -42,8 +42,7 @@ export default function ResetPassword() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Input label="E-mail" type="email" readOnly className="bg-slate-50 cursor-not-allowed text-slate-500" {...register("email")} />
-
-        <Input label="Nova senha" type="password" placeholder="Mínimo 6 caracteres" autoFocus {...register("password")} error={errors.password?.message} />
+        <Input label="Nova senha" type="password" placeholder="Ex: Senha@123" autoFocus {...register("password")} error={errors.password?.message} />
         <Input label="Confirmar senha" type="password" placeholder="••••••••" {...register("confirm")} error={errors.confirm?.message} />
 
         {error && <p className="rounded-lg px-3 py-2 text-xs bg-red-50 text-red-600 border border-red-100">{error}</p>}

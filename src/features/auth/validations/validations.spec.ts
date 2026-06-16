@@ -9,6 +9,7 @@ import {
 import { UserRole } from '../types/roles';
 
 describe('Auth Validations', () => {
+
     describe('loginSchema', () => {
         it('deve aprovar dados válidos', () => {
             const result = loginSchema.safeParse({ email: "teste@vilt-group.com", password: "123" });
@@ -29,7 +30,7 @@ describe('Auth Validations', () => {
             const result = registerSchema.safeParse({
                 name: "João",
                 email: "joao@gmail.com",
-                password: "password123",
+                password: "Senha@123", // Atualizado para passar no regex
                 role: UserRole.RESOURCE,
                 groupId: "1"
             });
@@ -38,6 +39,17 @@ describe('Auth Validations', () => {
                 expect(result.error.issues[0].message).toBe("Use seu e-mail corporativo");
             }
         });
+
+        it('deve rejeitar senha que não tenha caracteres especiais ou letra maiúscula', () => {
+            const result = registerSchema.safeParse({
+                name: "João",
+                email: "joao@vilt-group.com",
+                password: "password123", // Inválido pela nova regra
+                role: UserRole.RESOURCE,
+                groupId: "1"
+            });
+            expect(result.success).toBe(false);
+        });
     });
 
     describe('resetPasswordSchema', () => {
@@ -45,8 +57,8 @@ describe('Auth Validations', () => {
             const result = resetPasswordSchema.safeParse({
                 email: "teste@vilt-group.com",
                 token: "token-valido",
-                password: "password123",
-                confirm: "passwordDiferente"
+                password: "Senha@123", // Atualizado
+                confirm: "Senha@321" // Diferente
             });
             expect(result.success).toBe(false);
             if (!result.success) {
@@ -54,12 +66,12 @@ describe('Auth Validations', () => {
             }
         });
 
-        it('deve aprovar se as passwords coincidirem', () => {
+        it('deve aprovar se as passwords coincidirem e forem fortes', () => {
             const result = resetPasswordSchema.safeParse({
                 email: "teste@vilt-group.com",
                 token: "token-valido",
-                password: "password123",
-                confirm: "password123"
+                password: "Senha@123",
+                confirm: "Senha@123"
             });
             expect(result.success).toBe(true);
         });

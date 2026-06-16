@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,14 @@ import { getApiError } from "@/lib/axios";
 export default function VerifyEmail() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const emailParam = params.get("email");
+
+  useEffect(() => {
+    if (!emailParam) {
+      navigate("/login", { replace: true });
+    }
+  }, [emailParam, navigate]);
+
   const [error, setError] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
@@ -18,12 +26,14 @@ export default function VerifyEmail() {
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<VerifyEmailFormData>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: {
-      email: params.get("email") ?? "",
+      email: emailParam ?? "",
       code: ""
     }
   });
 
   const currentEmail = watch("email");
+
+  if (!emailParam) return null;
 
   async function onSubmit(data: VerifyEmailFormData) {
     setError("");
@@ -41,9 +51,11 @@ export default function VerifyEmail() {
       setError("Por favor, preencha o e-mail para reenviar o código.");
       return;
     }
+
     setError("");
     setResendMsg("");
     setResendLoading(true);
+
     try {
       await authApi.resendVerificationCode(currentEmail);
       setResendMsg("Novo código enviado! Verifique sua caixa de entrada (e o spam).");

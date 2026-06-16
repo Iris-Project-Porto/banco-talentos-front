@@ -8,7 +8,10 @@ import { authApi, UserRole } from "@/features/auth";
 import { registerSchema, type RegisterFormData } from "@/features/auth/validations/validations";
 import { getApiError } from "@/lib/axios";
 
-interface Group { id: string; name: string; }
+interface Group {
+  id: string;
+  name: string;
+}
 
 export default function Register() {
   const navigate = useNavigate();
@@ -59,7 +62,7 @@ export default function Register() {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Input label="Nome completo" placeholder="Seu nome" autoFocus {...register("name")} error={errors.name?.message} />
         <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} />
-        <Input label="Senha" type="password" placeholder="Mínimo 6 caracteres" {...register("password")} error={errors.password?.message} />
+        <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} />
 
         <Select
           label="Perfil"
@@ -71,6 +74,7 @@ export default function Register() {
           {...register("role")}
           error={errors.role?.message}
         />
+
         {selectedRole === UserRole.ADMIN && (
           <p className="text-xs text-amber-600 -mt-2">Contas de admin precisam de aprovação antes do primeiro acesso.</p>
         )}
