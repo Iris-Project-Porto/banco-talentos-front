@@ -20,6 +20,7 @@ export default function Register() {
 
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    mode: "onChange"
   });
 
   const selectedRole = watch("role");
@@ -63,6 +64,7 @@ export default function Register() {
         <Input label="Nome completo" placeholder="Seu nome" autoFocus {...register("name")} error={errors.name?.message} />
         <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} />
         <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} />
+        <Input label="Confirmar senha" type="password" placeholder="Ex: Senha@123" {...register("confirm")} error={errors.confirm?.message} />
 
         <Select
           label="Perfil"

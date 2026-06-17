@@ -23,12 +23,20 @@ export const registerSchema = z.object({
         .min(8, "A senha deve ter no mínimo 8 caracteres")
         .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
         .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial"),
+    confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
+        .min(1, "Confirme sua senha"),
     role: z.nativeEnum(UserRole, {
         errorMap: () => ({ message: "O perfil é obrigatório" })
     }),
     groupId: z.string({ required_error: "O grupo é obrigatório" })
         .min(1, "Selecione um grupo"),
+}).refine((data) => data.password === data.confirm, {
+    message: "As senhas não coincidem",
+    path: ["confirm"],
+
 });
+
+
 
 export const resetPasswordSchema = z.object({
     email: z.string({ required_error: "O e-mail é obrigatório" })
