@@ -60,11 +60,11 @@ export default function Register() {
       <h1 className="text-lg font-bold text-slate-900 mb-1">Criar conta</h1>
       <p className="text-sm text-slate-400 mb-7">Use seu e-mail corporativo @vilt-group.com</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <Input label="Nome completo" placeholder="Seu nome" autoFocus {...register("name")} error={errors.name?.message} />
-        <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} />
-        <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} />
-        <Input label="Confirmar senha" type="password" placeholder="Ex: Senha@123" {...register("confirm")} error={errors.confirm?.message} />
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" autoComplete="off">
+        <Input label="Nome completo" placeholder="Seu nome" autoFocus {...register("name")} error={errors.name?.message} autoComplete="off" />
+        <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} autoComplete="off" />
+        <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} autoComplete="new-password" />
+        <Input label="Confirmar senha" type="password" placeholder="Ex: Senha@123" {...register("confirm")} error={errors.confirm?.message} autoComplete="new-password" />
 
         <Select
           label="Perfil"
