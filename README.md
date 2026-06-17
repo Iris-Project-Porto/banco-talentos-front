@@ -19,9 +19,10 @@ Aplicação web central da **VILT** para gerenciamento de talentos e recursos hu
 - [✨ Funcionalidades](#-funcionalidades)
 - [🛠️ Stack Tecnológica](#️-stack-tecnológica)
 - [📂 Estrutura de Arquivos](#-estrutura-de-arquivos)
+- [🗺️ Mapa de Rotas](#️-mapa-de-rotas)
 - [⚙️ Variáveis de Ambiente](#️-variáveis-de-ambiente)
 - [🚀 Como Executar](#-como-executar)
-- [🔌 Integrações e APIs](#-integrações-e-apis)
+- [🔌 Endpoints da API](#-endpoints-da-api)
 - [🚢 Deploy](#-deploy)
 
 ---
@@ -42,10 +43,16 @@ Seção dedicada para visualização e acesso à URL dos formulários customizad
 - **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
 
 **Autenticação completa e segura**
-Fluxo de login, registro, verificação de e-mail (OTP), recuperação e redefinição de senha, via JWT com interceptadores Axios que previnem loops em respostas 401.
+Fluxo de login, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha, via JWT com interceptadores Axios que previnem loops em respostas 401.
 
 **Validação robusta de formulários**
-Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, garantindo integridade dos dados enviados.
+Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, incluindo:
+- Registro restrito a e-mails `@vilt-group.com`
+- Senha com regras de complexidade (maiúscula + caractere especial)
+- Código OTP com exatamente 6 dígitos
+
+**Tratamento global de erros**
+`ErrorBoundary` global captura falhas de renderização, exibe mensagem amigável e oferece opção de recarregar a aplicação.
 
 ---
 
@@ -56,12 +63,17 @@ Todos os formulários utilizam **React Hook Form** + **Zod** para validação de
 | **Vite** | Build tool e servidor de desenvolvimento | `5.3.x` |
 | **React** | Biblioteca de interface declarativa | `18.3.x` |
 | **TypeScript** | Tipagem estática | `5.x` |
-| **React Router DOM** | Roteamento client-side (SPA) | `6.23.x` |
+| **React Router DOM** | Roteamento client-side (SPA) com Lazy Loading | `6.23.x` |
 | **Tailwind CSS** | Estilização utilitária com design tokens customizados | `3.4.x` |
 | **React Hook Form** | Gerenciamento de estado de formulários | `7.x` |
 | **Zod** | Validação de schema | `3.x` |
 | **TanStack Query** | Gerenciamento de estado assíncrono e cache | `5.x` |
 | **Axios** | Cliente HTTP com interceptadores de token e refresh | `1.7.x` |
+| **React Hot Toast** | Notificações toast | `2.x` |
+| **React Error Boundary** | Captura de erros de renderização | `6.x` |
+| **Lucide React** | Biblioteca de ícones | `1.x` |
+| **Vitest** | Framework de testes unitários | `4.x` |
+| **Testing Library** | Utilitários de testes para React | `16.x` |
 
 ---
 
@@ -72,46 +84,129 @@ Arquitetura baseada no padrão **Feature-Sliced Design**, garantindo escalabilid
 ```text
 src/
 ├── components/
-│   ├── layouts/               # Layouts estruturais (AdminLayout, RecursoLayout, AuthLayout)
-│   └── ui/                    # Biblioteca de componentes visuais base (Avatar, Badge, Button, Select, etc.)
+│   ├── layouts/
+│   │   ├── AdminLayout/       # Layout com sidebar e topbar para admins
+│   │   ├── RecursoLayout/     # Layout simplificado para talentos (recursos)
+│   │   └── AuthLayout/        # Layout centralizado para telas de autenticação
+│   └── ui/                    # Biblioteca de componentes visuais base
+│       ├── Avatar/
+│       ├── Badge/
+│       ├── Button/
+│       ├── Card/
+│       ├── Input/
+│       ├── PageHeader/
+│       ├── Pagination/
+│       ├── Section/
+│       ├── Select/
+│       ├── StatCard/
+│       ├── Tag/
+│       └── index.ts           # Barrel export dos componentes UI
 │
 ├── features/                  # Módulos de negócio independentes
-│   ├── auth/                  # Lógica de autenticação, validações, tipos e hooks (Contexts, API)
-│   ├── profiles/              # Gestão de perfis, componentes de listagem (StackInput, BancoTalentosList)
-│   ├── skills/                # API e tipos para gestão de skills
-│   └── vagas/                 # CRUD e interfaces para a gestão de Vagas
+│   ├── auth/
+│   │   ├── api/               # Chamadas HTTP de autenticação
+│   │   ├── contexts/          # AuthContext e AuthProvider
+│   │   ├── hooks/             # Hooks personalizados (useAuth, etc.)
+│   │   ├── types/             # Tipos e enums (UserRole)
+│   │   ├── validations/       # Schemas Zod (login, register, verify, reset, forgot)
+│   │   └── index.ts           # Barrel export do módulo auth
+│   ├── profiles/
+│   │   ├── api/               # Endpoints de perfil e listagem
+│   │   ├── components/
+│   │   │   ├── BancoTalentosList/  # Listagem do banco de talentos
+│   │   │   ├── PersonCard/         # Card de exibição de talento
+│   │   │   ├── ProfileReadOnly/    # Visualização do perfil em modo leitura
+│   │   │   └── StackInput/         # Input de skills com nível de proficiência
+│   │   ├── hooks/             # Hooks de dados de perfis
+│   │   ├── types/             # Tipos do domínio de perfis
+│   │   ├── utils/             # Funções auxiliares
+│   │   ├── profile.ts         # Lógica de mapeamento de perfil
+│   │   └── index.ts
+│   ├── skills/
+│   │   └── api/               # Endpoints e tipos de skills
+│   └── vagas/
+│       ├── api/               # Endpoints de vagas (CRUD)
+│       ├── components/        # Componentes de listagem e formulário de vagas
+│       ├── types.ts           # Tipos do domínio de vagas
+│       └── index.ts
 │
 ├── lib/
-│   └── axios.ts               # Instância global do Axios e interceptadores (Tratamento de erro 401)
+│   └── axios.ts               # Instância global do Axios, interceptadores de 401 e helper getApiError
 │
 ├── pages/
-│   ├── admin/                 # Dashboards, Fila de Revisão, Vagas, Forms, Recursos
-│   ├── public/                # Login, Register, ForgotPassword, ResetPassword, VerifyEmail
-│   └── user/                  # MeuPerfil, MeuHistorico
+│   ├── admin/
+│   │   ├── Dashboard.tsx          # KPIs e estatísticas gerais
+│   │   ├── BancoTalentos.tsx      # Listagem de todos os talentos
+│   │   ├── TalentoDetalhe.tsx     # Perfil completo de um talento
+│   │   ├── RecursosAlocados.tsx   # Talentos em projetos ativos
+│   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
+│   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
+│   │   ├── Vagas.tsx              # Gestão de vagas
+│   │   └── Forms.tsx              # Integração com o Form Builder (iFrame)
+│   ├── public/
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx           # Cadastro com seleção de perfil e grupo
+│   │   ├── VerifyEmail.tsx        # Verificação via OTP de 6 dígitos
+│   │   ├── ForgotPassWord.tsx
+│   │   └── ResetPassword.tsx
+│   └── user/
+│       ├── MeuPerfil.tsx          # Edição do currículo do talento logado
+│       └── MeuHistorico.tsx       # Histórico do talento
 │
 ├── routes/
 │   ├── index.tsx              # Mapa global de rotas com Lazy Loading
-│   ├── ProtectedRoute.tsx     # Guardião de rotas privadas baseado em permissões (Admin/Recurso)
-│   └── PublicRoute.tsx        # Guardião para não-autenticados
+│   ├── ProtectedRoute.tsx     # Guardião de rotas privadas baseado em role (Admin/Recurso)
+│   └── PublicRoute.tsx        # Guardião para usuários não autenticados
+│
+├── types/                     # Tipos globais compartilhados
 │
 ├── App.tsx                    # ErrorBoundary, QueryClientProvider, AuthProvider e RouterProvider
 ├── main.tsx                   # Ponto de entrada e injeção global de CSS
-└── index.css                  # Importações do Tailwind e estilos base
+├── index.css                  # Importações do Tailwind e estilos base
+└── setupTests.ts              # Configuração do ambiente de testes (jest-dom)
+```
+
+---
+
+## 🗺️ Mapa de Rotas
+
+| Rota | Componente | Acesso |
+| :--- | :--- | :--- |
+| `/login` | `Login` | Público |
+| `/register` | `Register` | Público |
+| `/verify` | `VerifyEmail` | Público |
+| `/forgot-password` | `ForgotPassword` | Público |
+| `/reset-password` | `ResetPassword` | Público |
+| `/meu-perfil` | `MeuPerfil` | 🔒 Recurso |
+| `/meu-historico` | `MeuHistorico` | 🔒 Recurso |
+| `/admin/dashboard` | `Dashboard` | 🔒 Admin |
+| `/admin/talentos` | `BancoTalentos` | 🔒 Admin |
+| `/admin/talentos/:id` | `TalentoDetalhe` | 🔒 Admin |
+| `/admin/alocados` | `RecursosAlocados` | 🔒 Admin |
+| `/admin/fila` | `FilaRevisao` | 🔒 Admin |
+| `/admin/usuarios` | `UsuariosPendentes` | 🔒 Admin |
+| `/admin/vagas` | `Vagas` | 🔒 Admin |
+| `/admin/forms` | `Forms` | 🔒 Admin |
+| `*` | — | Redireciona para `/login` |
+
+> Todas as páginas são carregadas via **Lazy Loading** para otimização do bundle.
+
+---
 
 ## ⚙️ Variáveis de Ambiente
 
-Crie um arquivo `.env.local` na raiz do projeto com as seguintes variáveis:
+Crie um arquivo `.env` (ou `.env.local`) na raiz do projeto com as seguintes variáveis:
 
 ```env
 # Em desenvolvimento, o proxy do Vite já redireciona /api → http://localhost:8080
 # A variável abaixo é usada apenas em produção (Vercel)
-VITE_API_URL=[https://iris-banco-talentos.onrender.com/api](https://iris-banco-talentos.onrender.com/api)
+VITE_API_URL=https://iris-banco-talentos.onrender.com/api
 
 # URL do Form Builder (banco-talentos-form — Next.js)
 # Desenvolvimento: rode o Next.js na porta 3000
-VITE_FORM_BUILDER_URL=[https://banco-talentos-form.netlify.app](https://banco-talentos-form.netlify.app)
+VITE_FORM_BUILDER_URL=https://banco-talentos-form.netlify.app
 # Produção: substitua pela URL do seu deploy
-# VITE_FORM_BUILDER_URL=[https://your-form-builder.vercel.app](https://your-form-builder.vercel.app)
+# VITE_FORM_BUILDER_URL=https://your-form-builder.vercel.app
 ```
 
 > **Nota:** Em desenvolvimento, o proxy configurado no `vite.config.ts` encaminha automaticamente todas as requisições `/api` para `http://localhost:8080`, então `VITE_API_URL` não é necessário localmente.
@@ -141,8 +236,7 @@ npm install
 ### 3. Configure as variáveis de ambiente
 
 ```bash
-cp .env.local.example .env.local
-# Edite o arquivo conforme necessário
+# Crie o arquivo .env na raiz e preencha com os valores acima
 ```
 
 ### 4. Inicie o servidor de desenvolvimento
@@ -153,10 +247,16 @@ npm run dev
 
 Acesse em [http://localhost:5173](http://localhost:5173).
 
-### 5. Build para produção
+### 5. Executar os testes
 
 ```bash
-npm run build   # Compila TypeScript e gera bundle
+npm run test
+```
+
+### 6. Build para produção
+
+```bash
+npm run build   # Compila TypeScript e gera bundle otimizado
 npm run preview # Pré-visualiza o build localmente
 ```
 
@@ -164,17 +264,17 @@ npm run preview # Pré-visualiza o build localmente
 
 ## 🔌 Endpoints da API
 
-Todas as chamadas são feitas via `src/lib/api.ts` com autenticação JWT.
+Todas as chamadas são feitas via `src/lib/axios.ts` com autenticação JWT.
 
 ### 🔒 Autenticação
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `POST` | `/auth/login` | Autentica o usuário e retorna o token |
-| `POST` | `/auth/register` | Cria nova conta no banco de talentos |
-| `POST` | `/auth/verify` | Valida o código de ativação de e-mail |
+| `POST` | `/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
+| `POST` | `/auth/verify` | Valida o código OTP de ativação de e-mail |
 | `POST` | `/auth/forgot-password` | Solicita e-mail de recuperação de senha |
-| `POST` | `/auth/reset-password` | Redefine a senha via link enviado por e-mail |
+| `POST` | `/auth/reset-password` | Redefine a senha via token enviado por e-mail |
 
 ### 👤 Perfil do Talento
 
@@ -201,7 +301,7 @@ Todas as chamadas são feitas via `src/lib/api.ts` com autenticação JWT.
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/v1/groups` | Carrega os grupos disponíveis para cadastro |
+| `GET` | `/v1/groups` | Carrega os grupos disponíveis para cadastro (paginado) |
 
 ---
 

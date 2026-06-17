@@ -33,7 +33,7 @@ export function VagaModal({ initial, saving, onSave, onClose }: Props) {
             requirements: initial.requirements || "",
             recruiter: initial.recruiter || "",
             estimatedAllocationWeeks: initial.estimatedAllocationWeeks || 0,
-            status: initial.status || "Aberta",
+            status: initial.status || "ACTIVE",
             notes: initial.notes || "",
             openingDate: initial.openingDate ? new Date(initial.openingDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
             isUrgent: initial.isUrgent || false,
