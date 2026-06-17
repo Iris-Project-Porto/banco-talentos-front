@@ -10,6 +10,7 @@ const staticNavItems = [
   { to: "/admin/alocados", label: "Alocados" },
   { to: "/admin/usuarios", label: "Usuários" },
   { to: "/admin/vagas", label: "Vagas" },
+  { to: "/admin/squads", label: "Squads" }
 ];
 
 export default function AdminLayout() {
