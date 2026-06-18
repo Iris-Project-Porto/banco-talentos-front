@@ -29,8 +29,7 @@ export default function Dashboard() {
         <StatCard label="Total de cadastros" value={stats.dashData.total} to="/admin/usuarios" />
         <StatCard label="Perfis ativos" value={stats.dashData.active} accentColor="#E11D48" to="/admin/alocados" />
         <StatCard label="Aguardando revisão" value={stats.dashData.pending} accentColor={stats.dashData.pending > 0 ? "#D97706" : undefined} to="/admin/fila" />
-        <StatCard label="Vagas Ativas" value={vagasAtivas?.length ?? 0} accentColor="#8B5CF6" to="/admin/vagas" />
-      </div>
+        <StatCard label="Vagas Ativas" value={vagasAtivas?.totalElements ?? 0} accentColor="#8B5CF6" to="/admin/vagas" />      </div>
 
       <div className="flex items-center gap-2 pt-2">
         <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-400">Alocação</p>

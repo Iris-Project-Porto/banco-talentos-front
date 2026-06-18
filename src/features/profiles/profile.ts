@@ -18,7 +18,6 @@ export const SOFTSKILLS_LIST = [
     "Senso de dono (ownership)", "Adaptabilidade e flexibilidade", "Disponibilidade no chat",
 ];
 
-// Utilitário para transformar array de strings em array de objetos para o Select
 const toSelectOptions = (items: string[]) => items.map((item) => ({ value: item, label: item }));
 
 export const AREA_OPTIONS = toSelectOptions([
