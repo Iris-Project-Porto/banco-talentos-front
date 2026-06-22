@@ -50,6 +50,7 @@ describe('AdminLayout Component', () => {
 
         // Correção: A rota de "Vagas" agora existe no componente, logo o comentário deve ser ignorado e testado em vigor.
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Skills').length).toBeGreaterThan(0);
     });
 
     it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', () => {
