@@ -36,7 +36,6 @@ describe('Hook useDashboardStats', () => {
             { name: "Node.js", score: 95 },
             { name: "Docker", score: 85 }
         ],
-        // Correção: Adicionado `levelCount` ao mock, já que o componente lê estas chaves
         levelCount: {
             Jr: 1,
             Pleno: 2,
@@ -54,7 +53,6 @@ describe('Hook useDashboardStats', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(profilesApi.getDashboard).mockResolvedValue(mockDashData);
-        // Correção: O componente extrai data.content, logo a promessa tem de retornar num objeto envelopado
         vi.mocked(profilesApi.getAllProfiles).mockResolvedValue({ content: mockAllProfiles } as any);
     });
 

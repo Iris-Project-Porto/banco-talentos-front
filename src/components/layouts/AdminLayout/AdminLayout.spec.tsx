@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 
-// 1. Mock do React Router (useNavigate e Outlet)
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
@@ -14,7 +13,6 @@ vi.mock('react-router-dom', async () => {
     };
 });
 
-// 2. Mock do Hook de Autenticação (useAuth)
 const mockLogout = vi.fn();
 vi.mock('@/features/auth', () => ({
     useAuth: () => ({
@@ -41,14 +39,12 @@ describe('AdminLayout Component', () => {
             </MemoryRouter>
         );
 
-        // Os links repetem-se (sidebar desktop e mobile), daí usarmos length > 0
         expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Fila de revisão').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Recursos').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Alocados').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Usuários').length).toBeGreaterThan(0);
 
-        // Correção: A rota de "Vagas" agora existe no componente, logo o comentário deve ser ignorado e testado em vigor.
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
     });
 

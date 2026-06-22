@@ -20,7 +20,6 @@ export default function Vagas() {
     queryKey: ['vagas', 'active', page],
     queryFn: () => vagasApi.getActive(page)
   });
-
   const { data: inactiveData, isLoading: loadingInactive } = useQuery({
     queryKey: ['vagas', 'inactive', page],
     queryFn: () => vagasApi.getInactive(page)
@@ -32,20 +31,11 @@ export default function Vagas() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vagas'] });
       closeModal();
+      toast.success("Vaga salva com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao salvar", error);
-      toast.error("Ocorreu um erro ao atualizar o recurso. Por favor, tente novamente.");
-    }
-  });
-
-  const toggleStatusMutation = useMutation({
-    mutationFn: async ({ id, active }: { id: string, active: boolean }) =>
-      active ? vagasApi.deactivate(id) : vagasApi.activate(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vagas'] }),
-    onError: (error) => {
-      console.error("Erro ao atualizar status", error);
-      toast.error("Ocorreu um erro ao atualizar o recurso. Por favor, tente novamente.");
+      toast.error("Ocorreu um erro ao atualizar a vaga. Verifique os dados e tente novamente.");
     }
   });
 
@@ -56,26 +46,30 @@ export default function Vagas() {
 
   const filtered = currentList.filter((v: JobPosting) => {
     const q = search.toLowerCase();
-    return !q || (v.projectName?.toLowerCase() || "").includes(q)
-      || (v.recruiter?.toLowerCase() || "").includes(q)
-      || (v.status?.toLowerCase() || "").includes(q);
+    return !q ||
+      (v.vacancyCode?.toLowerCase() || "").includes(q) ||
+      (v.title?.toLowerCase() || "").includes(q) ||
+      (v.projectName?.toLowerCase() || "").includes(q) ||
+      (v.recruiter?.toLowerCase() || "").includes(q) ||
+      (v.status?.toLowerCase() || "").includes(q) ||
+      (v.experienceLevel?.toLowerCase() || "").includes(q);
   });
 
   function openNew() { setEditing({}); setModalOpen(true); }
   function openEdit(v: JobPosting) { setEditing(v); setModalOpen(true); }
   function closeModal() { setModalOpen(false); setEditing(null); }
 
-  function handleToggleActive(id: string, currentActive: boolean) {
-    if (confirm(`Deseja ${currentActive ? 'desativar' : 'ativar'} esta vaga?`)) {
-      toggleStatusMutation.mutate({ id, active: currentActive });
+  function handleCancelJob(vaga: JobPosting) {
+    if (confirm(`Deseja realmente cancelar a vaga ${vaga.vacancyCode}?`)) {
+      saveMutation.mutate({ ...vaga, status: "CANCELLED" });
     }
   }
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Vagas"
-        subtitle="Gestão de vagas e requisições"
+        title="Vagas Externas"
+        subtitle="Gestão de vagas, requisições e matching"
         actions={<Button variant="primary" size="sm" onClick={openNew}>+ Nova vaga</Button>}
       />
 
@@ -91,12 +85,12 @@ export default function Vagas() {
             onClick={() => setViewActive(false)}
             className={`px-4 py-1.5 rounded-md text-xs font-semibold ${!viewActive ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
           >
-            Inativas
+            Inativas / Histórico
           </button>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-[280px]">
           <input
-            placeholder="Buscar por projeto, recrutador, status..."
+            placeholder="Buscar por código, título, projeto, recrutador, senioridade..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full text-sm border border-slate-300 rounded-md px-3 py-2 outline-none focus:border-pink focus:shadow-focus-pink"
@@ -114,10 +108,9 @@ export default function Vagas() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((v: JobPosting) => (
-              <VagaCard key={v.id} vaga={v} onEdit={openEdit} onToggleActive={handleToggleActive} />
+              <VagaCard key={v.id} vaga={v} onEdit={openEdit} onCancel={handleCancelJob} />
             ))}
           </div>
-
           <Pagination
             currentPage={page}
             totalPages={totalPages}

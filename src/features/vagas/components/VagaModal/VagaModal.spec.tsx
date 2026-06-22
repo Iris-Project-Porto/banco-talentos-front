@@ -25,9 +25,7 @@ const mockSquads = [
 const renderWithClient = (ui: React.ReactElement) => {
     const queryClient = new QueryClient({
         defaultOptions: {
-            queries: {
-                retry: false,
-            },
+            queries: { retry: false },
         },
     });
     return render(
@@ -51,17 +49,36 @@ describe('Componente VagaModal', () => {
     });
 
     it('deve renderizar o cabeçalho de Editar Vaga quando um ID inicial for fornecido', () => {
-        renderWithClient(<VagaModal initial={{ id: 'vaga-123' }} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
+        renderWithClient(<VagaModal initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
         expect(screen.getByText('Editar vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
     });
 
+    it('deve bloquear a edição e esconder o botão de salvar caso o status da vaga não permita edição', async () => {
+        renderWithClient(
+            <VagaModal
+                initial={{ id: 'vaga-123', status: 'FILLED' }}
+                saving={false}
+                onSave={vi.fn()}
+                onClose={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText(/Vagas com status/i)).toBeInTheDocument();
+        expect(screen.getByText('FILLED')).toBeInTheDocument();
+        expect(screen.getByText(/não podem ser editadas/i)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Salvar alterações' })).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
+    });
+
     it('deve carregar os projetos e squads vindos da API nos seletores', async () => {
         renderWithClient(<VagaModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
+
         await waitFor(() => {
             expect(vagasApi.getProjects).toHaveBeenCalledTimes(1);
             expect(vagasApi.getSquads).toHaveBeenCalledTimes(1);
         });
+
         await waitFor(() => {
             expect(screen.getByText('Projeto Alpha')).toBeInTheDocument();
             expect(screen.getByText('Projeto Beta')).toBeInTheDocument();
@@ -72,14 +89,14 @@ describe('Componente VagaModal', () => {
         renderWithClient(<VagaModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
         await waitFor(() => {
-            expect(screen.queryByText('Carregando...')).not.toBeInTheDocument();
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
         const selects = screen.getAllByRole('combobox');
-        const projectSelect = selects[0]; // Primeiro <select> mapeado é o Projeto
-        expect(screen.getByText('Selecione o projeto primeiro')).toBeInTheDocument();
+        const projectSelect = selects[0];
 
-        // Altera a seleção de projeto para "Projeto Alpha" (proj-1)
+        expect(screen.getByText('Nenhuma squad neste projeto')).toBeInTheDocument();
+
         fireEvent.change(projectSelect, { target: { value: 'proj-1' } });
 
         await waitFor(() => {
@@ -93,15 +110,18 @@ describe('Componente VagaModal', () => {
         renderWithClient(<VagaModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
         await waitFor(() => {
-            expect(screen.queryByText('Carregando...')).not.toBeInTheDocument();
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
         const submitButton = screen.getByRole('button', { name: 'Criar vaga' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
+            expect(screen.getByText('Código da vaga é obrigatório')).toBeInTheDocument();
+            expect(screen.getByText('Título da vaga é obrigatório')).toBeInTheDocument();
             expect(screen.getByText('Selecione o projeto')).toBeInTheDocument();
             expect(screen.getByText('Selecione a squad')).toBeInTheDocument();
+            expect(screen.getByText('A modalidade é obrigatória')).toBeInTheDocument();
             expect(screen.getByText('Informe o recrutador responsável')).toBeInTheDocument();
         });
     });
@@ -113,26 +133,27 @@ describe('Componente VagaModal', () => {
         );
 
         await waitFor(() => {
-            expect(screen.queryByText('Carregando...')).not.toBeInTheDocument();
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
         const selects = screen.getAllByRole('combobox');
-        fireEvent.change(selects[0], { target: { value: 'proj-1' } }); // Projeto
+        fireEvent.change(selects[0], { target: { value: 'proj-1' } });
 
         await waitFor(() => {
             expect(screen.getByText('Squad A1')).toBeInTheDocument();
         });
 
-        fireEvent.change(selects[1], { target: { value: 'sq-1' } });   // Squad
-        fireEvent.change(selects[2], { target: { value: 'SENIOR' } }); // Nível
+        fireEvent.change(selects[1], { target: { value: 'sq-1' } });
+        fireEvent.change(selects[2], { target: { value: 'SENIOR' } });
+        fireEvent.change(selects[3], { target: { value: 'REMOTO' } });
+        fireEvent.change(selects[4], { target: { value: 'OPEN' } });
+
+        fireEvent.change(screen.getByPlaceholderText('Ex: VAG-001'), { target: { value: 'VAG-123' } });
+        fireEvent.change(screen.getByPlaceholderText('Ex: Desenvolvedor React Sênior'), { target: { value: 'Frontend Developer' } });
         fireEvent.change(screen.getByPlaceholderText('Nome do recrutador'), { target: { value: 'Paula RH' } });
         fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '12' } });
-
-        fireEvent.change(selects[3], { target: { value: 'ACTIVE' } }); // Status
-
-        fireEvent.change(screen.getByPlaceholderText('Descrição da vaga'), { target: { value: 'Desenvolvedor Frontend' } });
-        fireEvent.change(screen.getByPlaceholderText('Requisitos esperados'), { target: { value: 'React' } });
-        fireEvent.change(screen.getByPlaceholderText('Notas...'), { target: { value: 'Urgente' } });
+        fireEvent.change(screen.getByPlaceholderText('Conteúdo principal...'), { target: { value: 'Desenvolvedor Frontend' } });
+        fireEvent.change(screen.getByPlaceholderText('Notas de alinhamento...'), { target: { value: 'Urgente' } });
 
         const checkbox = screen.getByLabelText('Vaga Urgente');
         fireEvent.click(checkbox);
@@ -148,17 +169,20 @@ describe('Componente VagaModal', () => {
         await waitFor(() => {
             expect(handleSave).toHaveBeenCalledTimes(1);
             expect(handleSave).toHaveBeenCalledWith(expect.objectContaining({
+                vacancyCode: 'VAG-123',
+                title: 'Frontend Developer',
                 projectId: 'proj-1',
                 squadId: 'sq-1',
                 experienceLevel: 'SENIOR',
+                modality: 'REMOTO',
                 recruiter: 'Paula RH',
                 estimatedAllocationWeeks: 12,
-                status: 'ACTIVE',
+                status: 'OPEN',
                 description: 'Desenvolvedor Frontend',
-                requirements: 'React',
+                requirements: '',
                 notes: 'Urgente',
                 isUrgent: true,
-                openingDate: new Date('2026-07-01').toISOString()
+                openingDate: expect.stringContaining('2026-07-01')
             }));
         });
     });
@@ -169,21 +193,17 @@ describe('Componente VagaModal', () => {
             <VagaModal initial={{}} saving={false} onSave={vi.fn()} onClose={handleClose} />
         );
 
-        // 1. Clicar no botão Cancelar
         const cancelBtn = screen.getByRole('button', { name: /cancelar/i });
         fireEvent.click(cancelBtn);
         expect(handleClose).toHaveBeenCalledTimes(1);
 
-        // 2. Clicar no fundo escurecido (backdrop)
         const backdrop = container.querySelector('.bg-slate-900\\/40') || container.querySelector('.backdrop-blur-sm');
         if (backdrop) {
             fireEvent.click(backdrop);
             expect(handleClose).toHaveBeenCalledTimes(2);
         }
 
-        // 3. Clicar no botão "X" no canto superior
-        // Usamos querySelector pela classe específica (text-xl) para evitar erro de encoding com o caractere "✕"
-        const closeX = container.querySelector('button.text-xl');
+        const closeX = screen.getByText('×');
         if (closeX) {
             fireEvent.click(closeX);
             expect(handleClose).toHaveBeenCalledTimes(3);
@@ -202,32 +222,35 @@ describe('Componente VagaModal', () => {
     });
 
     it('deve resetar o campo de squad se o projeto mudar e a squad anterior se tornar inválida', async () => {
+
         renderWithClient(
-            <VagaModal
-                initial={{ projectId: 'proj-1', squadId: 'sq-1' }}
-                saving={false}
-                onSave={vi.fn()}
-                onClose={vi.fn()}
-            />
+            <VagaModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />
         );
 
         await waitFor(() => {
-            expect(screen.queryByText('Carregando...')).not.toBeInTheDocument();
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
         const selects = screen.getAllByRole('combobox');
-        const projectSelect = selects[0];
-        const squadSelect = selects[1];
+        const projectSelect = selects[0] as HTMLSelectElement;
+        const squadSelect = selects[1] as HTMLSelectElement;
+
+        fireEvent.change(projectSelect, { target: { value: 'proj-1' } });
 
         await waitFor(() => {
-            expect(projectSelect).toHaveValue('proj-1');
-            expect(squadSelect).toHaveValue('sq-1');
+            expect(screen.getByText('Squad A1')).toBeInTheDocument();
+        });
+
+        fireEvent.change(squadSelect, { target: { value: 'sq-1' } });
+
+        await waitFor(() => {
+            expect(squadSelect.value).toBe('sq-1');
         });
 
         fireEvent.change(projectSelect, { target: { value: 'proj-2' } });
 
         await waitFor(() => {
-            expect(squadSelect).toHaveValue('');
+            expect(squadSelect.value).toBe('');
         });
     });
 });
