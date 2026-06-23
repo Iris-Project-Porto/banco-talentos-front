@@ -1,5 +1,5 @@
 import { http } from "@/lib/axios";
-import type { JobPosting, JobPostingPayload } from "../types";
+import type { JobPosting, JobPostingPayload } from "../types/types";
 
 export const vagasApi = {
     getActive: (page = 0, size = 20) => http.get(`/v1/admin/job-postings/active?page=${page}&size=${size}`).then((r) => r.data),

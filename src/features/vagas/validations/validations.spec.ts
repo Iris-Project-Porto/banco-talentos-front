@@ -3,12 +3,15 @@ import { vagaSchema } from './validations';
 
 describe('Vagas Validations', () => {
     const dadosBase = {
+        vacancyCode: "VAG-001",
+        title: "Desenvolvedor React",
         projectId: "proj-123",
         squadId: "sq-123",
         experienceLevel: "PLENO",
+        modality: "REMOTO",
         recruiter: "Maria Silva",
         estimatedAllocationWeeks: 12,
-        status: "Aberta",
+        status: "OPEN",
         openingDate: "2024-01-01",
     };
 
@@ -31,7 +34,7 @@ describe('Vagas Validations', () => {
     it('deve rejeitar um nível de experiência inválido', () => {
         const result = vagaSchema.safeParse({
             ...dadosBase,
-            experienceLevel: "ESTAGIARIO" // Não existe no enum
+            experienceLevel: "ESTAGIARIO"
         });
         expect(result.success).toBe(false);
     });

@@ -30,7 +30,8 @@ describe('Auth Validations', () => {
             const result = registerSchema.safeParse({
                 name: "João",
                 email: "joao@gmail.com",
-                password: "Senha@123", // Atualizado para passar no regex
+                password: "Senha@123",
+                confirm: "Senha@123",
                 role: UserRole.RESOURCE,
                 groupId: "1"
             });
@@ -44,7 +45,8 @@ describe('Auth Validations', () => {
             const result = registerSchema.safeParse({
                 name: "João",
                 email: "joao@vilt-group.com",
-                password: "password123", // Inválido pela nova regra
+                password: "password123",
+                confirm: "password123",
                 role: UserRole.RESOURCE,
                 groupId: "1"
             });
@@ -57,8 +59,8 @@ describe('Auth Validations', () => {
             const result = resetPasswordSchema.safeParse({
                 email: "teste@vilt-group.com",
                 token: "token-valido",
-                password: "Senha@123", // Atualizado
-                confirm: "Senha@321" // Diferente
+                password: "Senha@123",
+                confirm: "Senha@321"
             });
             expect(result.success).toBe(false);
             if (!result.success) {
