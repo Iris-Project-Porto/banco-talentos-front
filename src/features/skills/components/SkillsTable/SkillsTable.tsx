@@ -1,8 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar/Avatar";
+import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
+import { SkillCategoryBadge } from "../SkillCategoryBadge/SkillCategoryBadge";
 import type { Skill } from "../../types/types";
-import { getCategoryBadgeStyle, getSkillCategoryLabel } from "../../utils/skillDisplay";
 
 interface Props {
     data: Skill[];
@@ -10,6 +11,8 @@ interface Props {
     onEdit?: (skill: Skill) => void;
     onDelete?: (skill: Skill) => void;
 }
+
+const iconButtonCls = "border-0 shadow-none !p-2 min-w-0";
 
 function formatAverageProficiency(value?: number) {
     const proficiency = value ?? 0;
@@ -32,13 +35,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
         },
         {
             header: "CATEGORIA",
-            render: (skill: Skill) => (
-                <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${getCategoryBadgeStyle(skill.category)}`}
-                >
-                    {getSkillCategoryLabel(skill.category)}
-                </span>
-            ),
+            render: (skill: Skill) => <SkillCategoryBadge category={skill.category} />,
             className: "w-36",
         },
         {
@@ -89,23 +86,29 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
             header: "AÇÕES",
             render: (skill: Skill) => (
                 <div className="flex items-center gap-1 justify-end">
-                    <button
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => onEdit?.(skill)}
-                        className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors p-2 rounded-md"
+                        className={`${iconButtonCls} text-slate-400 hover:text-slate-700 hover:bg-slate-100`}
                         title="Editar skill"
                         aria-label="Editar skill"
                     >
                         <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="danger"
+                        size="sm"
                         onClick={() => onDelete?.(skill)}
                         disabled={deletingSkillId === skill.id}
-                        className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors p-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={iconButtonCls}
                         title="Excluir skill"
                         aria-label="Excluir skill"
                     >
                         <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             ),
             className: "w-24",

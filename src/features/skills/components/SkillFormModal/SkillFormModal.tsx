@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui";
+import { Button, Input, Select } from "@/components/ui";
 import { SKILL_CATEGORIES, type Skill, type SkillPayload } from "../../types/types";
 import { getSkillCategoryLabel } from "../../utils/skillDisplay";
 import {
@@ -11,20 +11,25 @@ import {
     type SkillFormInput,
 } from "../../validations/validations";
 
-const inputCls =
-    "w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900 placeholder:text-slate-400";
+const textareaCls =
+    "w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900 placeholder:text-slate-400 resize-none";
+
+const TYPE_OPTIONS = [
+    { value: "", label: "Selecione o tipo" },
+    { value: "HARD", label: "HARD" },
+    { value: "SOFT", label: "SOFT" },
+];
+
+const CATEGORY_OPTIONS = [
+    { value: "", label: "Selecione a categoria" },
+    ...SKILL_CATEGORIES.map((category) => ({
+        value: category,
+        label: getSkillCategoryLabel(category),
+    })),
+];
 
 const ErrorMsg = ({ msg }: { msg?: string }) =>
     msg ? <span className="text-xs text-red-500">{msg}</span> : null;
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-slate-600">{label}</label>
-            {children}
-        </div>
-    );
-}
 
 interface Props {
     initial: Partial<SkillPayload> & { id?: string };
@@ -93,51 +98,39 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
 
                 <form onSubmit={handleSubmit(onSubmit)} className="overflow-y-auto flex-1">
                     <div className="px-7 py-6 flex flex-col gap-5">
-                        <Field label="Nome da Skill">
-                            <input
-                                className={`${inputCls} ${errors.name ? "border-red-400" : ""}`}
-                                placeholder="Ex: Kubernetes, Lógica de Programação, Figma..."
-                                {...register("name")}
-                            />
-                            <ErrorMsg msg={errors.name?.message} />
-                        </Field>
+                        <Input
+                            label="Nome da Skill"
+                            placeholder="Ex: Kubernetes, Lógica de Programação, Figma..."
+                            error={errors.name?.message}
+                            {...register("name")}
+                        />
 
-                        <Field label="Tipo">
-                            <select
-                                className={`${inputCls} ${errors.type ? "border-red-400" : ""}`}
-                                {...register("type")}
-                            >
-                                <option value="">Selecione o tipo</option>
-                                <option value="HARD">HARD</option>
-                                <option value="SOFT">SOFT</option>
-                            </select>
-                            <ErrorMsg msg={errors.type?.message} />
-                        </Field>
+                        <Select
+                            label="Tipo"
+                            options={TYPE_OPTIONS}
+                            error={errors.type?.message}
+                            {...register("type")}
+                        />
 
-                        <Field label="Categoria">
-                            <select
-                                className={`${inputCls} ${errors.category ? "border-red-400" : ""}`}
-                                {...register("category")}
-                            >
-                                <option value="">Selecione a categoria</option>
-                                {SKILL_CATEGORIES.map((category) => (
-                                    <option key={category} value={category}>
-                                        {getSkillCategoryLabel(category)}
-                                    </option>
-                                ))}
-                            </select>
-                            <ErrorMsg msg={errors.category?.message} />
-                        </Field>
+                        <Select
+                            label="Categoria"
+                            options={CATEGORY_OPTIONS}
+                            error={errors.category?.message}
+                            {...register("category")}
+                        />
 
-                        <Field label="Descrição (opcional)">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-medium text-slate-600">
+                                Descrição (opcional)
+                            </label>
                             <textarea
-                                className={`${inputCls} resize-none ${errors.description ? "border-red-400" : ""}`}
+                                className={`${textareaCls} ${errors.description ? "border-red-400" : ""}`}
                                 rows={3}
                                 placeholder="Descreva a competência..."
                                 {...register("description")}
                             />
                             <ErrorMsg msg={errors.description?.message} />
-                        </Field>
+                        </div>
                     </div>
 
                     <div className="px-7 py-5 border-t border-slate-200 flex items-center justify-end gap-3">

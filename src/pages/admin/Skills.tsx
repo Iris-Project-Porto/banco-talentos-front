@@ -1,26 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
-import { Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
     skillsApi,
     SkillFormModal,
     SkillsTable,
-    SKILL_CATEGORIES,
+    SkillsFilters,
     normalizeSkills,
-    getSkillCategoryLabel,
     type Skill,
     type SkillPayload,
 } from "@/features/skills";
-import { Button, ConfirmModal, PageHeader, Pagination, Select } from "@/components/ui";
-
-const CATEGORY_FILTER_OPTIONS = [
-    { value: "", label: "Todas as Categorias" },
-    ...SKILL_CATEGORIES.map((category) => ({
-        value: category,
-        label: getSkillCategoryLabel(category),
-    })),
-];
+import { Button, ConfirmModal, PageHeader, Pagination } from "@/components/ui";
 
 const PAGE_SIZE = 10;
 
@@ -151,44 +141,13 @@ export default function Skills() {
                 }
             />
 
-            <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4">
-                <div className="flex flex-col lg:flex-row lg:items-end gap-4">
-                    <div className="flex-1 min-w-[220px]">
-                        <label className="block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5">
-                            NOME DA SKILL
-                        </label>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                                placeholder="Ex: React, Python, Scrum..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 outline-none focus:border-pink focus:shadow-focus-pink"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="w-full lg:w-56">
-                        <label className="block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5">
-                            CATEGORIA
-                        </label>
-                        <Select
-                            className="px-3.5 py-2.5 text-sm w-full border border-slate-300 rounded-lg focus:ring-pink focus:border-pink focus:shadow-focus-pink"
-                            options={CATEGORY_FILTER_OPTIONS}
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                        />
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={handleClearFilters}
-                        className="text-sm font-medium text-slate-500 hover:text-pink transition-colors pb-2.5"
-                    >
-                        Limpar Filtros
-                    </button>
-                </div>
-            </div>
+            <SkillsFilters
+                search={search}
+                selectedCategory={selectedCategory}
+                onSearchChange={setSearch}
+                onCategoryChange={setSelectedCategory}
+                onClear={handleClearFilters}
+            />
 
             {isLoading ? (
                 <p className="text-sm text-slate-400">Carregando...</p>
