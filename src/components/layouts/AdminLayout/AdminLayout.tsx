@@ -9,6 +9,7 @@ const staticNavItems = [
   { to: "/admin/talentos", label: "Recursos" },
   { to: "/admin/alocados", label: "Alocados" },
   { to: "/admin/usuarios", label: "Usuários" },
+  { to: "/admin/skills", label: "Skills" },
   { to: "/admin/vagas", label: "Vagas" },
   { to: "/admin/squads", label: "Squads" }
 ];

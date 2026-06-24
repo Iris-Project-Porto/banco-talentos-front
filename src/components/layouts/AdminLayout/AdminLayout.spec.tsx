@@ -46,6 +46,7 @@ describe('AdminLayout Component', () => {
         expect(screen.getAllByText('Usuários').length).toBeGreaterThan(0);
 
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Skills').length).toBeGreaterThan(0);
     });
 
     it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', () => {

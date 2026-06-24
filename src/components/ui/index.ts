@@ -2,6 +2,7 @@ export * from "./Avatar/Avatar";
 export * from "./Badge/Badge";
 export * from "./Button/Button";
 export * from "./Card/Card";
+export * from "./ConfirmModal/ConfirmModal";
 export * from "./Input/Input";
 export * from "./PageHeader/PageHeader";
 export * from "./Section/Section";
