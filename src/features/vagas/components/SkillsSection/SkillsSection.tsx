@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
 import { Trash2, FileText, CheckCircle2, HelpCircle } from "lucide-react";
 import { type VagaFormData } from "@/features/vagas/validations/validations";
-import { ErrorMsg, Field, INPUT_CLS } from "../FormHelpers/FormHelpers";
+import { ErrorMsg } from "../FormHelpers/FormHelpers";
 
 export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
