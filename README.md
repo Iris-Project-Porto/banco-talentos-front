@@ -273,6 +273,7 @@ Todas as chamadas são feitas via `src/lib/axios.ts` com autenticação JWT.
 | `POST` | `/auth/login` | Autentica o usuário e retorna o token |
 | `POST` | `/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
 | `POST` | `/auth/verify` | Valida o código OTP de ativação de e-mail |
+| `POST` | `/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
 | `POST` | `/auth/forgot-password` | Solicita e-mail de recuperação de senha |
 | `POST` | `/auth/reset-password` | Redefine a senha via token enviado por e-mail |
 
@@ -302,6 +303,42 @@ Todas as chamadas são feitas via `src/lib/axios.ts` com autenticação JWT.
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
 | `GET` | `/v1/groups` | Carrega os grupos disponíveis para cadastro (paginado) |
+
+### 🎯 Vagas (Job Postings)
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/admin/job-postings/active` | Lista as vagas ativas (paginado) |
+| `GET` | `/admin/job-postings/inactive` | Lista as vagas inativas (paginado) |
+| `GET` | `/admin/job-postings/:id` | Busca detalhes de uma vaga específica |
+| `POST` | `/admin/job-postings` | Cria uma nova vaga |
+| `PUT` | `/admin/job-postings/:id` | Atualiza os dados de uma vaga |
+| `PATCH`| `/admin/job-postings/:id/activate` | Ativa uma vaga |
+| `PATCH`| `/admin/job-postings/:id/deactivate` | Desativa uma vaga |
+
+### 🛡️ Squads e Projetos
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/admin/squads/active` | Lista os squads ativos (paginado) |
+| `GET` | `/admin/squads/inactive` | Lista os squads inativas (paginado) |
+| `GET` | `/admin/squads/:id` | Busca detalhes de um squad |
+| `POST` | `/admin/squads` | Cria um novo squad |
+| `PUT` | `/admin/squads/:id` | Atualiza os dados de um squad |
+| `PATCH`| `/admin/squads/:id/activate` | Ativa um squad |
+| `PATCH`| `/admin/squads/:id/inactivate` | Inativa um squad |
+| `GET` | `/admin/projects/active` | Lista os projetos ativos |
+
+### 🛠️ Skills
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/admin/skills/active` | Lista as skills ativas |
+| `GET` | `/admin/skills/inactive` | Lista as skills inativas |
+| `GET` | `/admin/skills/:id` | Busca detalhes de uma skill |
+| `PUT` | `/admin/skills/:id` | Atualiza os dados de uma skill |
+| `PATCH`| `/admin/skills/:id/activate` | Ativa uma skill |
+| `PATCH`| `/admin/skills/:id/inactivate` | Inativa uma skill |
 
 ---
 
