@@ -13,10 +13,10 @@ describe('Componente SkillFormModal', () => {
     it('deve renderizar os campos do formulário com labels', () => {
         render(<SkillFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
-        expect(screen.getByText('Nome da Skill')).toBeInTheDocument();
-        expect(screen.getByText('Tipo')).toBeInTheDocument();
-        expect(screen.getByText('Categoria')).toBeInTheDocument();
-        expect(screen.getByText('Descrição (opcional)')).toBeInTheDocument();
+        expect(screen.getByText('NOME DA SKILL')).toBeInTheDocument();
+        expect(screen.getByText('TIPO')).toBeInTheDocument();
+        expect(screen.getByText('CATEGORIA')).toBeInTheDocument();
+        expect(screen.getByText('DESCRIÇÃO DA COMPETÊNCIA')).toBeInTheDocument();
     });
 
     it('deve renderizar o cabeçalho de Editar Skill quando um ID inicial for fornecido', () => {

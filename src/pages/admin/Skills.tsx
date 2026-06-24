@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
@@ -8,6 +8,7 @@ import {
     SkillsFilters,
     normalizeSkills,
     type Skill,
+    type SkillCategory,
     type SkillPayload,
 } from "@/features/skills";
 import { Button, ConfirmModal, PageHeader, Pagination } from "@/components/ui";
@@ -28,9 +29,15 @@ export default function Skills() {
     }, [search, selectedCategory]);
 
     const { data, isLoading } = useQuery({
-        queryKey: ["skills", "active"],
+        queryKey: ["skills", "management", page, search, selectedCategory],
         queryFn: async () => {
-            const response = await skillsApi.getActiveSkills(0, 500);
+            const response = await skillsApi.listForManagement({
+                page,
+                size: PAGE_SIZE,
+                name: search || undefined,
+                category: (selectedCategory || undefined) as SkillCategory | undefined,
+            });
+
             return {
                 ...response,
                 content: normalizeSkills(response.content ?? []),
@@ -55,10 +62,13 @@ export default function Skills() {
     });
 
     const skills = data?.content ?? [];
+    const totalPages = data?.totalPages ?? 1;
 
     const saveMutation = useMutation({
-        mutationFn: async (payload: SkillPayload & { id?: string }) =>
-            payload.id ? skillsApi.update(payload.id, payload) : skillsApi.create(payload),
+        mutationFn: async (payload: SkillPayload & { id?: string }) => {
+            const { id, ...data } = payload;
+            return id ? skillsApi.update(id, data) : skillsApi.create(data);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["skills"] });
             closeModal();
@@ -80,21 +90,6 @@ export default function Skills() {
             toast.error("Ocorreu um erro ao atualizar o recurso. Por favor, tente novamente.");
         },
     });
-
-    const filteredSkills = useMemo(() => {
-        return skills.filter((skill) => {
-            const q = search.toLowerCase();
-            const matchesSearch =
-                !q ||
-                skill.name.toLowerCase().includes(q) ||
-                (skill.description?.toLowerCase() || "").includes(q);
-            const matchesCategory = !selectedCategory || skill.category === selectedCategory;
-            return matchesSearch && matchesCategory;
-        });
-    }, [skills, search, selectedCategory]);
-
-    const totalPages = Math.ceil(filteredSkills.length / PAGE_SIZE) || 1;
-    const paginatedSkills = filteredSkills.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
     function openNew() {
         setEditing({});
@@ -151,14 +146,14 @@ export default function Skills() {
 
             {isLoading ? (
                 <p className="text-sm text-slate-400">Carregando...</p>
-            ) : filteredSkills.length === 0 ? (
+            ) : skills.length === 0 ? (
                 <div className="bg-white border rounded-xl py-16 text-center">
                     <p className="text-slate-400 text-sm">Nenhuma skill encontrada.</p>
                 </div>
             ) : (
                 <div className="bg-white border border-slate-200 rounded-xl shadow-card overflow-hidden flex flex-col">
                     <SkillsTable
-                        data={paginatedSkills}
+                        data={skills}
                         deletingSkillId={
                             deleteMutation.isPending ? (deleteMutation.variables ?? null) : null
                         }

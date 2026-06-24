@@ -51,3 +51,10 @@ export interface SkillPayload {
     description?: string;
     category: SkillCategory;
 }
+
+export interface SkillsListParams {
+    page?: number;
+    size?: number;
+    name?: string;
+    category?: SkillCategory;
+}
