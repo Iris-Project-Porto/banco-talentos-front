@@ -63,11 +63,12 @@ describe('Componente SkillsTable', () => {
         expect(screen.getByText('66.0%')).toBeInTheDocument();
     });
 
-    it('deve exibir zero quando proficiência não vier da API', () => {
+    it('deve exibir zero quando proficiência e recursos não vierem da API', () => {
         const skillWithoutMetrics = {
             ...mockSkills[0],
             averageProficiency: undefined,
             resourcesCount: undefined,
+            avatarUrls: undefined,
         } as unknown as Skill;
 
         render(<SkillsTable data={[skillWithoutMetrics]} />);
@@ -80,6 +81,64 @@ describe('Componente SkillsTable', () => {
         render(<SkillsTable data={mockSkills} />);
 
         expect(screen.getByAltText('React.js 1')).toBeInTheDocument();
+    });
+
+    it('deve exibir o total de recursos antes dos avatares', () => {
+        render(<SkillsTable data={mockSkills} />);
+
+        expect(screen.getByText('342')).toBeInTheDocument();
+    });
+
+    it('deve exibir 2 avatares e + quando houver 3 recursos', () => {
+        const skillWithThree = {
+            ...mockSkills[0],
+            resourcesCount: 3,
+            avatarUrls: [
+                'https://example.com/a.jpg',
+                'https://example.com/b.jpg',
+                'https://example.com/c.jpg',
+            ],
+        };
+
+        render(<SkillsTable data={[skillWithThree]} />);
+
+        expect(screen.getByText('3')).toBeInTheDocument();
+        expect(screen.getByAltText('React.js 1')).toBeInTheDocument();
+        expect(screen.getByAltText('React.js 2')).toBeInTheDocument();
+        expect(screen.queryByAltText('React.js 3')).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Mais recursos')).toBeInTheDocument();
+    });
+
+    it('deve exibir no máximo 2 avatares e indicador + quando houver mais recursos', () => {
+        const skillWithMany = {
+            ...mockSkills[0],
+            resourcesCount: 342,
+            avatarUrls: [
+                'https://example.com/a.jpg',
+                'https://example.com/b.jpg',
+                'https://example.com/c.jpg',
+            ],
+        };
+
+        render(<SkillsTable data={[skillWithMany]} />);
+
+        expect(screen.getByText('342')).toBeInTheDocument();
+        expect(screen.getByAltText('React.js 1')).toBeInTheDocument();
+        expect(screen.getByAltText('React.js 2')).toBeInTheDocument();
+        expect(screen.queryByAltText('React.js 3')).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Mais recursos')).toBeInTheDocument();
+    });
+
+    it('não deve exibir indicador + quando houver no máximo 2 recursos', () => {
+        const skillWithTwo = {
+            ...mockSkills[0],
+            resourcesCount: 2,
+            avatarUrls: ['https://example.com/a.jpg', 'https://example.com/b.jpg'],
+        };
+
+        render(<SkillsTable data={[skillWithTwo]} />);
+
+        expect(screen.queryByLabelText('Mais recursos')).not.toBeInTheDocument();
     });
 
     it('deve exibir mensagem quando não houver dados', () => {

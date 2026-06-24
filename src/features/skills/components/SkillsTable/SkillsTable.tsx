@@ -14,6 +14,55 @@ interface Props {
 
 const columnCls = "w-1/5 px-6 py-3";
 const iconButtonCls = "border-0 shadow-none !p-2 min-w-0";
+const MAX_VISIBLE_AVATARS = 2;
+
+function getResourcesTotal(skill: Skill) {
+    const avatarCount = skill.avatarUrls?.length ?? 0;
+    return skill.resourcesCount ?? avatarCount;
+}
+
+function shouldShowMoreResources(skill: Skill) {
+    const avatarCount = skill.avatarUrls?.length ?? 0;
+    const total = getResourcesTotal(skill);
+    return total > MAX_VISIBLE_AVATARS || avatarCount > MAX_VISIBLE_AVATARS;
+}
+
+function ResourcesCell({ skill }: { skill: Skill }) {
+    const avatarUrls = skill.avatarUrls ?? [];
+    const total = getResourcesTotal(skill);
+    const showMore = shouldShowMoreResources(skill);
+    const visibleAvatars = avatarUrls.slice(0, MAX_VISIBLE_AVATARS);
+
+    return (
+        <div className="flex items-center gap-2.5">
+            <span className="text-sm font-semibold text-slate-900 tabular-nums shrink-0">
+                {total}
+            </span>
+
+            {(visibleAvatars.length > 0 || showMore) && (
+                <div className="flex items-center -space-x-2">
+                    {visibleAvatars.map((url, index) => (
+                        <Avatar
+                            key={`${skill.id}-avatar-${index}`}
+                            name={`${skill.name} ${index + 1}`}
+                            photoUrl={url}
+                            size={28}
+                        />
+                    ))}
+
+                    {showMore && (
+                        <div
+                            className="size-7 rounded-full flex items-center justify-center shrink-0 bg-slate-100 border-2 border-white text-slate-500 text-sm font-semibold leading-none"
+                            aria-label="Mais recursos"
+                        >
+                            +
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
 
 function formatAverageProficiency(value?: number) {
     const proficiency = value ?? 0;
@@ -41,25 +90,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
         },
         {
             header: "QTD. RECURSOS",
-            render: (skill: Skill) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800 min-w-[2rem]">
-                        {skill.resourcesCount ?? 0}
-                    </span>
-                    {skill.avatarUrls && skill.avatarUrls.length > 0 && (
-                        <div className="flex -space-x-2">
-                            {skill.avatarUrls.slice(0, 3).map((url, index) => (
-                                <Avatar
-                                    key={`${skill.id}-avatar-${index}`}
-                                    name={`${skill.name} ${index + 1}`}
-                                    photoUrl={url}
-                                    size={28}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            ),
+            render: (skill: Skill) => <ResourcesCell skill={skill} />,
             className: columnCls,
         },
         {
