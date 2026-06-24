@@ -30,8 +30,8 @@ export function SkillsFilters({
 }: Props) {
     return (
         <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4">
-            <div className="flex flex-col lg:flex-row lg:items-end gap-4">
-                <div className="flex-1 min-w-[220px]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                <div className="min-w-0 lg:col-span-4">
                     <label className={filterLabelCls}>NOME DA SKILL</label>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
@@ -39,30 +39,31 @@ export function SkillsFilters({
                             placeholder="Ex: React, Python, Scrum..."
                             value={search}
                             onChange={(e) => onSearchChange(e.target.value)}
-                            className="pl-9 text-sm py-2.5"
+                            className="pl-9 pr-3"
                         />
                     </div>
                 </div>
 
-                <div className="w-full lg:w-56">
+                <div className="min-w-0 lg:col-span-4">
                     <label className={filterLabelCls}>CATEGORIA</label>
                     <Select
-                        className="px-3.5 py-2.5 text-sm w-full border border-slate-300 rounded-lg focus:ring-pink focus:border-pink focus:shadow-focus-pink"
                         options={CATEGORY_OPTIONS}
                         value={selectedCategory}
                         onChange={(e) => onCategoryChange(e.target.value)}
                     />
                 </div>
 
-                <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={onClear}
-                    className="border-0 bg-transparent text-slate-500 hover:text-pink hover:bg-transparent shadow-none font-medium self-end lg:mb-0.5"
-                >
-                    Limpar Filtros
-                </Button>
+                <div className="min-w-0 lg:col-span-4 flex items-end">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="md"
+                        onClick={onClear}
+                        className="w-full px-3 py-2"
+                    >
+                        Limpar Filtros
+                    </Button>
+                </div>
             </div>
         </div>
     );

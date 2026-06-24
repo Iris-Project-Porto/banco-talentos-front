@@ -12,14 +12,15 @@ interface Props<T> {
     keyExtractor: (row: T) => string | number;
     emptyMessage?: string;
     minRows?: number;
+    className?: string;
 }
 
-export function Table<T>({ columns, data, keyExtractor, emptyMessage = "Sem dados disponíveis", minRows = 0 }: Props<T>) {
+export function Table<T>({ columns, data, keyExtractor, emptyMessage = "Sem dados disponíveis", minRows = 0, className = "" }: Props<T>) {
     const emptyRows = data.length === 0 ? 0 : Math.max(0, minRows - data.length);
 
     return (
         <div className="w-full text-sm border-collapse">
-            <table className="w-full text-left border-collapse">
+            <table className={`w-full text-left border-collapse ${className}`}>
                 <thead>
                     <tr className="bg-gray-100">
                         {columns.map((column) => (

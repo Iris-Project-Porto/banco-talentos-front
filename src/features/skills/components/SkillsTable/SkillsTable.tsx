@@ -12,6 +12,7 @@ interface Props {
     onDelete?: (skill: Skill) => void;
 }
 
+const columnCls = "w-1/5 px-6 py-3";
 const iconButtonCls = "border-0 shadow-none !p-2 min-w-0";
 
 function formatAverageProficiency(value?: number) {
@@ -31,12 +32,12 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                     </p>
                 </div>
             ),
-            className: "min-w-[220px]",
+            className: columnCls,
         },
         {
             header: "CATEGORIA",
             render: (skill: Skill) => <SkillCategoryBadge category={skill.category} />,
-            className: "w-36",
+            className: columnCls,
         },
         {
             header: "QTD. RECURSOS",
@@ -59,7 +60,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                     )}
                 </div>
             ),
-            className: "w-44",
+            className: columnCls,
         },
         {
             header: "NÍVEL MÉDIO",
@@ -67,7 +68,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                 const proficiency = skill.averageProficiency ?? 0;
 
                 return (
-                    <div className="flex flex-col gap-1.5 min-w-[180px]">
+                    <div className="flex flex-col gap-1.5 max-w-[180px]">
                         <span className="text-sm text-slate-700">
                             {formatAverageProficiency(skill.averageProficiency)}
                         </span>
@@ -80,12 +81,12 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                     </div>
                 );
             },
-            className: "w-52",
+            className: columnCls,
         },
         {
             header: "AÇÕES",
             render: (skill: Skill) => (
-                <div className="flex items-center gap-1 justify-end">
+                <div className="flex items-center justify-end gap-1">
                     <Button
                         type="button"
                         variant="secondary"
@@ -111,12 +112,13 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                     </Button>
                 </div>
             ),
-            className: "w-24",
+            className: `${columnCls} text-right`,
         },
     ];
 
     return (
         <Table<Skill>
+            className="table-fixed"
             columns={columns}
             data={data}
             keyExtractor={(skill) => skill.id}

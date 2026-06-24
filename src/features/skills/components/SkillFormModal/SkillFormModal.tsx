@@ -99,21 +99,21 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
                 <form onSubmit={handleSubmit(onSubmit)} className="overflow-y-auto flex-1">
                     <div className="px-7 py-6 flex flex-col gap-5">
                         <Input
-                            label="Nome da Skill"
+                            label="NOME DA SKILL"
                             placeholder="Ex: Kubernetes, Lógica de Programação, Figma..."
                             error={errors.name?.message}
                             {...register("name")}
                         />
 
                         <Select
-                            label="Tipo"
+                            label="TIPO"
                             options={TYPE_OPTIONS}
                             error={errors.type?.message}
                             {...register("type")}
                         />
 
                         <Select
-                            label="Categoria"
+                            label="CATEGORIA"
                             options={CATEGORY_OPTIONS}
                             error={errors.category?.message}
                             {...register("category")}
@@ -121,12 +121,12 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
 
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-medium text-slate-600">
-                                Descrição (opcional)
+                                DESCRIÇÃO DA COMPETÊNCIA
                             </label>
                             <textarea
                                 className={`${textareaCls} ${errors.description ? "border-red-400" : ""}`}
-                                rows={3}
-                                placeholder="Descreva a competência..."
+                                rows={4}
+                                placeholder="Descreva brevemente o que compõe essa skill e quais os critérios para avaliação"
                                 {...register("description")}
                             />
                             <ErrorMsg msg={errors.description?.message} />

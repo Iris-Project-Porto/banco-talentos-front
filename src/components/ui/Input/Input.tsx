@@ -1,5 +1,6 @@
 import { InputHTMLAttributes, forwardRef, ReactNode, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -27,12 +28,12 @@ export const Input = forwardRef<HTMLInputElement, Props>(
           <input
             ref={ref}
             type={inputType}
-            className={`w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border
-              ${error ? "border-red-400" : "border-slate-300"}
-              focus:border-pink focus:shadow-focus-pink
-              placeholder:text-slate-400 text-slate-900 
-              ${isPasswordType ? 'pr-11' : ''} 
-              ${className}`}
+            className={twMerge(
+              "h-10 w-full rounded-lg border bg-white px-3 font-sans text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-pink focus:shadow-focus-pink",
+              error ? "border-red-400" : "border-slate-300",
+              isPasswordType ? "pr-11" : "",
+              className,
+            )}
             {...props}
           />
 
