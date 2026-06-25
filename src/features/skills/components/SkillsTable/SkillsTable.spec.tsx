@@ -184,10 +184,10 @@ describe('Componente SkillsTable', () => {
         const { container } = render(<SkillsTable data={mockSkills} />);
 
         const headers = container.querySelectorAll('th');
-        expect(headers[0]).toHaveTextContent('SKILL');
-        expect(headers[1]).toHaveTextContent('CATEGORIA');
-        expect(headers[2]).toHaveTextContent('QTD. RECURSOS');
-        expect(headers[3]).toHaveTextContent('NÍVEL MÉDIO');
-        expect(headers[4]).toHaveTextContent('AÇÕES');
+        expect(headers[0]).toHaveTextContent('Skill');
+        expect(headers[1]).toHaveTextContent('Categoria');
+        expect(headers[2]).toHaveTextContent('Qtd. Recursos');
+        expect(headers[3]).toHaveTextContent('Nível Médio');
+        expect(headers[4]).toHaveTextContent('Ações');
     });
 });
