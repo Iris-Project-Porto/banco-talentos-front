@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,20 +8,37 @@ import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { resetPasswordSchema, type ResetPasswordFormData } from "@/features/auth/validations/validations";
 import { getApiError } from "@/lib/axios";
 
+type TokenStatus = "loading" | "valid" | "invalid";
+
 export default function ResetPassword() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [error, setError] = useState("");
+  const [tokenStatus, setTokenStatus] = useState<TokenStatus>("loading");
+
+  const email = params.get("email") ?? "";
+  const token = params.get("token") ?? "";
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: params.get("email") ?? "",
-      token: params.get("token") ?? "",
+      email,
+      token,
       password: "",
       confirm: ""
     }
   });
+
+  useEffect(() => {
+    if (!email || !token) {
+      setTokenStatus("invalid");
+      return;
+    }
+
+    authApi.validateResetToken(email, token)
+      .then(() => setTokenStatus("valid"))
+      .catch(() => setTokenStatus("invalid"));
+  }, [email, token]);
 
   async function onSubmit(data: ResetPasswordFormData) {
     setError("");
@@ -31,6 +48,38 @@ export default function ResetPassword() {
     } catch (err: unknown) {
       setError(getApiError(err, "Erro ao redefinir senha. O link pode ter expirado."));
     }
+  }
+
+  if (tokenStatus === "loading") {
+    return (
+      <AuthLayout footer={
+        <Link to="/login" className="text-xs text-pink font-medium hover:underline">Voltar ao login</Link>
+      }>
+        <p className="text-sm text-slate-400">Verificando link de redefinição...</p>
+      </AuthLayout>
+    );
+  }
+
+  if (tokenStatus === "invalid") {
+    return (
+      <AuthLayout footer={
+        <Link to="/login" className="text-xs text-pink font-medium hover:underline">Voltar ao login</Link>
+      }>
+        <h1 className="text-lg font-bold text-slate-900 mb-1">Link expirado</h1>
+        <p className="text-sm text-slate-400 my-4">
+          Este link de redefinição de senha expirou ou é inválido. Solicite um novo link para continuar.
+        </p>
+        <div className="flex justify-center">
+          <Link
+            to="/forgot-password"
+            className="inline-flex items-center justify-center rounded-lg bg-pink px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          >
+            Solicitar novo link
+          </Link>
+        </div>
+     
+      </AuthLayout>
+    );
   }
 
   return (

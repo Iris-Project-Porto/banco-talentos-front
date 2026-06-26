@@ -43,7 +43,7 @@ Seção dedicada para visualização e acesso à URL dos formulários customizad
 - **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
 
 **Autenticação completa e segura**
-Fluxo de login, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha, via JWT com interceptadores Axios que previnem loops em respostas 401.
+Fluxo de login, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha (link com validade de 1 hora, validado ao abrir a página e no envio do formulário), via JWT com interceptadores Axios que previnem loops em respostas 401.
 
 **Validação robusta de formulários**
 Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, incluindo:
@@ -176,7 +176,7 @@ src/
 | `/register` | `Register` | Público |
 | `/verify` | `VerifyEmail` | Público |
 | `/forgot-password` | `ForgotPassword` | Público |
-| `/reset-password` | `ResetPassword` | Público |
+| `/reset-password` | `ResetPassword` | Público (requer `?token=` e `?email=` válidos na URL) |
 | `/meu-perfil` | `MeuPerfil` | 🔒 Recurso |
 | `/meu-historico` | `MeuHistorico` | 🔒 Recurso |
 | `/admin/dashboard` | `Dashboard` | 🔒 Admin |
@@ -268,14 +268,23 @@ Todas as chamadas são feitas via `src/lib/axios.ts` com autenticação JWT.
 
 ### 🔒 Autenticação
 
+Base path: `/v1/auth` (prefixo `/api` é adicionado pelo Axios em produção ou pelo proxy do Vite em desenvolvimento).
+
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `POST` | `/auth/login` | Autentica o usuário e retorna o token |
-| `POST` | `/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
-| `POST` | `/auth/verify` | Valida o código OTP de ativação de e-mail |
-| `POST` | `/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
-| `POST` | `/auth/forgot-password` | Solicita e-mail de recuperação de senha |
-| `POST` | `/auth/reset-password` | Redefine a senha via token enviado por e-mail |
+| `POST` | `/v1/auth/login` | Autentica o usuário e retorna o token |
+| `POST` | `/v1/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
+| `POST` | `/v1/auth/verify` | Valida o código OTP de ativação de e-mail |
+| `POST` | `/v1/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
+| `POST` | `/v1/auth/forgot-password` | Solicita e-mail de recuperação de senha |
+| `GET` | `/v1/auth/validate-reset-token` | Valida se o link de redefinição ainda é válido (`?email=` e `?token=`; expira em 1 hora) |
+| `POST` | `/v1/auth/reset-password` | Redefine a senha via token enviado por e-mail |
+
+**Fluxo de redefinição de senha (`ResetPassword.tsx`):**
+1. Usuário acessa `/reset-password?token=...&email=...` recebido por e-mail.
+2. O front chama `GET /v1/auth/validate-reset-token` ao carregar a página.
+3. Se o token estiver expirado ou inválido, exibe mensagem e orienta a solicitar novo link em `/forgot-password`.
+4. Se válido, exibe o formulário; ao salvar, chama `POST /v1/auth/reset-password` (validação repetida no backend).
 
 ### 👤 Perfil do Talento
 
