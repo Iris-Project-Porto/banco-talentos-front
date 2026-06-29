@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { profilesApi } from "../../api/profiles.api";
 import type { UserProfile } from "../../types/profile";
@@ -8,7 +8,6 @@ export interface DashData {
     active: number;
     pending: number;
     topSkillsByProficiency?: { name: string; score: number }[];
-    topSkillsByImportance?: { name: string; score: number }[];
     levelCount?: Record<string, number>;
 }
 
@@ -22,8 +21,6 @@ export const ALOCACAO_COLORS: Record<string, string> = {
 };
 
 export function useDashboardStats() {
-    const [skillView, setSkillView] = useState<"proficiency" | "importance">("proficiency");
-
     const { data: dashData, isLoading: loadingDash } = useQuery<DashData>({
         queryKey: ['dashboard-data'],
         queryFn: profilesApi.getDashboard,
@@ -50,9 +47,7 @@ export function useDashboardStats() {
         const maxAlocacao = alocacaoEntries.reduce((m, [, v]) => Math.max(m, v), 1);
         const disponiveisBench = alocacaoMap["Disponível (Bench)"] ?? 0;
 
-        const skillsToRender = skillView === "proficiency"
-            ? (dashData.topSkillsByProficiency || [])
-            : (dashData.topSkillsByImportance || []);
+        const skillsToRender = dashData.topSkillsByProficiency || [];
         const maxSkill = skillsToRender.reduce((m: number, s: any) => Math.max(m, s.score), 1);
 
         const nivelCalculado = {
@@ -71,12 +66,10 @@ export function useDashboardStats() {
             skillsToRender,
             maxSkill
         };
-    }, [allProfiles, dashData, skillView]);
+    }, [allProfiles, dashData]);
 
     return {
         loading: loadingDash || loadingProfiles,
-        skillView,
-        setSkillView,
         stats,
         allProfilesLength: allProfiles.length
     };

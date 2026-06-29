@@ -2,6 +2,8 @@ import { PageHeader, StatCard, Card, Badge } from "@/components/ui";
 import { useDashboardStats, ALOCACAO_COLORS } from "@/features/profiles";
 import { vagasApi } from "@/features/vagas";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 
 const NIVEL_ROWS = [
   { label: "Sênior", key: "Sr", variant: "senior" },
@@ -10,7 +12,8 @@ const NIVEL_ROWS = [
 ] as const;
 
 export default function Dashboard() {
-  const { loading: loadingProfiles, skillView, setSkillView, stats, allProfilesLength } = useDashboardStats();
+  const navigate = useNavigate();
+  const { loading: loadingProfiles, stats, allProfilesLength } = useDashboardStats();
 
   const { data: vagasAtivas, isLoading: loadingVagas } = useQuery({
     queryKey: ['dashboard-vagas-ativas'],
@@ -29,7 +32,8 @@ export default function Dashboard() {
         <StatCard label="Total de cadastros" value={stats.dashData.total} to="/admin/usuarios" />
         <StatCard label="Perfis ativos" value={stats.dashData.active} accentColor="#E11D48" to="/admin/alocados" />
         <StatCard label="Aguardando revisão" value={stats.dashData.pending} accentColor={stats.dashData.pending > 0 ? "#D97706" : undefined} to="/admin/fila" />
-        <StatCard label="Vagas Ativas" value={vagasAtivas?.totalElements ?? 0} accentColor="#8B5CF6" to="/admin/vagas" />      </div>
+        <StatCard label="Vagas Ativas" value={vagasAtivas?.totalElements ?? 0} accentColor="#8B5CF6" to="/admin/vagas" />
+      </div>
 
       <div className="flex items-center gap-2 pt-2">
         <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-400">Alocação</p>
@@ -89,22 +93,27 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="col-span-1 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Top Skills</p>
-            <div className="flex bg-slate-100 p-0.5 rounded-lg">
-              <button onClick={() => setSkillView("proficiency")} className={`px-3 py-1 rounded-md text-xs font-medium ${skillView === "proficiency" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"}`}>Por Proficiência</button>
-              <button onClick={() => setSkillView("importance")} className={`px-3 py-1 rounded-md text-xs font-medium ${skillView === "importance" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"}`}>Por Importância</button>
-            </div>
+          <div className="flex flex-col mb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Top Skills por Proficiência</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Clique em uma skill para filtrar os recursos correspondentes no banco de talentos</p>
           </div>
           <div className="flex flex-col gap-2.5">
             {stats.skillsToRender.length === 0 && <p className="text-sm text-slate-400">Nenhuma skill ainda.</p>}
             {stats.skillsToRender.map(({ name, score }) => (
-              <div key={name} className="flex items-center gap-3">
-                <span className="w-32 truncate text-sm text-slate-700 font-mono">{name}</span>
-                <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                  <div className={`h-full rounded-full ${skillView === "proficiency" ? "bg-pink" : "bg-indigo-500"}`} style={{ width: `${(score / stats.maxSkill) * 100}%` }} />
+              <div
+                key={name}
+                className="flex items-center gap-3 cursor-pointer group hover:bg-pink/5 p-1.5 -mx-1.5 rounded-lg transition-colors"
+                onClick={() => navigate(`/admin/talentos?skill=${encodeURIComponent(name)}`)}
+                title={`Filtrar talentos pela skill: ${name}`}
+              >
+                <div className="w-40 flex items-center justify-between pr-2">
+                  <span className="truncate text-sm text-slate-700 font-mono group-hover:text-pink transition-colors">{name}</span>
+                  <Search className="w-3.5 h-3.5 text-pink opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
                 </div>
-                <span className="text-xs w-8 text-right text-slate-400">{Math.round(score)}</span>
+                <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="h-full rounded-full bg-pink" style={{ width: `${(score / stats.maxSkill) * 100}%` }} />
+                </div>
+                <span className="text-xs w-8 text-right text-slate-400 group-hover:text-pink transition-colors">{Math.round(score)}</span>
               </div>
             ))}
           </div>

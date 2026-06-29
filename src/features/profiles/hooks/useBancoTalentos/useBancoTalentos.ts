@@ -1,17 +1,21 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { profilesApi } from "../../api/profiles.api";
 import type { UserProfile } from "../../types/profile";
 
 export function useBancoTalentos() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const skillParam = searchParams.get("skill") || "";
+
     const [search, setSearch] = useState("");
     const [area, setArea] = useState("");
 
     const [page, setPage] = useState(0);
 
     const { data, isLoading: loading } = useQuery({
-        queryKey: ['profiles-ativos', page],
-        queryFn: () => profilesApi.getAtivos(page, 20)
+        queryKey: ['profiles-ativos', page, skillParam],
+        queryFn: () => profilesApi.getAtivos(page, 20, skillParam)
     });
 
     const profiles: UserProfile[] = data?.content || [];
@@ -20,7 +24,7 @@ export function useBancoTalentos() {
 
     useEffect(() => {
         setPage(0);
-    }, [search, area]);
+    }, [search, area, skillParam]);
 
     const areas = useMemo(() => Array.from(new Set(profiles.map((p) => p.area).filter(Boolean))), [profiles]);
     const disponiveis = useMemo(() => profiles.filter((p) => p.allocationStatus === "Disponível (Bench)"), [profiles]);
@@ -34,8 +38,16 @@ export function useBancoTalentos() {
         );
     }), [disponiveis, search, area]);
 
+    const clearSkillFilter = () => {
+        const params = new URLSearchParams(searchParams);
+        params.delete("skill");
+        setSearchParams(params);
+        setPage(0);
+    };
+
     return {
         search, setSearch, area, setArea, areas, filtered, loading,
-        page, setPage, totalPages, totalElements
+        page, setPage, totalPages, totalElements,
+        skillParam, clearSkillFilter
     };
 }
