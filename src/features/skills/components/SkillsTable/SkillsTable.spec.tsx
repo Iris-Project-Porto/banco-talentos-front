@@ -46,10 +46,10 @@ describe('Componente SkillsTable', () => {
         expect(screen.getByText('Figma')).toBeInTheDocument();
     });
 
-    it('deve exibir descrição e categorias em português', () => {
+    it('deve exibir o tipo da skill e categorias em português', () => {
         render(<SkillsTable data={mockSkills} />);
 
-        expect(screen.getByText('Biblioteca JS')).toBeInTheDocument();
+        expect(screen.getAllByText('HARD')).toHaveLength(3);
         expect(screen.getByText('Frontend')).toBeInTheDocument();
         expect(screen.getByText('Backend')).toBeInTheDocument();
         expect(screen.getByText('Design')).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe('Componente SkillsTable', () => {
         const handleEdit = vi.fn();
         render(<SkillsTable data={mockSkills} onEdit={handleEdit} />);
 
-        fireEvent.click(screen.getAllByRole('button', { name: 'Editar skill' })[0]);
+        fireEvent.click(screen.getAllByTitle('Detalhes/Editar')[0]);
 
         expect(handleEdit).toHaveBeenCalledWith(mockSkills[0]);
     });
@@ -160,7 +160,7 @@ describe('Componente SkillsTable', () => {
         const handleDelete = vi.fn();
         render(<SkillsTable data={mockSkills} onDelete={handleDelete} />);
 
-        fireEvent.click(screen.getAllByRole('button', { name: 'Excluir skill' })[0]);
+        fireEvent.click(screen.getAllByTitle('Excluir skill')[0]);
 
         expect(handleDelete).toHaveBeenCalledWith(mockSkills[0]);
     });
@@ -174,7 +174,7 @@ describe('Componente SkillsTable', () => {
             />
         );
 
-        const deleteButtons = screen.getAllByRole('button', { name: 'Excluir skill' });
+        const deleteButtons = screen.getAllByTitle('Excluir skill');
 
         expect(deleteButtons[0]).toBeDisabled();
         expect(deleteButtons[1]).not.toBeDisabled();

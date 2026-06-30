@@ -18,8 +18,8 @@ const PAGE_SIZE = 10;
 export default function Skills() {
     const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);
-    const [editing, setEditing] = useState<(Partial<SkillPayload> & { id?: string }) | null>(null);
     const [skillToDelete, setSkillToDelete] = useState<Skill | null>(null);
+    const [editing, setEditing] = useState<(Partial<SkillPayload> & { id?: string }) | null>(null);
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
     const [page, setPage] = useState(0);
@@ -72,6 +72,7 @@ export default function Skills() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["skills"] });
             closeModal();
+            toast.success("Skill salva com sucesso!");
         },
         onError: (error) => {
             console.error("Erro ao salvar skill:", error);
@@ -84,6 +85,7 @@ export default function Skills() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["skills"] });
             setSkillToDelete(null);
+            toast.success("Skill excluída com sucesso!");
         },
         onError: (error) => {
             console.error("Erro ao excluir skill:", error);
@@ -118,6 +120,10 @@ export default function Skills() {
         setPage(0);
     }
 
+    function handleDelete(skill: Skill) {
+        setSkillToDelete(skill);
+    }
+
     function confirmDelete() {
         if (skillToDelete) {
             deleteMutation.mutate(skillToDelete.id);
@@ -131,7 +137,7 @@ export default function Skills() {
                 subtitle="Catálogo de competências técnicas e comportamentais"
                 actions={
                     <Button variant="primary" size="md" onClick={openNew}>
-                        + Cadastrar Skill
+                        + Nova Skill
                     </Button>
                 }
             />
@@ -158,7 +164,7 @@ export default function Skills() {
                             deleteMutation.isPending ? (deleteMutation.variables ?? null) : null
                         }
                         onEdit={openEdit}
-                        onDelete={setSkillToDelete}
+                        onDelete={handleDelete}
                     />
 
                     <Pagination

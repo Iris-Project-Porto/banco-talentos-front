@@ -1,6 +1,5 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar/Avatar";
-import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { SkillCategoryBadge } from "../SkillCategoryBadge/SkillCategoryBadge";
 import type { Skill } from "../../types/types";
@@ -73,7 +72,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
                 <div className="min-w-0">
                     <p className="font-bold text-slate-900 truncate">{skill.name}</p>
                     <p className="text-xs text-slate-500 truncate mt-0.5">
-                        {skill.description || skill.type}
+                        {skill.type}
                     </p>
                 </div>
             ),
@@ -108,30 +107,24 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
             header: "Ações",
             className: "text-right",
             render: (skill: Skill) => (
-                <div className="flex items-center justify-end gap-2">
-                    <Button
+                <div className="flex items-center justify-end gap-1">
+                    <button
                         type="button"
-                        variant="secondary"
-                        size="sm"
                         onClick={() => onEdit?.(skill)}
-                        className="min-w-0 border-0 bg-slate-50 p-1.5 shadow-none font-normal rounded-md text-slate-400 hover:text-pink hover:bg-pink/10 active:scale-100 focus-visible:shadow-none"
-                        title="Editar skill"
-                        aria-label="Editar skill"
+                        className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors p-1.5 rounded-md"
+                        title="Detalhes/Editar"
                     >
                         <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                         type="button"
-                        variant="secondary"
-                        size="sm"
                         onClick={() => onDelete?.(skill)}
                         disabled={deletingSkillId === skill.id}
-                        className="min-w-0 border-0 bg-slate-50 p-1.5 shadow-none font-normal rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 active:scale-100 focus-visible:shadow-none disabled:hover:bg-slate-50 disabled:hover:text-slate-400"
+                        className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
                         title="Excluir skill"
-                        aria-label="Excluir skill"
                     >
                         <Trash2 className="w-4 h-4" />
-                    </Button>
+                    </button>
                 </div>
             ),
         },
