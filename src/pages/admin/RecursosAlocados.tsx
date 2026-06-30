@@ -1,7 +1,10 @@
 import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { PageHeader, Card } from "@/components/ui";
+import { PageHeader, Card, Input, Select } from "@/components/ui";
 import { PersonCard, profilesApi, type UserProfile } from "@/features/profiles";
+
+const filterLabelCls = "block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5";
 
 const STATUS_ALOCADO = new Set([
   "Alocado Integral (100%)",
@@ -28,7 +31,25 @@ export default function RecursosAlocados() {
     }
   });
 
-  const areas = useMemo(() => Array.from(new Set(profiles.map((p) => p.area).filter(Boolean))), [profiles]);
+  const areas = useMemo(
+    () => Array.from(new Set(profiles.map((p) => p.area).filter((a): a is string => Boolean(a)))),
+    [profiles],
+  );
+
+  const areaOptions = useMemo(
+    () => [
+      { value: "", label: "Todas" },
+      ...areas.map((a) => ({ value: a, label: a })),
+    ],
+    [areas],
+  );
+
+  const statusOptions = [
+    { value: "", label: "Todos" },
+    { value: "Alocado Integral (100%)", label: "Integral" },
+    { value: "Alocado Parcial", label: "Parcial" },
+    { value: "Em Transição (saindo de projeto)", label: "Em Transição" },
+  ];
 
   const filtered = useMemo(() => profiles.filter((p) => {
     const q = search.toLowerCase();
@@ -67,38 +88,44 @@ export default function RecursosAlocados() {
         </div>
       </div>
 
-      <Card padding="sm" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500">Business Unit:</span>
-          <select
-            value={area} onChange={(e) => setArea(e.target.value)}
-            className="text-sm border border-slate-300 rounded-md px-3 py-1.5 outline-none focus:border-pink focus:shadow-focus-pink bg-white text-slate-900"
-          >
-            <option value="">All</option>
-            {areas.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
+      <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="min-w-0 lg:col-span-4">
+            <label className={filterLabelCls}>BUSCA</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
+              <Input
+                placeholder="Buscar por nome, área ou skill..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-3"
+              />
+            </div>
+          </div>
+
+          <div className="min-w-0 lg:col-span-4">
+            <label className={filterLabelCls}>BUSINESS UNIT</label>
+            <Select
+              options={areaOptions}
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+            />
+          </div>
+
+          <div className="min-w-0 lg:col-span-4">
+            <label className={filterLabelCls}>STATUS</label>
+            <Select
+              options={statusOptions}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500">Status:</span>
-          <select
-            value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm border border-slate-300 rounded-md px-3 py-1.5 outline-none focus:border-pink focus:shadow-focus-pink bg-white text-slate-900"
-          >
-            <option value="">Todos</option>
-            <option value="Alocado Integral (100%)">Integral</option>
-            <option value="Alocado Parcial">Parcial</option>
-            <option value="Em Transição (saindo de projeto)">Em Transição</option>
-          </select>
-        </div>
-        <div className="flex-1">
-          <input
-            placeholder="Search..."
-            value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full text-sm border border-slate-300 rounded-md px-3 py-1.5 outline-none focus:border-pink focus:shadow-focus-pink bg-white text-slate-900"
-          />
-        </div>
-        <span className="text-xs text-slate-400">{filtered.length} pessoa{filtered.length !== 1 ? "s" : ""}</span>
-      </Card>
+      </div>
+
+      <p className="text-sm text-slate-500">
+        {filtered.length} pessoa{filtered.length !== 1 ? "s" : ""}
+      </p>
 
       {filtered.length === 0 ? (
         <Card className="py-12 text-center">
