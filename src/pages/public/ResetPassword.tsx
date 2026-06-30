@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +15,6 @@ export default function ResetPassword() {
   const email = params.get("email") ?? "";
   const token = params.get("token") ?? "";
   const hasParams = Boolean(email && token);
-  const [passwordFieldsReady, setPasswordFieldsReady] = useState(false);
 
   const { isLoading: isValidating, isError: isTokenInvalid } = useQuery({
     queryKey: ["validate-reset-token", email, token],
@@ -34,13 +32,6 @@ export default function ResetPassword() {
       confirm: "",
     },
   });
-
-  const passwordRegister = register("password");
-  const confirmRegister = register("confirm");
-
-  function enablePasswordFields() {
-    setPasswordFieldsReady(true);
-  }
 
   const resetMutation = useMutation({
     mutationFn: (data: ResetPasswordFormData) =>
@@ -111,9 +102,7 @@ export default function ResetPassword() {
           placeholder="Ex: Senha@123"
           autoFocus
           autoComplete="new-password"
-          readOnly={!passwordFieldsReady}
-          {...passwordRegister}
-          onFocus={() => enablePasswordFields()}
+          {...register("password")}
           error={errors.password?.message}
         />
         <Input
@@ -121,9 +110,7 @@ export default function ResetPassword() {
           type="password"
           placeholder="••••••••"
           autoComplete="new-password"
-          readOnly={!passwordFieldsReady}
-          {...confirmRegister}
-          onFocus={() => enablePasswordFields()}
+          {...register("confirm")}
           error={errors.confirm?.message}
         />
 
