@@ -1,7 +1,30 @@
 import { useFormContext, Controller } from "react-hook-form";
+import { Input, Select } from "@/components/ui";
 import { type VagaFormData } from "../../validations/validations";
-import { Field, ErrorMsg, INPUT_CLS } from "../FormHelpers/FormHelpers";
 import { useVagaDependencies } from "../VagaModal/hooks/useVagaDependencies/useVagaDependencies";
+
+const EXPERIENCE_LEVEL_OPTIONS = [
+    { value: "JUNIOR", label: "Júnior" },
+    { value: "PLENO", label: "Pleno" },
+    { value: "SENIOR", label: "Sênior" },
+    { value: "ESPECIALISTA", label: "Especialista" },
+];
+
+const MODALITY_OPTIONS = [
+    { value: "", label: "Selecione..." },
+    { value: "REMOTO", label: "Remoto" },
+    { value: "HIBRIDO", label: "Híbrido" },
+    { value: "PRESENCIAL", label: "Presencial" },
+];
+
+const STATUS_OPTIONS = [
+    { value: "OPEN", label: "Aberta" },
+    { value: "SCREENING", label: "Em Triagem" },
+    { value: "ALLOCATING", label: "Em Alocação" },
+    { value: "FILLED", label: "Preenchida" },
+    { value: "CLOSED", label: "Encerrada" },
+    { value: "CANCELLED", label: "Cancelada" },
+];
 
 interface Props {
     canEdit: boolean;
@@ -15,98 +38,111 @@ export function GeneralFields({ canEdit, dependencies }: Props) {
     return (
         <fieldset disabled={!canEdit} className="flex flex-col gap-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Código da Vaga *">
-                    <input className={`${INPUT_CLS} ${errors.vacancyCode ? 'border-red-400' : ''}`} placeholder="Ex: VAG-001" {...register("vacancyCode")} />
-                    <ErrorMsg msg={errors.vacancyCode?.message} />
-                </Field>
-                <Field label="Título da Vaga *">
-                    <input className={`${INPUT_CLS} ${errors.title ? 'border-red-400' : ''}`} placeholder="Ex: Desenvolvedor React Sênior" {...register("title")} />
-                    <ErrorMsg msg={errors.title?.message} />
-                </Field>
+                <Input
+                    label="Código da Vaga *"
+                    placeholder="Ex: VAG-001"
+                    error={errors.vacancyCode?.message}
+                    {...register("vacancyCode")}
+                />
+                <Input
+                    label="Título da Vaga *"
+                    placeholder="Ex: Desenvolvedor React Sênior"
+                    error={errors.title?.message}
+                    {...register("title")}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Projeto *">
-                    <Controller
-                        name="projectId"
-                        control={control}
-                        render={({ field }) => (
-                            <select
-                                {...field}
-                                className={`${INPUT_CLS} ${errors.projectId ? 'border-red-400' : ''}`}
-                                disabled={loadingProjects || !canEdit}
-                            >
-                                <option value="">{loadingProjects ? "Carregando..." : "Selecione um projeto"}</option>
-                                {projects.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                            </select>
-                        )}
-                    />
-                    <ErrorMsg msg={errors.projectId?.message} />
-                </Field>
+                <Controller
+                    name="projectId"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            label="Projeto *"
+                            options={[
+                                { value: "", label: loadingProjects ? "Carregando..." : "Selecione um projeto" },
+                                ...projects.map((p: { id: string; name: string }) => ({ value: p.id, label: p.name })),
+                            ]}
+                            error={errors.projectId?.message}
+                            disabled={loadingProjects || !canEdit}
+                            {...field}
+                        />
+                    )}
+                />
 
-                <Field label="Squad Responsável *">
-                    <Controller
-                        name="squadId"
-                        control={control}
-                        render={({ field }) => (
-                            <select
-                                {...field}
-                                className={`${INPUT_CLS} ${errors.squadId ? 'border-red-400' : ''}`}
-                                disabled={(!loadingProjects && filteredSquads.length === 0) || loadingSquads || !canEdit}
-                            >
-                                <option value="">{loadingSquads ? "Carregando..." : filteredSquads.length === 0 ? "Nenhuma squad neste projeto" : "Selecione uma squad"}</option>
-                                {filteredSquads.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                            </select>
-                        )}
-                    />
-                    <ErrorMsg msg={errors.squadId?.message} />
-                </Field>
+                <Controller
+                    name="squadId"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            label="Squad Responsável *"
+                            options={[
+                                {
+                                    value: "",
+                                    label: loadingSquads
+                                        ? "Carregando..."
+                                        : filteredSquads.length === 0
+                                            ? "Nenhuma squad neste projeto"
+                                            : "Selecione uma squad",
+                                },
+                                ...filteredSquads.map((s: { id: string; name: string }) => ({ value: s.id, label: s.name })),
+                            ]}
+                            error={errors.squadId?.message}
+                            disabled={(!loadingProjects && filteredSquads.length === 0) || loadingSquads || !canEdit}
+                            {...field}
+                        />
+                    )}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Nível de Experiência (Senioridade) *">
-                    <select className={`${INPUT_CLS} ${errors.experienceLevel ? 'border-red-400' : ''}`} {...register("experienceLevel")}>
-                        <option value="JUNIOR">Júnior</option><option value="PLENO">Pleno</option>
-                        <option value="SENIOR">Sênior</option><option value="ESPECIALISTA">Especialista</option>
-                    </select>
-                    <ErrorMsg msg={errors.experienceLevel?.message} />
-                </Field>
-                <Field label="Modalidade *">
-                    <select className={`${INPUT_CLS} ${errors.modality ? 'border-red-400' : ''}`} {...register("modality")}>
-                        <option value="">Selecione...</option><option value="REMOTO">Remoto</option>
-                        <option value="HIBRIDO">Híbrido</option><option value="PRESENCIAL">Presencial</option>
-                    </select>
-                    <ErrorMsg msg={errors.modality?.message} />
-                </Field>
+                <Select
+                    label="Nível de Experiência (Senioridade) *"
+                    options={EXPERIENCE_LEVEL_OPTIONS}
+                    error={errors.experienceLevel?.message}
+                    {...register("experienceLevel")}
+                />
+                <Select
+                    label="Modalidade *"
+                    options={MODALITY_OPTIONS}
+                    error={errors.modality?.message}
+                    {...register("modality")}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Field label="Status da Vaga *">
-                    <select className={`${INPUT_CLS} ${errors.status ? 'border-red-400' : ''}`} {...register("status")}>
-                        <option value="OPEN">Aberta</option><option value="SCREENING">Em Triagem</option>
-                        <option value="ALLOCATING">Em Alocação</option><option value="FILLED">Preenchida</option>
-                        <option value="CLOSED">Encerrada</option><option value="CANCELLED">Cancelada</option>
-                    </select>
-                    <ErrorMsg msg={errors.status?.message} />
-                </Field>
-                <Field label="Data de Abertura *">
-                    <input type="date" className={`${INPUT_CLS} ${errors.openingDate ? 'border-red-400' : ''}`} {...register("openingDate")} />
-                    <ErrorMsg msg={errors.openingDate?.message} />
-                </Field>
-                <Field label="Data de Encerramento (Opcional)">
-                    <input type="date" className={INPUT_CLS} {...register("closingDate")} />
-                </Field>
+                <Select
+                    label="Status da Vaga *"
+                    options={STATUS_OPTIONS}
+                    error={errors.status?.message}
+                    {...register("status")}
+                />
+                <Input
+                    label="Data de Abertura *"
+                    type="date"
+                    error={errors.openingDate?.message}
+                    {...register("openingDate")}
+                />
+                <Input
+                    label="Data de Encerramento (Opcional)"
+                    type="date"
+                    {...register("closingDate")}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Field label="Recrutador *">
-                    <input className={`${INPUT_CLS} ${errors.recruiter ? 'border-red-400' : ''}`} placeholder="Nome do recrutador" {...register("recruiter")} />
-                    <ErrorMsg msg={errors.recruiter?.message} />
-                </Field>
-                <Field label="Semanas de Alocação Estimadas *">
-                    <input type="number" className={`${INPUT_CLS} ${errors.estimatedAllocationWeeks ? 'border-red-400' : ''}`} {...register("estimatedAllocationWeeks")} />
-                    <ErrorMsg msg={errors.estimatedAllocationWeeks?.message} />
-                </Field>
+                <Input
+                    label="Recrutador *"
+                    placeholder="Nome do recrutador"
+                    error={errors.recruiter?.message}
+                    {...register("recruiter")}
+                />
+                <Input
+                    label="Semanas de Alocação Estimadas *"
+                    type="number"
+                    error={errors.estimatedAllocationWeeks?.message}
+                    {...register("estimatedAllocationWeeks")}
+                />
                 <div className="flex items-center mt-6">
                     <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                         <input type="checkbox" className="w-4 h-4 text-pink rounded focus:ring-pink" {...register("isUrgent")} />
