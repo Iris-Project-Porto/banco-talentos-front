@@ -83,10 +83,36 @@ export default function ResetPassword() {
       <h1 className="text-lg font-bold text-slate-900 mb-1">Nova senha</h1>
       <p className="text-sm text-slate-400 mb-7">Defina uma nova senha para sua conta.</p>
 
-      <form onSubmit={handleSubmit((data) => resetMutation.mutate(data))} className="flex flex-col gap-4">
-        <Input label="E-mail" type="email" readOnly className="bg-slate-50 cursor-not-allowed text-slate-500" {...register("email")} />
-        <Input label="Nova senha" type="password" placeholder="Ex: Senha@123" autoFocus {...register("password")} error={errors.password?.message} />
-        <Input label="Confirmar senha" type="password" placeholder="••••••••" {...register("confirm")} error={errors.confirm?.message} />
+      <form
+        onSubmit={handleSubmit((data) => resetMutation.mutate(data))}
+        className="flex flex-col gap-4"
+        autoComplete="off"
+      >
+        <Input
+          label="E-mail"
+          type="email"
+          readOnly
+          className="bg-slate-50 cursor-not-allowed text-slate-500"
+          autoComplete="off"
+          {...register("email")}
+        />
+        <Input
+          label="Nova senha"
+          type="password"
+          placeholder="Ex: Senha@123"
+          autoFocus
+          autoComplete="new-password"
+          {...register("password")}
+          error={errors.password?.message}
+        />
+        <Input
+          label="Confirmar senha"
+          type="password"
+          placeholder="••••••••"
+          autoComplete="new-password"
+          {...register("confirm")}
+          error={errors.confirm?.message}
+        />
 
         {submitError && (
           <p className="rounded-lg px-3 py-2 text-xs bg-red-50 text-red-600 border border-red-100">{submitError}</p>
