@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { vagasApi, VagaCard, VagaModal, type JobPosting, type JobPostingPayload } from "@/features/vagas";
-import { PageHeader, Button, Pagination } from "@/components/ui";
+import { PageHeader, Button, ConfirmModal, Input, Pagination } from "@/components/ui";
 
 export default function Vagas() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [vagaToCancel, setVagaToCancel] = useState<JobPosting | null>(null);
   const [editing, setEditing] = useState<(Partial<JobPostingPayload> & { id?: string }) | null>(null);
   const [viewActive, setViewActive] = useState(true);
   const [search, setSearch] = useState("");
@@ -31,6 +33,7 @@ export default function Vagas() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vagas'] });
       closeModal();
+      setVagaToCancel(null);
       toast.success("Vaga salva com sucesso!");
     },
     onError: (error) => {
@@ -60,8 +63,12 @@ export default function Vagas() {
   function closeModal() { setModalOpen(false); setEditing(null); }
 
   function handleCancelJob(vaga: JobPosting) {
-    if (confirm(`Deseja realmente cancelar a vaga ${vaga.vacancyCode}?`)) {
-      saveMutation.mutate({ ...vaga, status: "CANCELLED" });
+    setVagaToCancel(vaga);
+  }
+
+  function confirmCancelJob() {
+    if (vagaToCancel) {
+      saveMutation.mutate({ ...vagaToCancel, status: "CANCELLED" });
     }
   }
 
@@ -70,7 +77,7 @@ export default function Vagas() {
       <PageHeader
         title="Vagas Externas"
         subtitle="Gestão de vagas, requisições e matching"
-        actions={<Button variant="primary" size="sm" onClick={openNew}>+ Nova vaga</Button>}
+        actions={<Button variant="primary" size="md" onClick={openNew}>+ Nova vaga</Button>}
       />
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4 flex items-center gap-4 flex-wrap">
@@ -88,12 +95,13 @@ export default function Vagas() {
             Inativas / Histórico
           </button>
         </div>
-        <div className="flex-1 min-w-[280px]">
-          <input
+        <div className="flex-1 min-w-[280px] relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
+          <Input
             placeholder="Buscar por código, título, projeto, recrutador, senioridade..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full text-sm border border-slate-300 rounded-md px-3 py-2 outline-none focus:border-pink focus:shadow-focus-pink"
+            className="pl-9 pr-3"
           />
         </div>
       </div>
@@ -125,6 +133,17 @@ export default function Vagas() {
           saving={saveMutation.isPending}
           onSave={(data) => saveMutation.mutate(data)}
           onClose={closeModal}
+        />
+      )}
+
+      {vagaToCancel && (
+        <ConfirmModal
+          title="Cancelar vaga"
+          message={`Deseja realmente cancelar a vaga ${vagaToCancel.vacancyCode}?`}
+          confirmLabel="Cancelar vaga"
+          loading={saveMutation.isPending}
+          onConfirm={confirmCancelJob}
+          onClose={() => setVagaToCancel(null)}
         />
       )}
     </div>

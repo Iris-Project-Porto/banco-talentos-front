@@ -30,7 +30,7 @@ export function SkillsFilters({
 }: Props) {
     return (
         <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 <div className="min-w-0 lg:col-span-4">
                     <label className={filterLabelCls}>NOME DA SKILL</label>
                     <div className="relative">
@@ -53,13 +53,14 @@ export function SkillsFilters({
                     />
                 </div>
 
-                <div className="min-w-0 lg:col-span-4 flex items-end">
+                <div className="min-w-0 lg:col-span-4">
+                    <label className={`${filterLabelCls} invisible`} aria-hidden="true">&nbsp;</label>
                     <Button
                         type="button"
                         variant="secondary"
                         size="md"
+                        fullWidth
                         onClick={onClear}
-                        className="w-full px-3 py-2"
                     >
                         Limpar Filtros
                     </Button>

@@ -1,8 +1,20 @@
 import { useMemo } from "react";
 import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
 import { Trash2, FileText, CheckCircle2, HelpCircle } from "lucide-react";
+import { Button, Input, Select } from "@/components/ui";
 import { type VagaFormData } from "@/features/vagas/validations/validations";
 import { ErrorMsg } from "../FormHelpers/FormHelpers";
+
+const SKILL_TYPE_OPTIONS = [
+    { value: "MANDATORY", label: "Obrigatória" },
+    { value: "DESIRABLE", label: "Desejável" },
+];
+
+const MIN_LEVEL_OPTIONS = [
+    { value: "BASIC", label: "Básico" },
+    { value: "INTERMEDIATE", label: "Intermediário" },
+    { value: "ADVANCED", label: "Avançado" },
+];
 
 export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
@@ -65,32 +77,34 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         <div key={field.id} className="grid grid-cols-12 gap-x-4 items-start pb-4 border-b border-slate-100 last:border-0 last:pb-0">
 
                             <div className="col-span-2">
-                                <input list="skill-suggestions" className="w-full text-sm outline-none bg-transparent text-slate-700 font-medium placeholder:font-normal placeholder:text-slate-400" placeholder="Ex: Java" {...register(`skills.${index}.name` as const)} />
+                                <Input
+                                    list="skill-suggestions"
+                                    placeholder="Ex: Java"
+                                    className="font-medium"
+                                    {...register(`skills.${index}.name` as const)}
+                                />
                                 <ErrorMsg msg={skillErr?.name?.message} />
                             </div>
 
                             <div className="col-span-2">
-                                <select
-                                    className={`w-full rounded-md border px-3 py-1.5 text-sm outline-none focus:border-pink cursor-pointer transition-colors ${skillType === 'MANDATORY'
+                                <Select
+                                    options={SKILL_TYPE_OPTIONS}
+                                    className={`cursor-pointer transition-colors ${skillType === 'MANDATORY'
                                         ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium'
                                         : 'bg-green-50 border-green-200 text-green-700 font-medium'
                                         }`}
                                     {...register(`skills.${index}.type` as const)}
-                                >
-                                    <option value="MANDATORY">Obrigatória</option>
-                                    <option value="DESIRABLE">Desejável</option>
-                                </select>
+                                />
                             </div>
 
                             <div className="col-span-2 flex flex-col items-center">
                                 <div className="flex items-center justify-center gap-2">
-                                    <input
+                                    <Input
                                         type="number"
-                                        min="0"
-                                        max="100"
-                                        className={`w-16 rounded-md border ${skillErr?.importanceWeight ? 'border-red-400' : 'border-slate-200'} px-2 py-1.5 text-center text-sm outline-none focus:border-pink`}
+                                        min={0}
+                                        max={100}
                                         placeholder="0"
-
+                                        className={`w-16 text-center ${skillErr?.importanceWeight ? 'border-red-400' : ''}`}
                                         {...register(`skills.${index}.importanceWeight` as const, { valueAsNumber: true })}
                                     />
                                     <span className="text-sm font-medium text-slate-600">%</span>
@@ -99,13 +113,11 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                             </div>
 
                             <div className="col-span-2">
-                                <select className="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm outline-none focus:border-pink bg-white" {...register(`skills.${index}.minLevel` as const)}>
-                                    <option value="BASIC">Básico</option>
-                                    <option value="INTERMEDIATE">Intermediário</option>
-                                    <option value="ADVANCED">Avançado</option>
-                                </select>
+                                <Select
+                                    options={MIN_LEVEL_OPTIONS}
+                                    {...register(`skills.${index}.minLevel` as const)}
+                                />
                             </div>
-
 
                             <div className="col-span-1 flex items-center justify-center gap-2 pt-1">
                                 <button type="button" onClick={() => remove(index)} className="text-xs text-red-400 hover:text-red-600 transition-colors" title="Excluir"><Trash2 className="w-4 h-4" /></button>
@@ -116,9 +128,15 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-                <button type="button" onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 0, description: "" })} className="flex items-center gap-1.5 text-blue-600 text-sm font-semibold border border-blue-600 rounded-md px-4 py-2 hover:bg-blue-50 transition-colors">
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 0, description: "" })}
+                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                >
                     + Adicionar Skill
-                </button>
+                </Button>
                 <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-4">
                         <span className="text-sm font-bold text-slate-700">Soma dos Pesos: <span className={totalSkillsWeight === 100 ? 'text-green-600' : 'text-red-500'}>{totalSkillsWeight}%</span></span>
