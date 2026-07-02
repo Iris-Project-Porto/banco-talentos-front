@@ -7,7 +7,6 @@ export const loginSchema = z.object({
         .email("E-mail inválido"),
     password: z.string({ required_error: "A senha é obrigatória" })
         .min(1, "A senha é obrigatória")
-        .max(8, "A senha deve ter no máximo 8 caracteres"),
 });
 
 export const registerSchema = z.object({
@@ -21,7 +20,6 @@ export const registerSchema = z.object({
     password: z.string({ required_error: "A senha é obrigatória" })
         .min(1, "A senha é obrigatória")
         .min(8, "A senha deve ter no mínimo 8 caracteres")
-        .max(8, "A senha deve ter no máximo 8 caracteres")
         .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
         .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial"),
     confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
@@ -46,8 +44,9 @@ export const resetPasswordSchema = z.object({
     token: z.string({ required_error: "O token é obrigatório" })
         .min(1, "O token é obrigatório"),
     password: z.string({ required_error: "A senha é obrigatória" })
-        .min(6, "A senha deve ter no mínimo 6 caracteres")
+        .min(8, "A senha deve ter no mínimo 8 caracteres")
         .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
+        .regex(/[0-9]/, "A senha deve conter pelo menos um número")
         .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial"),
     confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
         .min(1, "Confirme sua senha"),

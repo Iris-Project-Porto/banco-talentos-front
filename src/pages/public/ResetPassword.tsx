@@ -23,8 +23,9 @@ export default function ResetPassword() {
     retry: false,
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordFormData>({
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
+    mode: "onChange",
     defaultValues: {
       email,
       token,
@@ -118,7 +119,14 @@ export default function ResetPassword() {
           <p className="rounded-lg px-3 py-2 text-xs bg-red-50 text-red-600 border border-red-100">{submitError}</p>
         )}
 
-        <Button type="submit" variant="primary" size="lg" loading={resetMutation.isPending} className="mt-1">
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          loading={resetMutation.isPending}
+          disabled={!isValid}
+          className="mt-1"
+        >
           {resetMutation.isPending ? "Salvando..." : "Salvar nova senha"}
         </Button>
       </form>

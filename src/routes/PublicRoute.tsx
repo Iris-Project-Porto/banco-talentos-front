@@ -8,12 +8,14 @@ const FullScreenLoader = () => (
     </div>
 );
 
-export function PublicRoute() {
+interface PublicRouteProps {allowAuthenticated?: boolean;}
+
+export function PublicRoute({ allowAuthenticated = false }: PublicRouteProps) {
     const { user, loading } = useAuth();
 
     if (loading) return null;
 
-    if (user) {
+    if (user && !allowAuthenticated) {
         return <Navigate to={user.role === UserRole.ADMIN ? "/admin/dashboard" : "/meu-perfil"} replace />;
     }
 

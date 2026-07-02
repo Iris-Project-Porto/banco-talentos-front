@@ -77,6 +77,26 @@ describe('Auth Validations', () => {
             });
             expect(result.success).toBe(true);
         });
+
+        it('deve rejeitar senha com menos de 8 caracteres', () => {
+            const result = resetPasswordSchema.safeParse({
+                email: "teste@vilt-group.com",
+                token: "token-valido",
+                password: "Senha@1",
+                confirm: "Senha@1"
+            });
+            expect(result.success).toBe(false);
+        });
+
+        it('deve rejeitar senha sem número', () => {
+            const result = resetPasswordSchema.safeParse({
+                email: "teste@vilt-group.com",
+                token: "token-valido",
+                password: "Senha@abc",
+                confirm: "Senha@abc"
+            });
+            expect(result.success).toBe(false);
+        });
     });
 
     describe('forgotPasswordSchema', () => {
