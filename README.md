@@ -35,11 +35,14 @@ Painéis dedicados para visualizar talentos em projetos ativos e filtros robusto
 **Gestão de Vagas**
 Módulo completo (CRUD) para controle de postos de trabalho (Abertas, Em andamento, Fechadas, Canceladas) e filtragem por requisitos técnicos ou senioridade.
 
+**Gestão de Projetos**
+CRUD de projetos com listagem paginada, filtros por nome e status (Ativo/Inativo), cards de resumo, modal de cadastro/edição com alteração de status e visualização de detalhes com metadados de auditoria.
+
 **Integração com Form Builder**
 Seção dedicada para visualização e acesso à URL dos formulários customizados gerados pelo *Banco de Talentos Form Builder* (Next.js) através de um iFrame embutido.
 
 **Perfis diferenciados por papel:**
-- **Admin / Recrutador** — acesso global ao Banco de Talentos, Vagas, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
+- **Admin / Recrutador** — acesso global ao Banco de Talentos, Vagas, Projetos, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
 - **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
 
 **Autenticação completa e segura**
@@ -122,6 +125,17 @@ src/
 │   │   ├── utils/             # Funções auxiliares
 │   │   ├── profile.ts         # Lógica de mapeamento de perfil
 │   │   └── index.ts
+│   ├── projects/
+│   │   ├── api/               # Endpoints de projetos (CRUD, activate/inactivate)
+│   │   ├── components/
+│   │   │   ├── ProjectDetailModal/   # Visualização de detalhes
+│   │   │   ├── ProjectFormModal/     # Cadastro e edição
+│   │   │   ├── ProjectsFilters/      # Filtros de busca e status
+│   │   │   └── ProjectsTable/        # Tabela de listagem
+│   │   ├── types/             # Tipos do domínio de projetos
+│   │   ├── utils/             # Filtros e paginação local
+│   │   ├── validations/       # Schemas Zod
+│   │   └── index.ts
 │   ├── skills/
 │   │   └── api/               # Endpoints e tipos de skills
 │   └── vagas/
@@ -141,6 +155,7 @@ src/
 │   │   ├── RecursosAlocados.tsx   # Talentos em projetos ativos
 │   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
 │   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
+│   │   ├── Projetos.tsx           # Gestão de projetos
 │   │   ├── Vagas.tsx              # Gestão de vagas
 │   │   └── Forms.tsx              # Integração com o Form Builder (iFrame)
 │   ├── public/
@@ -185,6 +200,7 @@ src/
 | `/admin/alocados` | `RecursosAlocados` | 🔒 Admin |
 | `/admin/fila` | `FilaRevisao` | 🔒 Admin |
 | `/admin/usuarios` | `UsuariosPendentes` | 🔒 Admin |
+| `/admin/projetos` | `Projetos` | 🔒 Admin |
 | `/admin/vagas` | `Vagas` | 🔒 Admin |
 | `/admin/forms` | `Forms` | 🔒 Admin |
 | `*` | — | Redireciona para `/login` |
@@ -336,7 +352,15 @@ Base path: `/v1/auth` (prefixo `/api` é adicionado pelo Axios em produção ou 
 | `PUT` | `/admin/squads/:id` | Atualiza os dados de um squad |
 | `PATCH`| `/admin/squads/:id/activate` | Ativa um squad |
 | `PATCH`| `/admin/squads/:id/inactivate` | Inativa um squad |
-| `GET` | `/admin/projects/active` | Lista os projetos ativos |
+| `GET` | `/v1/admin/projects/active` | Lista os projetos ativos (paginado) |
+| `GET` | `/v1/admin/projects/inactive` | Lista os projetos inativos (paginado) |
+| `GET` | `/v1/admin/projects/:id` | Busca detalhes de um projeto |
+| `POST` | `/v1/admin/projects` | Cria um novo projeto |
+| `PUT` | `/v1/admin/projects/:id` | Atualiza nome e descrição |
+| `PATCH`| `/v1/admin/projects/:id/activate` | Reativa um projeto |
+| `PATCH`| `/v1/admin/projects/:id/inactivate` | Inativa um projeto (exclusão lógica) |
+
+> **Campos do projeto:** `name` (obrigatório, único), `description` (obrigatório), `active` (padrão `true`). Metadados de auditoria: `createdAt`, `updatedAt`, `createdBy`, `updatedBy`.
 
 ### 🛠️ Skills
 
