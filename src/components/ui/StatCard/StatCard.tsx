@@ -4,11 +4,19 @@ interface Props {
   label: string;
   value: number | string;
   accentColor?: string;
+  labelColor?: string;
   to?: string;
 }
 
-export function StatCard({ label, value, accentColor, to }: Props) {
-  const content = (
+export function StatCard({ label, value, accentColor, labelColor, to }: Props) {
+  const content = labelColor ? (
+    <>
+      <span className="text-xs font-semibold" style={{ color: labelColor }}>
+        {label}
+      </span>
+      <p className="text-3xl font-bold text-slate-900 mt-1">{value}</p>
+    </>
+  ) : (
     <>
       <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500 mb-2">{label}</p>
       <p

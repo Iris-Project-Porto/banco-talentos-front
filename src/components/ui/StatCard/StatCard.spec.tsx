@@ -25,4 +25,11 @@ describe('StatCard Component', () => {
         render(<StatCard label="Pendentes" value={5} />);
         expect(screen.queryByRole('link')).not.toBeInTheDocument();
     });
+
+    it('deve aplicar labelColor quando fornecido', () => {
+        render(<StatCard label="Ativos" value={10} labelColor="#D97706" />);
+        const label = screen.getByText('Ativos');
+        expect(label).toHaveStyle({ color: '#D97706' });
+        expect(screen.getByText('10')).toHaveClass('text-slate-900');
+    });
 });
