@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useAuth } from "@/features/auth";
 import type { StackItem } from "../components/StackInput/StackInput";
 import type { UserProfile } from "../types/profile";
 import { profilesApi } from "../api/profiles.api";
@@ -21,6 +22,7 @@ const profileSchema = z.object({
 export type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function useMeuPerfil() {
+    const { user, markProfileCreated } = useAuth();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [saved, setSaved] = useState(false);
     const [stacks, setStacks] = useState<StackItem[]>([]);
@@ -29,11 +31,14 @@ export function useMeuPerfil() {
         resolver: zodResolver(profileSchema),
     });
 
-    const { data: fetchedProfile, isLoading: loading } = useQuery({
+    const { data: fetchedProfile, isFetching } = useQuery({
         queryKey: ['meu-perfil'],
         queryFn: profilesApi.getMyProfile,
         retry: false,
+        enabled: user?.hasProfile === true,
     });
+
+    const loading = user?.hasProfile === true && isFetching && !profile;
 
     useEffect(() => {
         if (!fetchedProfile) return;
@@ -63,6 +68,7 @@ export function useMeuPerfil() {
         mutationFn: profilesApi.submitProfile,
         onSuccess: (result) => {
             setProfile(result);
+            markProfileCreated();
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
         },
