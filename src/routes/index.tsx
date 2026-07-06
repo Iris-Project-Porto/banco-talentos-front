@@ -32,7 +32,6 @@ const Skills = lazy(() => import("@/pages/admin/Skills"));
 const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 const Squads = lazy(() => import("@/pages/admin/Squads"));
-const SquadDetalhe = lazy(() => import("@/pages/admin/SquadDetalhe"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
 const ConsultaRecursos = lazy(() => import("@/pages/admin/ConsultaRecursos"));
 
@@ -91,7 +90,6 @@ export const router = createBrowserRouter([
                     { path: "vagas", element: <Vagas /> },
                     { path: "forms", element: <Forms /> },
                     { path: "squads", element: <Squads /> },
-                    { path: "squads/:id", element: <SquadDetalhe /> },
                     { path: "projetos", element: <Projetos /> },
                     { path: "recursos", element: <ConsultaRecursos /> },
                 ],
