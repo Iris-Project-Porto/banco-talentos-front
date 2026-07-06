@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Input, Select } from "@/components/ui";
+import { Button, Input, Select, PasswordRequirements } from "@/components/ui";
 import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { authApi, UserRole } from "@/features/auth";
 import { registerSchema, type RegisterFormData } from "@/features/auth/validations/validations";
@@ -24,6 +24,7 @@ export default function Register() {
   });
 
   const selectedRole = watch("role");
+  const password = watch("password") ?? "";
 
   useEffect(() => {
     authApi.getGroups(0, 100).then((data) => {
@@ -60,7 +61,10 @@ export default function Register() {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" autoComplete="off">
         <Input label="Nome completo" placeholder="Seu nome" autoFocus {...register("name")} error={errors.name?.message} autoComplete="off" />
         <Input label="E-mail" type="email" placeholder="voce@vilt-group.com" {...register("email")} error={errors.email?.message} autoComplete="off" />
-        <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} autoComplete="new-password" />
+        <div className="flex flex-col gap-1.5">
+          <Input label="Senha" type="password" placeholder="Ex: Senha@123" {...register("password")} error={errors.password?.message} autoComplete="new-password" />
+          <PasswordRequirements password={password} />
+        </div>
         <Input label="Confirmar senha" type="password" placeholder="Ex: Senha@123" {...register("confirm")} error={errors.confirm?.message} autoComplete="new-password" />
 
         <Select

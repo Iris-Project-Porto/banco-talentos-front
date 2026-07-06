@@ -10,3 +10,4 @@ export * from "./Select/Select";
 export * from "./StatCard/StatCard";
 export * from "./Tag/Tag";
 export * from "./Pagination/Pagination";
+export * from "./PasswordRequirements/PasswordRequirements";

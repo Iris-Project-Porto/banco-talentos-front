@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { authApi } from "@/features/auth";
-import { Button, Input } from "@/components/ui";
+import { Button, Input, PasswordRequirements } from "@/components/ui";
 import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { resetPasswordSchema, type ResetPasswordFormData } from "@/features/auth/validations/validations";
 import { getApiError } from "@/lib/axios";
@@ -23,7 +23,7 @@ export default function ResetPassword() {
     retry: false,
   });
 
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<ResetPasswordFormData>({
+  const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     mode: "onChange",
     defaultValues: {
@@ -33,6 +33,8 @@ export default function ResetPassword() {
       confirm: "",
     },
   });
+
+  const password = watch("password") ?? "";
 
   const resetMutation = useMutation({
     mutationFn: (data: ResetPasswordFormData) =>
@@ -97,15 +99,18 @@ export default function ResetPassword() {
           autoComplete="off"
           {...register("email")}
         />
-        <Input
-          label="Nova senha"
-          type="password"
-          placeholder="Ex: Senha@123"
-          autoFocus
-          autoComplete="new-password"
-          {...register("password")}
-          error={errors.password?.message}
-        />
+        <div className="flex flex-col gap-1.5">
+          <Input
+            label="Nova senha"
+            type="password"
+            placeholder="Ex: Senha@123"
+            autoFocus
+            autoComplete="new-password"
+            {...register("password")}
+            error={errors.password?.message}
+          />
+          <PasswordRequirements password={password} />
+        </div>
         <Input
           label="Confirmar senha"
           type="password"
