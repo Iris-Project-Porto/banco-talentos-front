@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Search, Pencil } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { PageHeader, Button, Badge, Card, Input, Pagination, Select } from "@/components/ui";
-import { squadsApi } from "@/features/squads";
+import { squadsApi, SquadFormModal, type SquadFormData } from "@/features/squads";
 
 const STATUS_OPTIONS = [
     { value: "ACTIVE", label: "Ativa" },
@@ -13,6 +13,9 @@ const STATUS_OPTIONS = [
 const filterLabelCls = "block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5";
 
 export default function Squads() {
+    const queryClient = useQueryClient();
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editing, setEditing] = useState<(Partial<SquadFormData> & { id?: string; active?: boolean }) | null>(null);
     const [search, setSearch] = useState("");
     const [statusType, setStatusType] = useState<"ACTIVE" | "INACTIVE">("ACTIVE");
     const [page, setPage] = useState(0);
@@ -20,6 +23,21 @@ export default function Squads() {
     useEffect(() => {
         setPage(0);
     }, [search, statusType]);
+
+    const saveMutation = useMutation({
+        mutationFn: async (data: SquadFormData & { id?: string }) =>
+            data.id ? squadsApi.update(data.id, data) : squadsApi.create(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['squads'] });
+            closeModal();
+            toast.success("Squad salva com sucesso!");
+        },
+        onError: () => toast.error("Ocorreu um erro ao salvar a squad.")
+    });
+
+    function openNew() { setEditing({}); setModalOpen(true); }
+    function openEdit(squad: any) { setEditing(squad); setModalOpen(true); }
+    function closeModal() { setModalOpen(false); setEditing(null); }
 
     const { data, isLoading } = useQuery({
         queryKey: ['squads', statusType, page, search],
@@ -42,7 +60,7 @@ export default function Squads() {
             <PageHeader
                 title="Squads"
                 subtitle="Gerencie as squads da sua empresa"
-                actions={<Link to="/admin/squads/nova"><Button variant="primary">+ Nova Squad</Button></Link>}
+                actions={<Button variant="primary" onClick={openNew}>+ Nova Squad</Button>}
             />
 
             <Card padding="sm" className="flex flex-col gap-4">
@@ -110,9 +128,9 @@ export default function Squads() {
                                     </td>
                                     <td className="py-4 px-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <Link to={`/admin/squads/${squad.id}`} className="p-1.5 text-slate-400 hover:text-pink bg-slate-50 hover:bg-pink/10 rounded-md transition-colors" title="Visualizar/Editar">
+                                            <button onClick={() => openEdit(squad)} className="p-1.5 text-slate-400 hover:text-pink bg-slate-50 hover:bg-pink/10 rounded-md transition-colors" title="Visualizar/Editar">
                                                 <Pencil className="w-4 h-4" />
-                                            </Link>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -123,6 +141,15 @@ export default function Squads() {
 
                 <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             </Card>
+
+            {modalOpen && editing && (
+                <SquadFormModal
+                    initial={editing}
+                    saving={saveMutation.isPending}
+                    onSave={(data) => saveMutation.mutate(data)}
+                    onClose={closeModal}
+                />
+            )}
         </div>
     );
 }
