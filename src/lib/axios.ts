@@ -17,9 +17,7 @@ http.interceptors.response.use(
         if (err.response?.status === 401) {
             const url = err.config?.url ?? "";
             const isAuthRoute = url.includes("/auth/");
-            const isProfileRoute = url.endsWith("/profile");
-            if (!isAuthRoute && !isProfileRoute) {
-                // Remove o full reload e emite um evento global para o SPA
+            if (!isAuthRoute) {
                 window.dispatchEvent(new Event("unauthorized"));
             }
         }
