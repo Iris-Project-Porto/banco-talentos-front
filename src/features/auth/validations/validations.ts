@@ -1,5 +1,14 @@
 import { z } from "zod";
 import { UserRole } from "../types/roles";
+import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX } from "./passwordRules";
+
+const strongPasswordSchema = z
+    .string({ required_error: "A senha é obrigatória" })
+    .min(1, "A senha é obrigatória")
+    .min(PASSWORD_MIN_LENGTH, "A senha deve ter no mínimo 8 caracteres")
+    .regex(PASSWORD_REGEX.uppercase, "A senha deve conter pelo menos uma letra maiúscula")
+    .regex(PASSWORD_REGEX.number, "A senha deve conter pelo menos um número")
+    .regex(PASSWORD_REGEX.special, "A senha deve conter pelo menos um caractere especial");
 
 export const loginSchema = z.object({
     email: z.string({ required_error: "O e-mail é obrigatório" })
@@ -17,11 +26,7 @@ export const registerSchema = z.object({
         .min(1, "O e-mail é obrigatório")
         .email("Formato de e-mail inválido")
         .endsWith("@vilt-group.com", "Use seu e-mail corporativo"),
-    password: z.string({ required_error: "A senha é obrigatória" })
-        .min(1, "A senha é obrigatória")
-        .min(8, "A senha deve ter no mínimo 8 caracteres")
-        .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
-        .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial"),
+    password: strongPasswordSchema,
     confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
         .min(1, "Confirme sua senha"),
     role: z.nativeEnum(UserRole, {
@@ -43,11 +48,7 @@ export const resetPasswordSchema = z.object({
         .email("Formato de e-mail inválido"),
     token: z.string({ required_error: "O token é obrigatório" })
         .min(1, "O token é obrigatório"),
-    password: z.string({ required_error: "A senha é obrigatória" })
-        .min(8, "A senha deve ter no mínimo 8 caracteres")
-        .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
-        .regex(/[0-9]/, "A senha deve conter pelo menos um número")
-        .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial"),
+    password: strongPasswordSchema,
     confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
         .min(1, "Confirme sua senha"),
 }).refine((data) => data.password === data.confirm, {

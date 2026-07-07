@@ -52,6 +52,18 @@ describe('Auth Validations', () => {
             });
             expect(result.success).toBe(false);
         });
+
+        it('deve rejeitar senha sem número', () => {
+            const result = registerSchema.safeParse({
+                name: "João",
+                email: "joao@vilt-group.com",
+                password: "Senha@abc",
+                confirm: "Senha@abc",
+                role: UserRole.RESOURCE,
+                groupId: "1"
+            });
+            expect(result.success).toBe(false);
+        });
     });
 
     describe('resetPasswordSchema', () => {
