@@ -2,14 +2,15 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Select } from "@/components/ui";
-import { SKILL_CATEGORIES, type Skill, type SkillPayload } from "../../types/types";
-import { getSkillCategoryLabel } from "../../utils/skillDisplay";
 import {
     createSkillSchema,
     skillSchema,
     type SkillFormData,
     type SkillFormInput,
 } from "../../validations/validations";
+import { useSkillCategories } from "./hooks/useSkillCategories/useSkillCategories";
+import { Skill, SkillPayload } from "../../types/types";
+
 
 const textareaCls =
     "w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900 placeholder:text-slate-400 resize-none";
@@ -18,14 +19,6 @@ const TYPE_OPTIONS = [
     { value: "", label: "Selecione o tipo" },
     { value: "HARD", label: "HARD" },
     { value: "SOFT", label: "SOFT" },
-];
-
-const CATEGORY_OPTIONS = [
-    { value: "", label: "Selecione a categoria" },
-    ...SKILL_CATEGORIES.map((category) => ({
-        value: category,
-        label: getSkillCategoryLabel(category),
-    })),
 ];
 
 const ErrorMsg = ({ msg }: { msg?: string }) =>
@@ -50,6 +43,8 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<SkillFormInput>({
         resolver: zodResolver(schema),
@@ -60,6 +55,11 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
             category: initial.category || "",
         },
     });
+
+    const selectedType = watch("type");
+    const selectedCategory = watch("category");
+
+    const { categoryOptions } = useSkillCategories(selectedType, selectedCategory, setValue);
 
     function onSubmit(data: SkillFormInput) {
         const parsed: SkillFormData = skillSchema.parse(data);
@@ -110,7 +110,8 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
 
                     <Select
                         label="CATEGORIA"
-                        options={CATEGORY_OPTIONS}
+                        options={categoryOptions}
+                        disabled={!selectedType}
                         error={errors.category?.message}
                         {...register("category")}
                     />
