@@ -20,10 +20,9 @@ export default function RecursoLayout() {
 
   const sidebarContent = (
     <>
-      <div className="px-5 py-5 border-b border-white/[0.06] flex items-center justify-between">
-        <div>
-          <span className="font-bold text-lg tracking-tight text-white">VILT</span>
-          <span className="text-pink text-lg font-bold">.</span>
+      <div className="pr-5 py-5 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="flex items-center">
+          <img src="/images/iris_branco.svg" alt="ÍRIS" className="h-28 w-auto p-1 pl-0 rounded-md" />
         </div>
         <button
           className="md:hidden text-white/50 hover:text-white p-1"
@@ -73,22 +72,21 @@ export default function RecursoLayout() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
-          <aside className="relative w-64 max-w-[80%] flex flex-col bg-slate-950 h-full shadow-2xl">
+          <aside className="relative w-72 max-w-[80%] flex flex-col bg-slate-950 h-full shadow-2xl">
             {sidebarContent}
           </aside>
         </div>
       )}
 
-      <aside className="hidden md:flex w-52 lg:w-60 shrink-0 flex-col bg-slate-950 h-screen">
+      <aside className="hidden md:flex w-64 lg:w-72 shrink-0 flex-col bg-slate-950 h-screen">
         {sidebarContent}
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0">
-          <div className="flex items-center">
-            <span className="font-bold text-lg tracking-tight text-slate-900">VILT</span>
-            <span className="text-pink text-lg font-bold">.</span>
+        <header className="md:hidden flex items-center justify-end px-4 py-3 bg-white border-b border-slate-200 shrink-0">
+          <div className="hidden items-center">
+            <img src="/images/iris_preto.svg" alt="ÍRIS" className="h-12 w-auto p-1 rounded-md" />
           </div>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -mr-2 text-slate-600 hover:text-slate-900 focus:outline-none">
             <Menu className="w-6 h-6" />

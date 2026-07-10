@@ -9,9 +9,8 @@ export default function AuthLayout({ children, footer }: Props) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50">
       <div className="w-full max-w-sm px-4">
-        <div className="text-center mb-10">
-          <span className="font-extrabold text-2xl tracking-tight text-slate-900">VILT</span>
-          <span className="text-pink text-2xl font-extrabold">.</span>
+        <div className="flex justify-center items-center mb-5">
+          <img src="/images/iris_preto.svg" alt="ÍRIS" className="h-32 w-auto" />
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-login p-8">
