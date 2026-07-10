@@ -137,4 +137,23 @@ describe('Componente SkillFormModal', () => {
         expect(selects[0].value).toBe('HARD');
         expect(selects[1].value).toBe('FRONTEND');
     });
+
+    it('deve limpar a categoria ao trocar o tipo e permitir selecionar uma nova', async () => {
+        render(<SkillFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
+
+        const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
+
+        await userEvent.selectOptions(selects[0], 'HARD');
+        await userEvent.selectOptions(selects[1], 'FRONTEND');
+        await userEvent.selectOptions(selects[0], 'SOFT');
+
+        expect(selects[1]).toHaveValue('');
+        expect(screen.queryByRole('option', { name: 'Frontend' })).not.toBeInTheDocument();
+        expect(screen.getByRole('option', { name: 'Comunicação' })).toBeInTheDocument();
+
+        await userEvent.selectOptions(selects[1], 'COMMUNICATION');
+
+        expect(selects[1]).toHaveValue('COMMUNICATION');
+        expect(screen.queryByText('Categoria é obrigatória')).not.toBeInTheDocument();
+    });
 });

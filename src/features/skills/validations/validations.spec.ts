@@ -49,10 +49,24 @@ describe('Skills Validations', () => {
         const result = skillSchema.safeParse({
             name: 'Scrum',
             type: 'SOFT',
-            category: 'MANAGEMENT',
+            category: 'COMMUNICATION',
             description: '',
         });
         expect(result.success).toBe(true);
+    });
+
+    it('deve rejeitar categoria incompatível com o tipo', () => {
+        const result = skillSchema.safeParse({
+            ...dadosBase,
+            type: 'SOFT',
+            category: 'FRONTEND',
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues[0].message).toBe(
+                'A categoria deve ser compatível com o tipo da skill',
+            );
+        }
     });
 
     it('deve rejeitar descrição acima de 500 caracteres', () => {

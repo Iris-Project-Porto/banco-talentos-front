@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
-import { SKILL_CATEGORIES } from "../../types/types";
+import { SKILL_CATEGORIES } from "../../utils/skillCategories";
 import { getSkillCategoryLabel } from "../../utils/skillDisplay";
 
 const CATEGORY_OPTIONS = [
