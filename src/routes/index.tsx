@@ -25,7 +25,6 @@ const MeuHistorico = lazy(() => import("@/pages/user/MeuHistorico"));
 const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const FilaRevisao = lazy(() => import("@/pages/admin/FilaRevisao"));
 const BancoTalentos = lazy(() => import("@/pages/admin/BancoTalentos"));
-const TalentoDetalhe = lazy(() => import("@/pages/admin/TalentoDetalhe"));
 const RecursosAlocados = lazy(() => import("@/pages/admin/RecursosAlocados"));
 const UsuariosPendentes = lazy(() => import("@/pages/admin/UsuariosPendentes"));
 const Skills = lazy(() => import("@/pages/admin/Skills"));
@@ -33,7 +32,6 @@ const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 const Squads = lazy(() => import("@/pages/admin/Squads"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
-const ConsultaRecursos = lazy(() => import("@/pages/admin/ConsultaRecursos"));
 
 // DEFINIÇÃO DAS ROTAS
 
@@ -83,15 +81,13 @@ export const router = createBrowserRouter([
                     { path: "dashboard", element: <Dashboard /> },
                     { path: "fila", element: <FilaRevisao /> },
                     { path: "talentos", element: <BancoTalentos /> },
-                    { path: "talentos/:id", element: <TalentoDetalhe /> },
                     { path: "alocados", element: <RecursosAlocados /> },
                     { path: "usuarios", element: <UsuariosPendentes /> },
                     { path: "skills", element: <Skills /> },
                     { path: "vagas", element: <Vagas /> },
                     { path: "forms", element: <Forms /> },
                     { path: "squads", element: <Squads /> },
-                    { path: "projetos", element: <Projetos /> },
-                    { path: "recursos", element: <ConsultaRecursos /> },
+                    { path: "projetos", element: <Projetos /> }
                 ],
             },
         ],
