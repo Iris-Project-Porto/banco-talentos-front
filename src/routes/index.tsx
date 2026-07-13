@@ -25,6 +25,7 @@ const MeuHistorico = lazy(() => import("@/pages/user/MeuHistorico"));
 const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const FilaRevisao = lazy(() => import("@/pages/admin/FilaRevisao"));
 const BancoTalentos = lazy(() => import("@/pages/admin/BancoTalentos"));
+const TalentoDetalhe = lazy(() => import("@/pages/admin/TalentoDetalhe"));
 const RecursosAlocados = lazy(() => import("@/pages/admin/RecursosAlocados"));
 const UsuariosPendentes = lazy(() => import("@/pages/admin/UsuariosPendentes"));
 const Skills = lazy(() => import("@/pages/admin/Skills"));
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
                     { path: "dashboard", element: <Dashboard /> },
                     { path: "fila", element: <FilaRevisao /> },
                     { path: "talentos", element: <BancoTalentos /> },
+                    { path: "talentos/:id", element: <TalentoDetalhe /> },
                     { path: "alocados", element: <RecursosAlocados /> },
                     { path: "usuarios", element: <UsuariosPendentes /> },
                     { path: "skills", element: <Skills /> },
