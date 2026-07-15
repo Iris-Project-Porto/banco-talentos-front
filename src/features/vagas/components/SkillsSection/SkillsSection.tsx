@@ -1,9 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
 import { Trash2, FileText, CheckCircle2, HelpCircle } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
+import { SkillFormModal, type SkillPayload } from "@/features/skills";
 import { type VagaFormData } from "@/features/vagas/validations/validations";
 import { ErrorMsg } from "../FormHelpers/FormHelpers";
+import { useSkillsCatalog } from "./hooks/useSkillsCatalog/useSkillsCatalog";
 
 const SKILL_TYPE_OPTIONS = [
     { value: "MANDATORY", label: "Obrigatória" },
@@ -20,13 +22,24 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
     const { fields, append, remove } = useFieldArray({ control, name: "skills" });
 
+    const { skills: skillCatalog, createMutation } = useSkillsCatalog();
+    const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
+
     const watchedSkills = useWatch({ control, name: "skills" }) || [];
 
     const totalSkillsWeight = useMemo(() => {
         return watchedSkills.reduce((acc, curr) => acc + (Number(curr?.importanceWeight) || 0), 0);
     }, [watchedSkills]);
 
+    function onSkillSave({ name, type, description, category }: SkillPayload) {
+        const payload: SkillPayload = { name, type, description, category };
+        createMutation.mutate(payload, {
+            onSuccess: () => setIsSkillModalOpen(false),
+        });
+    }
+
     return (
+        <>
         <fieldset disabled={!canEdit} className="border border-slate-200 rounded-xl p-6 bg-white flex flex-col gap-5 shadow-sm mt-2">
             <div className="flex items-center gap-3 mb-1">
                 <FileText className="w-5 h-5 text-blue-500" />
@@ -53,8 +66,10 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
             </div>
 
             <div className="grid grid-cols-12 gap-x-4 px-1 pb-3 border-b border-slate-100 text-xs font-bold text-slate-700">
-                <div className="col-span-2">Skill</div><div className="col-span-2">Tipo</div>
-                <div className="col-span-2 text-center">Peso (%)</div><div className="col-span-2">Nível Mínimo</div>
+                <div className="col-span-4">Skill</div>
+                <div className="col-span-2">Tipo</div>
+                <div className="col-span-2 text-center">Peso (%)</div>
+                <div className="col-span-2">Nível Mínimo</div>
             </div>
 
             {fields.length === 0 && (
@@ -62,11 +77,6 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                     <p className="text-sm text-slate-500">Nenhuma skill adicionada para esta vaga.</p>
                 </div>
             )}
-
-            <datalist id="skill-suggestions">
-                <option value="Java" /><option value="SQL" /><option value="React" /><option value="TypeScript" />
-                <option value="Node.js" /><option value="AWS" /><option value="Docker" /><option value="Inglês" />
-            </datalist>
 
             <div className="flex flex-col gap-4">
                 {fields.map((field, index) => {
@@ -76,11 +86,9 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                     return (
                         <div key={field.id} className="grid grid-cols-12 gap-x-4 items-start pb-4 border-b border-slate-100 last:border-0 last:pb-0">
 
-                            <div className="col-span-2">
-                                <Input
-                                    list="skill-suggestions"
-                                    placeholder="Ex: Java"
-                                    className="font-medium"
+                            <div className="col-span-4">
+                                 <Select
+                                    options={skillCatalog.map((skill) => ({ value: skill.id, label: skill.name }))}
                                     {...register(`skills.${index}.name` as const)}
                                 />
                                 <ErrorMsg msg={skillErr?.name?.message} />
@@ -128,15 +136,26 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-                <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 0, description: "" })}
-                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                >
-                    + Adicionar Skill
-                </Button>
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 0, description: "" })}
+                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                    >
+                        Selecionar Skill
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setIsSkillModalOpen(true)}
+                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                    >
+                        + Adicionar Skill
+                    </Button>
+                </div>
                 <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-4">
                         <span className="text-sm font-bold text-slate-700">Soma dos Pesos: <span className={totalSkillsWeight === 100 ? 'text-green-600' : 'text-red-500'}>{totalSkillsWeight}%</span></span>
@@ -151,5 +170,16 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
 
             </div>
         </fieldset>
+
+        {isSkillModalOpen && (
+            <SkillFormModal
+                initial={{}}
+                existingSkills={skillCatalog}
+                saving={createMutation.isPending}
+                onSave={onSkillSave}
+                onClose={() => setIsSkillModalOpen(false)}
+            />
+        )}
+        </>
     );
 }
