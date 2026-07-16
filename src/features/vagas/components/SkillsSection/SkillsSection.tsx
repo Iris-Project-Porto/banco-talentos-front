@@ -16,6 +16,7 @@ const MIN_LEVEL_OPTIONS = [
     { value: "BASIC", label: "Básico" },
     { value: "INTERMEDIATE", label: "Intermediário" },
     { value: "ADVANCED", label: "Avançado" },
+    { value: "SPECIALIST", label: "Especialista" },
 ];
 
 export function SkillsSection({ canEdit }: { canEdit: boolean }) {
@@ -65,11 +66,13 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-x-4 px-1 pb-3 border-b border-slate-100 text-xs font-bold text-slate-700">
-                <div className="col-span-4">Skill</div>
-                <div className="col-span-2">Tipo</div>
-                <div className="col-span-2 text-center">Peso (%)</div>
+            <div className="grid grid-cols-12 gap-x-3 px-1 pb-3 border-b border-slate-100 text-xs font-bold text-slate-700">
+                <div className="col-span-3">Skill</div>
+                <div className="col-span-1">Tipo</div>
+                <div className="col-span-1">Peso (%)</div>
                 <div className="col-span-2">Nível Mínimo</div>
+                <div className="col-span-4">Descrição</div>
+                <div className="col-span-1 text-center">Ações</div>
             </div>
 
             {fields.length === 0 && (
@@ -84,17 +87,17 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                     const skillErr = errors.skills?.[index];
 
                     return (
-                        <div key={field.id} className="grid grid-cols-12 gap-x-4 items-start pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                        <div key={field.id} className="grid grid-cols-12 gap-x-3 px-1 items-start pb-4 border-b border-slate-100 last:border-0 last:pb-0">
 
-                            <div className="col-span-4">
+                            <div className="col-span-3">
                                  <Select
-                                    options={skillCatalog.map((skill) => ({ value: skill.id, label: skill.name }))}
+                                    options={[{value: "", label: "Selecione uma skill"},...skillCatalog.map((skill) => ({ value: skill.name, label: skill.name }))]}
                                     {...register(`skills.${index}.name` as const)}
                                 />
                                 <ErrorMsg msg={skillErr?.name?.message} />
                             </div>
 
-                            <div className="col-span-2">
+                            <div className="col-span-1">
                                 <Select
                                     options={SKILL_TYPE_OPTIONS}
                                     className={`cursor-pointer transition-colors ${skillType === 'MANDATORY'
@@ -105,11 +108,12 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                                 />
                             </div>
 
-                            <div className="col-span-2 flex flex-col items-center">
-                                <div className="flex items-center justify-center gap-2">
+                            <div className="col-span-1">
+                                <div className="flex items-center  gap-1">
                                     <Input
                                         type="number"
                                         min={0}
+                                        step={1}
                                         max={100}
                                         placeholder="0"
                                         className={`w-16 text-center ${skillErr?.importanceWeight ? 'border-red-400' : ''}`}
@@ -125,6 +129,15 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                                     options={MIN_LEVEL_OPTIONS}
                                     {...register(`skills.${index}.minLevel` as const)}
                                 />
+                            </div>
+                            <div className="col-span-4">
+                                <Input
+                                    type="text"
+                                    placeholder="Descrição"
+                                    maxLength={225}
+                                    {...register(`skills.${index}.description` as const)}
+                                />
+                                <ErrorMsg msg={skillErr?.description?.message} />
                             </div>
 
                             <div className="col-span-1 flex items-center justify-center gap-2 pt-1">
