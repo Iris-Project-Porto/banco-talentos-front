@@ -49,9 +49,7 @@ describe('SkillsSection Component', () => {
     it('deve renderizar a mensagem de lista vazia inicialmente', () => {
         renderSection();
         expect(screen.getByText('Nenhuma skill adicionada para esta vaga.')).toBeInTheDocument();
-
-        const sumElement = screen.getByText(/Soma dos Pesos:/i);
-        expect(sumElement).toHaveTextContent('0%');
+        expect(screen.queryByText(/Soma dos Pesos:/i)).not.toBeInTheDocument();
     });
 
     it('deve permitir adicionar uma nova skill ao clicar no botão', () => {
@@ -64,7 +62,7 @@ describe('SkillsSection Component', () => {
         expect(screen.getAllByRole('combobox').length).toBeGreaterThan(0);
     });
 
-    it('deve calcular corretamente a soma dos pesos das skills', async () => {
+    it('deve exibir os pesos individuais das skills', async () => {
         renderSection({
             defaultValues: {
                 skills: [
@@ -77,10 +75,7 @@ describe('SkillsSection Component', () => {
         await waitFor(() => {
             expect(screen.getByDisplayValue('60')).toBeInTheDocument();
             expect(screen.getByDisplayValue('40')).toBeInTheDocument();
-            expect(screen.getByText('Peso validado')).toBeInTheDocument();
-
-            const sumElement = screen.getByText(/Soma dos Pesos:/i);
-            expect(sumElement).toHaveTextContent('100%');
+            expect(screen.queryByText(/Soma dos Pesos:/i)).not.toBeInTheDocument();
         });
     });
 

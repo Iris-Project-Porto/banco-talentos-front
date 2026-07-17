@@ -55,7 +55,7 @@ export function VagaModal({ initial, saving, onSave, onClose }: VagaModalProps) 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative bg-white rounded-2xl shadow-login w-full max-w-6xl max-h-[90vh] flex flex-col">
+            <div className="relative bg-white rounded-2xl shadow-login w-full max-w-8xl max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200">
                     <h2 className="text-lg font-bold text-slate-900">{isEdit ? "Editar vaga" : "Nova vaga"}</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>

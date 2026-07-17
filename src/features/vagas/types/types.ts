@@ -4,7 +4,7 @@ export type JobStatus = "OPEN" | "SCREENING" | "ALLOCATING" | "FILLED" | "CLOSED
 
 export type SkillRequirementType = "MANDATORY" | "DESIRABLE";
 
-export type SkillLevel = "BASIC" | "INTERMEDIATE" | "ADVANCED";
+export type SkillLevel = "BASIC" | "INTERMEDIATE" | "ADVANCED" | "SPECIALIST";
 
 export interface JobSkill {
   name: string;
