@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
-import { Trash2, FileText, CheckCircle2, HelpCircle } from "lucide-react";
+import { Trash2, FileText, HelpCircle } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
 import { SkillFormModal, type SkillPayload } from "@/features/skills";
 import { type VagaFormData } from "@/features/vagas/validations/validations";
@@ -28,10 +28,6 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
 
     const watchedSkills = useWatch({ control, name: "skills" }) || [];
 
-    const totalSkillsWeight = useMemo(() => {
-        return watchedSkills.reduce((acc, curr) => acc + (Number(curr?.importanceWeight) || 0), 0);
-    }, [watchedSkills]);
-
     function onSkillSave({ name, type, description, category }: SkillPayload) {
         const payload: SkillPayload = { name, type, description, category };
         createMutation.mutate(payload, {
@@ -55,7 +51,6 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-60 bg-slate-800 text-white text-xs rounded-xl p-4 shadow-xl z-50">
                             <p className="font-bold mb-2 text-sm text-white">Sobre os requisitos:</p>
                             <ul className="space-y-1.5 list-disc list-inside marker:text-blue-400 text-slate-300">
-                                <li>A soma dos pesos deve ser igual a <span className="font-bold text-white">100%</span>.</li>
                                 <li>Skills <span className="font-bold text-white">obrigatórias</span> são essenciais.</li>
                                 <li>Skills <span className="font-bold text-white">desejáveis</span> aumentam o match.</li>
                                 <li>Defina o nível mínimo esperado.</li>
@@ -148,7 +143,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                 })}
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+            <div className="flex flex-col gap-2 mt-2">
                 <div className="flex flex-wrap items-center gap-3">
                     <Button
                         type="button"
@@ -169,18 +164,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         + Adicionar Skill
                     </Button>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm font-bold text-slate-700">Soma dos Pesos: <span className={totalSkillsWeight === 100 ? 'text-green-600' : 'text-red-500'}>{totalSkillsWeight}%</span></span>
-                        {totalSkillsWeight === 100 ? (
-                            <div className="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider border border-green-100"><CheckCircle2 className="w-3.5 h-3.5" strokeWidth={3} />Peso validado</div>
-                        ) : (
-                            <div className="bg-red-50 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-md">Inválido</div>
-                        )}
-                    </div>
-                    <ErrorMsg msg={errors.skills?.root?.message || errors.skills?.message} />
-                </div>
-
+                <ErrorMsg msg={errors.skills?.root?.message || errors.skills?.message} />
             </div>
         </fieldset>
 
