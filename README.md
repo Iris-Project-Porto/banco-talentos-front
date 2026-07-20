@@ -46,7 +46,7 @@ Seção dedicada para visualização e acesso à URL dos formulários customizad
 - **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
 
 **Autenticação completa e segura**
-Fluxo de login, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha (link com validade de 1 hora, validado ao abrir a página e no envio do formulário), via JWT com interceptadores Axios que previnem loops em respostas 401.
+Fluxo de login, logout, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha (link com validade de 1 hora, validado ao abrir a página e no envio do formulário). A sessão utiliza access token e refresh token: o Axios renova tokens expirados automaticamente, repete a requisição original uma única vez e encerra a sessão caso a renovação falhe. No logout, o refresh token é invalidado no backend e os dados locais da sessão são removidos.
 
 **Validação robusta de formulários**
 Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, incluindo:
@@ -107,7 +107,7 @@ src/
 │
 ├── features/                  # Módulos de negócio independentes
 │   ├── auth/
-│   │   ├── api/               # Chamadas HTTP de autenticação
+│   │   ├── api/               # Login, logout, registro e demais chamadas de autenticação
 │   │   ├── contexts/          # AuthContext e AuthProvider
 │   │   ├── hooks/             # Hooks personalizados (useAuth, etc.)
 │   │   ├── types/             # Tipos e enums (UserRole)
@@ -136,6 +136,8 @@ src/
 │   │   ├── utils/             # Filtros e paginação local
 │   │   ├── validations/       # Schemas Zod
 │   │   └── index.ts
+│   ├── recursos/              # Consulta e gestão operacional de recursos
+│   ├── squads/                # CRUD e regras de squads
 │   ├── skills/
 │   │   └── api/               # Endpoints e tipos de skills
 │   └── vagas/
@@ -145,7 +147,7 @@ src/
 │       └── index.ts
 │
 ├── lib/
-│   └── axios.ts               # Instância global do Axios, interceptadores de 401 e helper getApiError
+│   └── axios.ts               # Axios, autenticação, renovação de token em respostas 401 e helper getApiError
 │
 ├── pages/
 │   ├── admin/
@@ -155,6 +157,9 @@ src/
 │   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
 │   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
 │   │   ├── Projetos.tsx           # Gestão de projetos
+│   │   ├── Squads.tsx             # Gestão de squads
+│   │   ├── Skills.tsx             # Gestão de skills
+│   │   ├── ConsultaRecursos.tsx   # Gestão operacional de recursos
 │   │   ├── Vagas.tsx              # Gestão de vagas
 │   │   └── Forms.tsx              # Integração com o Form Builder (iFrame)
 │   ├── public/
@@ -170,7 +175,7 @@ src/
 ├── routes/
 │   ├── index.tsx              # Mapa global de rotas com Lazy Loading
 │   ├── ProtectedRoute.tsx     # Guardião de rotas privadas baseado em role (Admin/Recurso)
-│   └── PublicRoute.tsx        # Guardião para usuários não autenticados
+│   └── PublicRoute.tsx        # Guardião de rotas públicas, com acesso autenticado configurável
 │
 ├── types/                     # Tipos globais compartilhados
 │
@@ -199,6 +204,9 @@ src/
 | `/admin/fila` | `FilaRevisao` | 🔒 Admin |
 | `/admin/usuarios` | `UsuariosPendentes` | 🔒 Admin |
 | `/admin/projetos` | `Projetos` | 🔒 Admin |
+| `/admin/squads` | `Squads` | 🔒 Admin |
+| `/admin/skills` | `Skills` | 🔒 Admin |
+| `/admin/recursos` | `ConsultaRecursos` | 🔒 Admin |
 | `/admin/vagas` | `Vagas` | 🔒 Admin |
 | `/admin/forms` | `Forms` | 🔒 Admin |
 | `*` | — | Redireciona para `/login` |
@@ -286,13 +294,17 @@ Base path: `/v1/auth` (prefixo `/api` é adicionado pelo Axios em produção ou 
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `POST` | `/v1/auth/login` | Autentica o usuário e retorna o token |
+| `POST` | `/v1/auth/login` | Autentica e retorna os tokens e dados do usuário (`name`, `email`, `role`, `hasProfile`) |
+| `POST` | `/v1/auth/refresh` | Renova a sessão e rotaciona os tokens |
+| `POST` | `/v1/auth/logout` | Invalida o refresh token e encerra a sessão |
 | `POST` | `/v1/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
 | `POST` | `/v1/auth/verify` | Valida o código OTP de ativação de e-mail |
 | `POST` | `/v1/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
 | `POST` | `/v1/auth/forgot-password` | Solicita e-mail de recuperação de senha |
 | `GET` | `/v1/auth/validate-reset-token` | Valida se o link de redefinição ainda é válido (`?email=` e `?token=`; expira em 1 hora) |
 | `POST` | `/v1/auth/reset-password` | Redefine a senha via token enviado por e-mail |
+
+O front persiste `token`, `refreshToken` e `user` no `localStorage`. O interceptor adiciona o access token ao header `Authorization` e, em caso de 401, compartilha uma única tentativa de renovação entre requisições simultâneas. Se a renovação falhar, a sessão local é limpa.
 
 **Fluxo de redefinição de senha (`ResetPassword.tsx`):**
 1. Usuário acessa `/reset-password?token=...&email=...` recebido por e-mail.
