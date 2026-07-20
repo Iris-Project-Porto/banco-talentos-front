@@ -42,7 +42,6 @@ describe('AdminLayout Component', () => {
         expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Fila de revisão').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Recursos').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('Alocados').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Usuários').length).toBeGreaterThan(0);
 
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);

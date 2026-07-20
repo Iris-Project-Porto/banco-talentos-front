@@ -7,7 +7,6 @@ const staticNavItems = [
   { to: "/admin/dashboard", label: "Dashboard" },
   { to: "/admin/fila", label: "Fila de revisão" },
   { to: "/admin/talentos", label: "Recursos" },
-  { to: "/admin/alocados", label: "Alocados" },
   { to: "/admin/usuarios", label: "Usuários" },
   { to: "/admin/skills", label: "Skills" },
   { to: "/admin/vagas", label: "Vagas" },

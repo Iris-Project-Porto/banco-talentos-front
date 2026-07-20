@@ -152,7 +152,6 @@ src/
 │   │   ├── Dashboard.tsx          # KPIs e estatísticas gerais
 │   │   ├── BancoTalentos.tsx      # Listagem de todos os talentos
 │   │   ├── TalentoDetalhe.tsx     # Perfil completo de um talento
-│   │   ├── RecursosAlocados.tsx   # Talentos em projetos ativos
 │   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
 │   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
 │   │   ├── Projetos.tsx           # Gestão de projetos
@@ -197,7 +196,6 @@ src/
 | `/admin/dashboard` | `Dashboard` | 🔒 Admin |
 | `/admin/talentos` | `BancoTalentos` | 🔒 Admin |
 | `/admin/talentos/:id` | `TalentoDetalhe` | 🔒 Admin |
-| `/admin/alocados` | `RecursosAlocados` | 🔒 Admin |
 | `/admin/fila` | `FilaRevisao` | 🔒 Admin |
 | `/admin/usuarios` | `UsuariosPendentes` | 🔒 Admin |
 | `/admin/projetos` | `Projetos` | 🔒 Admin |

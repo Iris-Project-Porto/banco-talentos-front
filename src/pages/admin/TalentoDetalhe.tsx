@@ -145,9 +145,7 @@ export default function TalentoDetalhe() {
   }
 
   const isPendente = profile.status === "PENDING";
-  const isAlocado = profile.allocationStatus &&
-    ["Alocado Integral (100%)", "Alocado Parcial", "Em Transição (saindo de projeto)"].includes(profile.allocationStatus);
-  const backLink = isPendente ? "/admin/fila" : (isAlocado ? "/admin/alocados" : "/admin/talentos");
+  const backLink = isPendente ? "/admin/fila" : "/admin/talentos";
 
   const nivel = form.levelOverride || profile.nivel;
   const ns = nivel ? NIVEL_STYLE[nivel] : null;
