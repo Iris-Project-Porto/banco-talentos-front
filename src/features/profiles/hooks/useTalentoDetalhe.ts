@@ -90,14 +90,13 @@ export function useTalentoDetalhe(id: string | undefined) {
             queryClient.invalidateQueries({ queryKey: ['talento', variables.id] });
 
             // Verifica o status de alocação que acabou de ser salvo
-            const isAlocado = variables.payload.allocationStatus && ["Alocado Integral (100%)", "Alocado Parcial", "Em Transição (saindo de projeto)"].includes(variables.payload.allocationStatus);
             const isPendente = variables.payload.status === "PENDING" || variables.payload.status === "PENDENTE";
 
             // Redireciona para a lista correta
             if (isPendente) {
                 navigate("/admin/fila");
             } else {
-                navigate(isAlocado ? "/admin/alocados" : "/admin/talentos");
+                navigate("/admin/talentos");
             }
         },
         onError: (error) => {
