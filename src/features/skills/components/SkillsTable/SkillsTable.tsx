@@ -14,21 +14,21 @@ interface Props {
 const MAX_VISIBLE_AVATARS = 2;
 
 function getResourcesTotal(skill: Skill) {
-    const avatarCount = skill.avatarUrls?.length ?? 0;
+    const avatarCount = skill.avatars?.length ?? 0;
     return skill.resourcesCount ?? avatarCount;
 }
 
 function shouldShowMoreResources(skill: Skill) {
-    const avatarCount = skill.avatarUrls?.length ?? 0;
+    const avatarCount = skill.avatars?.length ?? 0;
     const total = getResourcesTotal(skill);
     return total > MAX_VISIBLE_AVATARS || avatarCount > MAX_VISIBLE_AVATARS;
 }
 
 function ResourcesCell({ skill }: { skill: Skill }) {
-    const avatarUrls = skill.avatarUrls ?? [];
+    const avatars = skill.avatars ?? [];
     const total = getResourcesTotal(skill);
     const showMore = shouldShowMoreResources(skill);
-    const visibleAvatars = avatarUrls.slice(0, MAX_VISIBLE_AVATARS);
+    const visibleAvatars = avatars.slice(0, MAX_VISIBLE_AVATARS);
 
     return (
         <div className="flex items-center gap-2.5">
@@ -36,11 +36,11 @@ function ResourcesCell({ skill }: { skill: Skill }) {
 
             {(visibleAvatars.length > 0 || showMore) && (
                 <div className="flex items-center -space-x-2">
-                    {visibleAvatars.map((url, index) => (
+                    {visibleAvatars.map((avatar, index) => (
                         <Avatar
                             key={`${skill.id}-avatar-${index}`}
-                            name={`${skill.name} ${index + 1}`}
-                            photoUrl={url}
+                            name={avatar.type === "INITIALS" && avatar.value ? avatar.value : `${skill.name} ${index + 1}`}
+                            photoUrl={avatar.type === "PHOTO" ? avatar.value : undefined}
                             size={28}
                         />
                     ))}
