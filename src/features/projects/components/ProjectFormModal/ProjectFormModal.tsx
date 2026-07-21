@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Input, Select } from "@/components/ui";
+import { Button } from "@/components/ui";
 import type { Project, ProjectPayload } from "../../types/types";
 import {
     createProjectSchema,
@@ -11,17 +11,9 @@ import {
     type ProjectEditFormInput,
     type ProjectEditFormData,
 } from "../../validations/validations";
-
-const textareaCls =
-    "w-full font-sans text-base rounded-lg px-3.5 py-2.5 outline-none transition-all bg-white border border-slate-300 focus:border-pink focus:shadow-focus-pink text-slate-900 placeholder:text-slate-400 resize-none";
-
-const ErrorMsg = ({ msg }: { msg?: string }) =>
-    msg ? <span className="text-xs text-red-500">{msg}</span> : null;
-
-const STATUS_OPTIONS = [
-    { value: "ACTIVE", label: "Ativo" },
-    { value: "INACTIVE", label: "Inativo" },
-];
+import { GeneralDataTab } from "./tabs/GeneralDataTab/GeneralDataTab";
+import { ProjectFormTabs, type ProjectFormTab } from "./ProjectFormTabs";
+import { ParticipatingSquadsTab } from "./tabs/ParticipatingSquadsTab/ParticipatingSquadsTab";
 
 interface Props {
     initial: Partial<ProjectPayload> & { id?: string; active?: boolean };
@@ -33,6 +25,7 @@ interface Props {
 
 export function ProjectFormModal({ initial, existingProjects = [], saving, onSave, onClose }: Props) {
     const isEdit = Boolean(initial.id);
+    const [activeTab, setActiveTab] = useState<ProjectFormTab>("general");
 
     const schema = useMemo(
         () =>
@@ -42,11 +35,7 @@ export function ProjectFormModal({ initial, existingProjects = [], saving, onSav
         [isEdit, existingProjects, initial.id],
     );
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<ProjectEditFormInput>({
+    const methods = useForm<ProjectEditFormInput>({
         resolver: zodResolver(schema),
         defaultValues: {
             name: initial.name || "",
@@ -54,6 +43,8 @@ export function ProjectFormModal({ initial, existingProjects = [], saving, onSav
             status: initial.active === false ? "INACTIVE" : "ACTIVE",
         },
     });
+
+    const { handleSubmit } = methods;
 
     function onSubmit(data: ProjectEditFormInput) {
         if (isEdit) {
@@ -79,11 +70,14 @@ export function ProjectFormModal({ initial, existingProjects = [], saving, onSav
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative bg-white rounded-2xl shadow-login w-full max-w-md max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200">
-                    <h2 className="text-lg font-bold text-slate-900">
-                        {isEdit ? "Editar projeto" : "Novo projeto"}
-                    </h2>
+            <div className="relative bg-white rounded-2xl shadow-login w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200 shrink-0">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-900">
+                            {isEdit ? "Editar projeto" : "Novo projeto"}
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-0.5">Preencha as informações do projeto</p>
+                    </div>
                     <button
                         type="button"
                         onClick={onClose}
@@ -93,40 +87,20 @@ export function ProjectFormModal({ initial, existingProjects = [], saving, onSav
                     </button>
                 </div>
 
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="overflow-y-auto flex-1 px-7 py-6 flex flex-col gap-5"
-                >
-                    <Input
-                        label="NOME DO PROJETO"
-                        placeholder="Ex: Migração de Cloud, Portal do Cliente..."
-                        error={errors.name?.message}
-                        required
-                        {...register("name")}
-                    />
+                <ProjectFormTabs active={activeTab} onChange={setActiveTab} />
 
-                    {isEdit && (
-                        <Select
-                            label="STATUS"
-                            options={STATUS_OPTIONS}
-                            {...register("status")}
-                        />
-                    )}
+                <FormProvider {...methods}>
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="overflow-y-auto flex-1 flex flex-col"
+                    >
+                        {activeTab === "general" && <GeneralDataTab isEdit={isEdit} />}
 
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-medium text-slate-600">
-                            DESCRIÇÃO
-                        </label>
-                        <textarea
-                            className={`${textareaCls} ${errors.description ? "border-red-400" : ""}`}
-                            rows={4}
-                            placeholder="Descreva brevemente o objetivo do projeto"
-                            required
-                            {...register("description")}
-                        />
-                        <ErrorMsg msg={errors.description?.message} />
-                    </div>
-                </form>
+                        {activeTab === "squads" && (
+                           <ParticipatingSquadsTab isEdit={isEdit} />
+                        )}
+                    </form>
+                </FormProvider>
 
                 <div className="px-7 py-5 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
                     <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
