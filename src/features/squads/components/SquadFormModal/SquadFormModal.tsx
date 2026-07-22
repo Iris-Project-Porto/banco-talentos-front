@@ -25,7 +25,6 @@ export function SquadFormModal({ initial, saving, onSave, onClose }: Props) {
             description: initial.description || "",
             portoCoordinator: initial.portoCoordinator || "",
             projectManager: initial.projectManager || "",
-            projectId: initial.projectId || "",
         }
     });
 
@@ -35,7 +34,6 @@ export function SquadFormModal({ initial, saving, onSave, onClose }: Props) {
             description: initial.description || "",
             portoCoordinator: initial.portoCoordinator || "",
             projectManager: initial.projectManager || "",
-            projectId: initial.projectId || "",
         });
     }, [initial, reset]);
 
@@ -85,11 +83,10 @@ export function SquadFormModal({ initial, saving, onSave, onClose }: Props) {
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input label="Nome da Squad *" {...register("name")} error={errors.name?.message} />
-                        <Input label="ID do Projeto *" placeholder="UUID do Projeto" {...register("projectId")} error={errors.projectId?.message} />
+                        <Input label="Project Manager *" {...register("projectManager")} error={errors.projectManager?.message} />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input label="Project Manager *" {...register("projectManager")} error={errors.projectManager?.message} />
                         <Input label="Coordenador Porto *" {...register("portoCoordinator")} error={errors.portoCoordinator?.message} />
                     </div>
 

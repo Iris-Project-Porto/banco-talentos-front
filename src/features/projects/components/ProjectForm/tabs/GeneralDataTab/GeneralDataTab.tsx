@@ -24,7 +24,7 @@ export function GeneralDataTab({ isEdit }: Props) {
     } = useFormContext<ProjectEditFormInput>();
 
     return (
-        <div className="flex-1 px-7 py-6 flex flex-col gap-5">
+        <div className="flex flex-col gap-5 px-7 py-6">
             <Input
                 label="NOME DO PROJETO"
                 placeholder="Ex: Migração de Cloud, Portal do Cliente..."

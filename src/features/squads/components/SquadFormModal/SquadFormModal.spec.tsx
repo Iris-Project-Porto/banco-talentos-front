@@ -41,7 +41,6 @@ describe('Componente SquadFormModal', () => {
         renderWithQueryClient(<SquadFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
         expect(screen.getByText('Nome da Squad *')).toBeInTheDocument();
-        expect(screen.getByText('ID do Projeto *')).toBeInTheDocument();
         expect(screen.getByText('Project Manager *')).toBeInTheDocument();
         expect(screen.getByText('Coordenador Porto *')).toBeInTheDocument();
         expect(screen.getByText('Descrição *')).toBeInTheDocument();
@@ -53,7 +52,6 @@ describe('Componente SquadFormModal', () => {
                 initial={{
                     id: '123',
                     name: 'Squad Alpha',
-                    projectId: 'proj-1',
                     projectManager: 'João',
                     portoCoordinator: 'Maria',
                     description: 'Uma squad',
@@ -76,7 +74,6 @@ describe('Componente SquadFormModal', () => {
                 initial={{
                     id: '123',
                     name: 'Squad Alpha',
-                    projectId: 'proj-1',
                     projectManager: 'João',
                     portoCoordinator: 'Maria',
                     description: 'Uma squad',
@@ -132,7 +129,6 @@ describe('Componente SquadFormModal', () => {
 
         expect(handleSave).toHaveBeenCalledWith({
             name: 'Nova Squad Teste',
-            projectId: 'proj-xyz',
             projectManager: 'Fulano PM',
             portoCoordinator: 'Ciclano Coord',
             description: 'Descrição da squad de testes',

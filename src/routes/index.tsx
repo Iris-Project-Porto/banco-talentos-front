@@ -32,6 +32,7 @@ const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 const Squads = lazy(() => import("@/pages/admin/Squads"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
+const ProjetoForm = lazy(() => import("@/pages/admin/ProjetoForm"));
 const ConsultaRecursos = lazy(() => import("@/pages/admin/ConsultaRecursos"));
 
 // DEFINIÇÃO DAS ROTAS
@@ -89,6 +90,8 @@ export const router = createBrowserRouter([
                     { path: "forms", element: <Forms /> },
                     { path: "squads", element: <Squads /> },
                     { path: "projetos", element: <Projetos /> },
+                    { path: "projetos/novo", element: <ProjetoForm /> },
+                    { path: "projetos/:id/editar", element: <ProjetoForm /> },
                     { path: "recursos", element: <ConsultaRecursos /> },
                 ],
             },

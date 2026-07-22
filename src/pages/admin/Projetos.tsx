@@ -1,9 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import {
-    projectsApi,
-    ProjectFormModal,
     ProjectDetailModal,
     ProjectsTable,
     ProjectsFilters,
@@ -14,16 +12,12 @@ import {
     getProjectsCatalog,
     PROJECTS_PAGE_SIZE,
     type Project,
-    type ProjectPayload,
 } from "@/features/projects";
 import { Button, PageHeader, Pagination, StatCard } from "@/components/ui";
-import { getApiError } from "@/lib/axios";
 
 export default function Projetos() {
-    const queryClient = useQueryClient();
-    const [modalOpen, setModalOpen] = useState(false);
+    const navigate = useNavigate();
     const [detailProject, setDetailProject] = useState<Project | null>(null);
-    const [editing, setEditing] = useState<(Partial<ProjectPayload> & { id?: string; active?: boolean }) | null>(null);
     const [search, setSearch] = useState("");
     const [statusType, setStatusType] = useState<"ACTIVE" | "INACTIVE">("ACTIVE");
     const [page, setPage] = useState(0);
@@ -49,7 +43,7 @@ export default function Projetos() {
     const { data: catalog = [], isLoading: loadingCatalog } = useQuery({
         queryKey: ["projects", "catalog"],
         queryFn: getProjectsCatalog,
-        enabled: modalOpen || hasSearch,
+        enabled: hasSearch,
     });
 
     const listResult = useMemo(() => {
@@ -65,70 +59,21 @@ export default function Projetos() {
         };
     }, [hasSearch, catalog, statusType, trimmedSearch, page, listData]);
 
-    const existingProjects = useMemo(
-        () => catalog.map((project) => ({ id: project.id, name: project.name })),
-        [catalog],
-    );
-
     const projects = listResult.content;
     const totalPages = listResult.totalPages;
     const isLoading = hasSearch ? loadingCatalog : loadingList;
 
-    const saveMutation = useMutation({
-        mutationFn: async (payload: ProjectPayload & { id?: string; active?: boolean; initialActive?: boolean }) => {
-            const { id, active, initialActive, ...body } = payload;
-
-            if (id) {
-                await projectsApi.update(id, body);
-
-                if (active !== undefined && initialActive !== undefined && active !== initialActive) {
-                    await (active ? projectsApi.activate(id) : projectsApi.inactivate(id));
-                }
-                return;
-            }
-
-            return projectsApi.create(body);
-        },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["projects"] });
-            closeModal();
-            toast.success("Projeto salvo com sucesso!");
-        },
-        onError: (error) => {
-            const message = getApiError(error, "Ocorreu um erro ao salvar o projeto. Por favor, tente novamente.");
-
-            if (message.toLowerCase().includes("duplicate") || message.toLowerCase().includes("unique")) {
-                toast.error("Já existe um projeto cadastrado com este nome.");
-                return;
-            }
-
-            toast.error(message);
-        },
-    });
-
     function openNew() {
-        setEditing({});
-        setModalOpen(true);
+        navigate("/admin/projetos/novo");
     }
 
     function openEdit(project: Project) {
         setDetailProject(null);
-        setEditing({
-            id: project.id,
-            name: project.name,
-            description: project.description,
-            active: project.active,
-        });
-        setModalOpen(true);
+        navigate(`/admin/projetos/${project.id}/editar`);
     }
 
     function openView(project: Project) {
         setDetailProject(project);
-    }
-
-    function closeModal() {
-        setModalOpen(false);
-        setEditing(null);
     }
 
     function handleClearFilters() {
@@ -190,16 +135,6 @@ export default function Projetos() {
                         onPageChange={setPage}
                     />
                 </div>
-            )}
-
-            {modalOpen && editing && (
-                <ProjectFormModal
-                    initial={editing}
-                    existingProjects={existingProjects}
-                    saving={saveMutation.isPending}
-                    onSave={(payload) => saveMutation.mutate(payload)}
-                    onClose={closeModal}
-                />
             )}
 
             {detailProject && (
