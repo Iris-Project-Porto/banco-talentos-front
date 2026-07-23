@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
     ProjectDetailModal,
@@ -38,6 +38,7 @@ export default function Projetos() {
         queryKey: ["projects", "list", statusType, page],
         queryFn: () => listProjectsSafe(statusType, { page, size: PROJECTS_PAGE_SIZE }),
         enabled: !hasSearch,
+        placeholderData: keepPreviousData,
     });
 
     const { data: catalog = [], isLoading: loadingCatalog } = useQuery({

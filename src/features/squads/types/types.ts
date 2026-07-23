@@ -22,6 +22,7 @@ export interface Squad {
     createdBy?: string;
     updatedBy?: string;
     metrics?: SquadMetrics;
+    members?: number;
 }
 
 export interface SquadPayload {
