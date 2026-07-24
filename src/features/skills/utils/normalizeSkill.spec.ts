@@ -16,28 +16,28 @@ describe('normalizeSkill', () => {
     it('deve manter url absoluta de avatar', () => {
         const skill = normalizeSkill({
             ...skillBase,
-            avatarUrls: ['https://cdn.example.com/avatar.png'],
+            avatars: [{ type: 'PHOTO', value: 'https://cdn.example.com/avatar.png' }],
         });
 
-        expect(skill.avatarUrls).toEqual(['https://cdn.example.com/avatar.png']);
+        expect(skill.avatars?.[0].value).toEqual('https://cdn.example.com/avatar.png');
     });
 
     it('deve resolver url relativa de avatar', () => {
         const skill = normalizeSkill({
             ...skillBase,
-            avatarUrls: ['/files/avatar.png'],
+            avatars: [{ type: 'PHOTO', value: '/files/avatar.png' }],
         });
 
-        expect(skill.avatarUrls?.[0]).toMatch(/\/files\/avatar\.png$/);
+        expect(skill.avatars?.[0].value).toMatch(/\/files\/avatar\.png$/);
     });
 
     it('deve normalizar lista de skills', () => {
         const skills = normalizeSkills([
-            { ...skillBase, avatarUrls: ['https://cdn.example.com/a.png'] },
-            { ...skillBase, id: '2', avatarUrls: undefined },
+            { ...skillBase, avatars: [{ type: 'PHOTO', value: 'https://cdn.example.com/a.png' }] },
+            { ...skillBase, id: '2', avatars: undefined },
         ]);
 
         expect(skills).toHaveLength(2);
-        expect(skills[0].avatarUrls?.[0]).toBe('https://cdn.example.com/a.png');
+        expect(skills[0].avatars?.[0].value).toBe('https://cdn.example.com/a.png');
     });
 });
