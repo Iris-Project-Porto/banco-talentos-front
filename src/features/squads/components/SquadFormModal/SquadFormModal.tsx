@@ -86,7 +86,7 @@ export function SquadFormModal({ initial, saving, onSave, onClose }: Props) {
                         <Input label="Project Manager *" {...register("projectManager")} error={errors.projectManager?.message} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
                         <Input label="Coordenador Porto *" {...register("portoCoordinator")} error={errors.portoCoordinator?.message} />
                     </div>
 

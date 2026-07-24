@@ -85,7 +85,6 @@ describe('Componente SquadFormModal', () => {
         );
 
         expect(screen.getByDisplayValue('Squad Alpha')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('proj-1')).toBeInTheDocument();
         expect(screen.getByDisplayValue('João')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Maria')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Uma squad')).toBeInTheDocument();
@@ -108,7 +107,6 @@ describe('Componente SquadFormModal', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Criar squad' }));
 
         expect(await screen.findByText('O nome da squad é obrigatório')).toBeInTheDocument();
-        expect(await screen.findByText('O projeto é obrigatório')).toBeInTheDocument();
         expect(await screen.findByText('Project Manager é obrigatório')).toBeInTheDocument();
         expect(await screen.findByText('A descrição é obrigatória')).toBeInTheDocument();
     });
@@ -120,10 +118,9 @@ describe('Componente SquadFormModal', () => {
         const inputs = screen.getAllByRole('textbox');
 
         await userEvent.type(inputs[0], 'Nova Squad Teste');
-        await userEvent.type(inputs[1], 'proj-xyz');
-        await userEvent.type(inputs[2], 'Fulano PM');
-        await userEvent.type(inputs[3], 'Ciclano Coord');
-        await userEvent.type(inputs[4], 'Descrição da squad de testes');
+        await userEvent.type(inputs[1], 'Fulano PM');
+        await userEvent.type(inputs[2], 'Ciclano Coord');
+        await userEvent.type(inputs[3], 'Descrição da squad de testes');
 
         await userEvent.click(screen.getByRole('button', { name: 'Criar squad' }));
 

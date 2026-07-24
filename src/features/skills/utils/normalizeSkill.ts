@@ -15,7 +15,11 @@ function resolveAvatarUrl(url?: string) {
 export function normalizeSkill(skill: Skill): Skill {
     return {
         ...skill,
-        avatarUrls: skill.avatarUrls?.map((url) => resolveAvatarUrl(url) ?? url),
+        avatars: skill.avatars?.map((avatar) =>
+            avatar.type === "PHOTO"
+                ? { ...avatar, value: resolveAvatarUrl(avatar.value) ?? avatar.value }
+                : avatar
+        ),
     };
 }
 
