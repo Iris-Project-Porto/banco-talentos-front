@@ -17,7 +17,7 @@ import { ProjectFormTabs, type ProjectFormTab } from "./ProjectFormTabs";
 import { ParticipatingSquadsTab } from "./tabs/ParticipatingSquadsTab/ParticipatingSquadsTab";
 
 interface Props {
-    initial: Partial<ProjectPayload> & { id?: string; active?: boolean };
+    initial: Partial<Project> & { id?: string };
     existingProjects?: Pick<Project, "id" | "name">[];
     saving: boolean;
     onSave: (data: ProjectPayload & { id?: string; active?: boolean; initialActive?: boolean }) => void;
@@ -42,10 +42,13 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
             name: initial.name || "",
             description: initial.description || "",
             status: initial.active === false ? "INACTIVE" : "ACTIVE",
+            squads: initial.squads ?? [],
         },
     });
 
-    const { handleSubmit } = methods;
+    const { handleSubmit, watch } = methods;
+    const [name, description] = watch(["name", "description"]);
+    const canSave = Boolean(name?.trim() && description?.trim());
 
     function onSubmit(data: ProjectEditFormInput) {
         if (isEdit) {
@@ -56,6 +59,7 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
                 id: initial.id,
                 active: parsed.status === "ACTIVE",
                 initialActive: initial.active ?? true,
+                squadIds: (parsed.squads ?? []).map((squad) => squad.id),
             });
             return;
         }
@@ -64,6 +68,7 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
         onSave({
             name: parsed.name,
             description: parsed.description,
+            squadIds: (parsed.squads ?? []).map((squad) => squad.id),
         });
     }
 
@@ -98,6 +103,7 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
                         variant="primary"
                         loading={saving}
                         onClick={handleSubmit(onSubmit)}
+                        disabled={!canSave || saving}
                     >
                         Salvar
                     </Button>

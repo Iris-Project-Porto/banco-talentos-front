@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { Button, Input, Pagination } from "@/components/ui";
 import { Squad } from "@/features/squads/types/types";
@@ -10,38 +10,55 @@ import { squadsApi } from "@/features/squads";
 interface Props {
     onClose: () => void;
     onConfirm?: (selected: Squad[]) => void;
+    initialSelected?: Squad[];
 }
 
-export function SelectSquadsModal({  onClose, onConfirm }: Props) {
+const PAGE_SIZE = 7;
+
+export function SelectSquadsModal({  onClose, onConfirm,  initialSelected = [] }: Props) {
     const [search, setSearch] = useState("");
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [selectedSquads, setSelectedSquads] = useState<Squad[]>(initialSelected);
     const [page, setPage] = useState(0);
-    const { data, isLoading } = useQuery({
-        queryKey: ['squads', page, search],
-        queryFn: () => squadsApi.getActive({ page, size: 10, search }),
+    const { data } = useQuery({
+        queryKey: ['squads', 'ACTIVE', page, PAGE_SIZE, search],
+        queryFn: () => squadsApi.getActive({ page, size: PAGE_SIZE, search }),
         placeholderData: keepPreviousData,
     });
     const squads = data?.content || [];
     const totalPages = data?.totalPages ?? 1;
-    useEffect(() => setPage(0), [search]);
 
+    function handleSearchChange(value: string) {
+        setSearch(value);
+        setPage(0);
+    }
 
     const toggleRow = useCallback((squad: Squad) => {
-        setSelectedIds((prev) =>
-            prev.includes(squad.id)
-                ? prev.filter((id) => id !== squad.id)
-                : [...prev, squad.id],
+        setSelectedSquads((prev) =>
+            prev.some((selected) => selected.id === squad.id)
+                ? prev.filter((selected) => selected.id !== squad.id)
+                : [...prev, squad],
         );
     }, []);
 
     const toggleAll = useCallback((checked: boolean) => {
         const visibleIds = squads.map((squad) => squad.id);
-        setSelectedIds((prev) =>
+
+        setSelectedSquads((prev) =>
             checked
-                ? Array.from(new Set([...prev, ...visibleIds]))
-                : prev.filter((id) => !visibleIds.includes(id)),
+                ? [
+                    ...prev,
+                    ...squads.filter(
+                        (squad) => !prev.some((selected) => selected.id === squad.id),
+                    ),
+                ]
+                : prev.filter((squad) => !visibleIds.includes(squad.id)),
         );
     }, [squads]);
+
+    const selectedIds = useMemo(
+        () => selectedSquads.map((squad) => squad.id),
+        [selectedSquads],
+    );
 
     const selection = useMemo<TableSelection<Squad>>(() => ({
         selectedKeys: selectedIds,
@@ -50,12 +67,11 @@ export function SelectSquadsModal({  onClose, onConfirm }: Props) {
     }), [selectedIds, toggleRow, toggleAll]);
 
     function handleConfirm() {
-        const selected = squads.filter((squad) => selectedIds.includes(squad.id));
-        onConfirm?.(selected);
+        onConfirm?.(selectedSquads);
         onClose();
     }
 
-    const selectedCount = selectedIds.length;
+    const selectedCount = selectedSquads.length;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -79,17 +95,17 @@ export function SelectSquadsModal({  onClose, onConfirm }: Props) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-4">
-                    <div className="relative">
+                    <div className="relative shrink-0">
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
                         <Input
                             placeholder="Buscar por nome da squad"
                             value={search}
-                            onChange={(event) => setSearch(event.target.value)}
+                            onChange={(event) => handleSearchChange(event.target.value)}
                             className="pl-9 pr-3"
                         />
                     </div>
 
-                    <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="border border-slate-200 rounded-xl overflow-hidden shrink-0">
                         <ParticipatingSquadsTable
                             data={squads}
                             emptyMessage="Nenhuma squad encontrada"
@@ -100,6 +116,7 @@ export function SelectSquadsModal({  onClose, onConfirm }: Props) {
                         currentPage={page}
                         totalPages={totalPages}
                         onPageChange={setPage}
+                        className="shrink-0"
                     />
                 </div>
 

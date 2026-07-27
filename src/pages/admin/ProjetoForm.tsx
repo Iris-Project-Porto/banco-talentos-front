@@ -71,6 +71,11 @@ export default function ProjetoForm() {
                 return;
             }
 
+            if (message.toLowerCase().includes("squad já está vinculada")) {
+                toast.error("A squad já está vinculada a outro projeto");
+                return;
+            }
+
             toast.error(message);
         },
     });

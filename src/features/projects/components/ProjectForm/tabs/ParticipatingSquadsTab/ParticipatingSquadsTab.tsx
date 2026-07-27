@@ -1,134 +1,166 @@
-import { Button, Pagination } from "@/components/ui";
+import { Button, ConfirmModal, Pagination } from "@/components/ui";
+import { ProjectEditFormInput } from "@/features/projects/validations/validations";
+import { squadsApi } from "@/features/squads/api/squads.api";
+import { SquadFormModal } from "@/features/squads/components/SquadFormModal";
+import { Squad } from "@/features/squads/types/types";
+import { SquadFormData } from "@/features/squads/validations/validations";
+import { useMutation } from "@tanstack/react-query";
 import { PlusIcon, SearchIcon, UsersRoundIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
+import { paginateLocally } from "@/features/projects/utils/projectsList";
 import { ParticipatingSquadsTable } from "./ParticipatingSquadsTable";
-import { Squad } from "@/features/squads";
-import { useState } from "react";
 import { SelectSquadsModal } from "./SelectSquadsModal";
 
 interface Props {
-    isEdit: boolean;
+  isEdit: boolean;
 }
 
-const data: Squad[] = [
-    {
-        id: "1",
-        name: "Squad 1",
-        description: "Description 1",
-        projectId: "1",
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        projectManager: "John Doe",
-        portoCoordinator: "Jane Doe",
-        members: 10,
-    },
-    {
-        id: "2",
-        name: "Squad 2",
-        description: "Description 2",
-        projectId: "2",
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        projectManager: "John Doe",
-        portoCoordinator: "Jane Doe",
-        members: 10,
-    },
-    {
-        id: "3",
-        name: "Squad 3",
-        description: "Description 3",
-        projectId: "3",
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        projectManager: "John Doe",
-        portoCoordinator: "Jane Doe",
-        members: 10,
-    },
-    {
-        id: "4",
-        name: "Squad 4",
-        description: "Description 4",
-        projectId: "4",
-        active: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        projectManager: "John Doe",
-        portoCoordinator: "Jane Doe",
-        members: 10,
-    },
-];
+const PAGE_SIZE = 7;
+
+type ModalState =
+  | { type: "select" }
+  | { type: "add" }
+  | { type: "remove"; squad: Squad };
 
 export function ParticipatingSquadsTab({ isEdit: _isEdit }: Props) {
-    const [selectSquadsModalOpen, setSelectSquadsModalOpen] = useState(false);
+  const { setValue } = useFormContext<ProjectEditFormInput>();
+  const selectedSquads =
+    useWatch<ProjectEditFormInput, "squads">({ name: "squads" }) ?? [];
+  const [modal, setModal] = useState<ModalState | null>(null);
+  const [page, setPage] = useState(0);
 
-    function openSelectSquadsModal() {
-        setSelectSquadsModalOpen(true);
+  const { content: paginatedSquads, totalPages } = useMemo(
+    () => paginateLocally(selectedSquads, page, PAGE_SIZE),
+    [selectedSquads, page],
+  );
+
+  useEffect(() => {
+    if (page > 0 && page >= totalPages) {
+      setPage(totalPages - 1);
     }
-    function closeSelectSquadsModal() {
-        setSelectSquadsModalOpen(false);
-    }
+  }, [page, totalPages]);
 
-    return (
-        <div className="flex flex-col gap-5 px-7 py-6">
-            <div className="bg-white">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <UsersRoundIcon className="w-6 h-6 text-pink shrink-0" />
-                        <div className="min-w-0">
-                            <h1 className="text-xl font-bold text-slate-900">
-                                Squads Participantes
-                            </h1>
-                            <p className="mt-0.5 text-sm text-slate-400">
-                                Gerencie as squads que participam deste projeto.
-                            </p>
-                        </div>
-                    </div>
+  const closeModal = () => setModal(null);
 
-                    <div className="flex flex-wrap items-center gap-3 shrink-0">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="md"
-                            className="border-pink text-pink hover:bg-pink/5"
-                            onClick={() => {}}
-                        >
-                            <span className="flex items-center gap-2">
-                                <PlusIcon className="w-4 h-4" />
-                                Adicionar Squad
-                            </span>
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="md"
-                            className="border-pink text-pink hover:bg-pink/5"
-                            onClick={openSelectSquadsModal}
-                        >
-                            <span className="flex items-center gap-2">
-                                <SearchIcon className="w-4 h-4" />
-                                Selecionar Squad
-                            </span>
-                        </Button>
-                    </div>
-                </div>
-            </div>
+  const addSquadMutation = useMutation({
+    mutationFn: async (data: SquadFormData) => squadsApi.create(data),
+    onSuccess: (createdSquad) => {
+      const alreadySelected = selectedSquads.some((squad) => squad.id === createdSquad.id);
+      if (!alreadySelected) {
+        setValue("squads", [...selectedSquads, createdSquad], { shouldDirty: true });
+      }
+      toast.success("Squad salva com sucesso!");
+      closeModal();
+    },
+    onError: () => toast.error("Ocorreu um erro ao salvar a squad."),
+  });
 
-            <div className="bg-white border border-slate-200 rounded-xl shadow-card overflow-hidden flex flex-col">
-                <ParticipatingSquadsTable data={data} />
-                <Pagination
-                    currentPage={1}
-                    totalPages={1}
-                    onPageChange={() => {}}
-                />
-            </div>
-            {selectSquadsModalOpen && (
-                <SelectSquadsModal
-                    onClose={closeSelectSquadsModal}
-                    onConfirm={() => {}}
-                />
-            )}
-        </div>
+  function confirmRemoveSquad() {
+    if (modal?.type !== "remove") return;
+
+    setValue(
+      "squads",
+      selectedSquads.filter((squad) => squad.id !== modal.squad.id),
+      { shouldDirty: true },
     );
+    closeModal();
+  }
+
+  return (
+    <div className="flex flex-col gap-5 px-7 py-6">
+      <div className="bg-white">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <UsersRoundIcon className="w-6 h-6 text-pink shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-slate-900">
+                Squads Participantes
+              </h1>
+              <p className="mt-0.5 text-sm text-slate-400">
+                Gerencie as squads que participam deste projeto.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="border-pink text-pink hover:bg-pink/5"
+              onClick={() => setModal({ type: "add" })}
+            >
+              <span className="flex items-center gap-2">
+                <PlusIcon className="w-4 h-4" />
+                Adicionar Squad
+              </span>
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="border-pink text-pink hover:bg-pink/5"
+              onClick={() => setModal({ type: "select" })}
+            >
+              <span className="flex items-center gap-2">
+                <SearchIcon className="w-4 h-4" />
+                Selecionar Squad
+              </span>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border border-slate-200 rounded-xl shadow-card overflow-hidden flex flex-col">
+        <ParticipatingSquadsTable
+          data={paginatedSquads}
+          onDelete={(squad) => setModal({ type: "remove", squad })}
+        />
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 px-4 py-4">
+          <p className="text-sm text-slate-500">
+            Total de squads:{" "}
+            <span className="font-semibold text-slate-900">
+              {selectedSquads.length}
+            </span>
+          </p>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            className="mt-0 pt-0 border-t-0"
+          />
+        </div>
+      </div>
+      {modal?.type === "select" && (
+        <SelectSquadsModal
+          initialSelected={selectedSquads}
+          onClose={closeModal}
+          onConfirm={(squads) =>
+            setValue("squads", squads, { shouldDirty: true })
+          }
+        />
+      )}
+
+      {modal?.type === "add" && (
+        <SquadFormModal
+          initial={{}}
+          saving={addSquadMutation.isPending}
+          onSave={(data) => addSquadMutation.mutate(data)}
+          onClose={closeModal}
+        />
+      )}
+
+      {modal?.type === "remove" && (
+        <ConfirmModal
+          title="Remover squad do projeto"
+          message={`Deseja realmente remover a squad "${modal.squad.name}" deste projeto? A squad continuará cadastrada e a alteração será aplicada ao salvar o projeto.`}
+          confirmLabel="Remover"
+          onConfirm={confirmRemoveSquad}
+          onClose={closeModal}
+        />
+      )}
+    </div>
+  );
 }

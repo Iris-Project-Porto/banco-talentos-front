@@ -26,7 +26,7 @@ export function GeneralDataTab({ isEdit }: Props) {
     return (
         <div className="flex flex-col gap-5 px-7 py-6">
             <Input
-                label="NOME DO PROJETO"
+                label="NOME DO PROJETO *"
                 placeholder="Ex: Migração de Cloud, Portal do Cliente..."
                 error={errors.name?.message}
                 required
@@ -43,7 +43,7 @@ export function GeneralDataTab({ isEdit }: Props) {
 
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-slate-600">
-                    DESCRIÇÃO
+                    DESCRIÇÃO *
                 </label>
                 <textarea
                     className={`${textareaCls} ${errors.description ? "border-red-400" : ""}`}

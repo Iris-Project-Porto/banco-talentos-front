@@ -14,8 +14,8 @@ describe("Componente ProjectForm", () => {
     it("deve renderizar os campos do formulário", () => {
         render(<ProjectForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
 
-        expect(screen.getByText("NOME DO PROJETO")).toBeInTheDocument();
-        expect(screen.getByText("DESCRIÇÃO")).toBeInTheDocument();
+        expect(screen.getByText("NOME DO PROJETO *")).toBeInTheDocument();
+        expect(screen.getByText("DESCRIÇÃO *")).toBeInTheDocument();
     });
 
     it("deve renderizar a página de edição e o campo de status", () => {
@@ -46,12 +46,25 @@ describe("Componente ProjectForm", () => {
         expect(handleCancel).toHaveBeenCalledOnce();
     });
 
-    it("deve exibir erro de validação ao submeter o formulário vazio", async () => {
+    it("deve manter o botão de salvar desabilitado enquanto os campos obrigatórios estiverem vazios", () => {
         render(<ProjectForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
+        expect(screen.getByRole("button", { name: "Salvar" })).toBeDisabled();
+    });
 
-        expect(screen.getByText("Nome do projeto é obrigatório")).toBeInTheDocument();
+    it("deve habilitar o botão de salvar quando os campos obrigatórios estiverem preenchidos", async () => {
+        render(<ProjectForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+
+        await userEvent.type(
+            screen.getByPlaceholderText("Ex: Migração de Cloud, Portal do Cliente..."),
+            "Portal do Cliente",
+        );
+        await userEvent.type(
+            screen.getByPlaceholderText("Descreva brevemente o objetivo do projeto"),
+            "Portal web para clientes",
+        );
+
+        expect(screen.getByRole("button", { name: "Salvar" })).toBeEnabled();
     });
 
     it("deve exibir erro ao cadastrar um projeto com nome duplicado", async () => {
@@ -95,6 +108,7 @@ describe("Componente ProjectForm", () => {
         expect(handleSave).toHaveBeenCalledWith({
             name: "Portal do Cliente",
             description: "Portal web para clientes",
+            squadIds: [],
         });
     });
 
@@ -123,6 +137,7 @@ describe("Componente ProjectForm", () => {
             id: "project-1",
             active: true,
             initialActive: false,
+            squadIds: [],
         });
     });
 

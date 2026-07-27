@@ -1,5 +1,5 @@
 import { ReactNode, useMemo } from "react";
-import { Eye, Pencil } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table, type TableSelection } from "@/components/ui/Table/Table";
 import { Squad } from "@/features/squads/types/types";
 
@@ -19,7 +19,7 @@ interface Props {
 
 const squadKey = (squad: Squad) => squad.id;
 
-export function ParticipatingSquadsTable({ data, onDelete, onEdit, selection, emptyMessage }: Props) {
+export function ParticipatingSquadsTable({ data, onDelete, selection, emptyMessage }: Props) {
     const hasSelection = Boolean(selection);
     const columns = useMemo<SquadColumn[]>(() => {
         const baseColumns: SquadColumn[] = [
@@ -40,6 +40,7 @@ export function ParticipatingSquadsTable({ data, onDelete, onEdit, selection, em
             },
             {
                 header: "Membros",
+                className: "text-center",
                 render: (squad) => (
                     <span className="text-slate-600">{squad.members ?? 0}</span>
                 ),
@@ -58,24 +59,16 @@ export function ParticipatingSquadsTable({ data, onDelete, onEdit, selection, em
                         <button
                             type="button"
                             onClick={() => onDelete?.(squad)}
-                            className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors p-1.5 rounded-md"
-                            title="Excluir"
+                            className="text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors p-1.5 rounded-md"
+                            title="Remover squad do projeto"
                         >
-                            <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => onEdit?.(squad)}
-                            className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors p-1.5 rounded-md"
-                            title="Editar"
-                        >
-                            <Pencil className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" />
                         </button>
                     </div>
                 ),
             },
         ];
-    }, [hasSelection, onDelete, onEdit]);
+    }, [hasSelection, onDelete]);
 
     return (
         <Table
