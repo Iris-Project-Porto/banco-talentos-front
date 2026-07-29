@@ -1,3 +1,4 @@
+import { Squad } from "@/features/squads/types/types";
 import { z } from "zod";
 
 export function normalizeProjectName(name: string) {
@@ -15,6 +16,7 @@ export const projectSchema = z.object({
         .trim()
         .min(1, "Descrição é obrigatória")
         .max(500, "Descrição deve ter no máximo 500 caracteres"),
+        squads: z.array(z.custom<Squad>()).default([]),
 });
 
 export function createProjectSchema(
