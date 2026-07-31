@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { useFormContext, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { Trash2, FileText, HelpCircle } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
 import { SkillFormModal, type SkillPayload } from "@/features/skills";
@@ -23,15 +23,24 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
     const { fields, append, remove } = useFieldArray({ control, name: "skills" });
 
-    const { skills: skillCatalog, createMutation } = useSkillsCatalog();
+    const { skills: skillCatalog, createMutation, isLoading } = useSkillsCatalog();
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
 
     const watchedSkills = useWatch({ control, name: "skills" }) || [];
 
+    const skillOptions = useMemo(() => [
+        {value: "", label: isLoading ? "Carregando..." : "Selecione uma skill"},
+        ...skillCatalog.map((skill) => ({ value: skill.name, label: skill.name })),
+    ],  [skillCatalog, isLoading]);
+
     function onSkillSave({ name, type, description, category }: SkillPayload) {
         const payload: SkillPayload = { name, type, description, category };
+        
         createMutation.mutate(payload, {
-            onSuccess: () => setIsSkillModalOpen(false),
+            onSuccess: (createdSkill) => {
+                append({ name: createdSkill.name, type: "MANDATORY", minLevel: "BASIC", importanceWeight: 1, description: createdSkill.description ?? "" });
+                setIsSkillModalOpen(false);
+            },
         });
     }
 
@@ -85,10 +94,17 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         <div key={field.id} className="grid grid-cols-12 gap-x-3 px-1 items-start pb-4 border-b border-slate-100 last:border-0 last:pb-0">
 
                             <div className="col-span-3">
-                                 <Select
-                                    options={[{value: "", label: "Selecione uma skill"},...skillCatalog.map((skill) => ({ value: skill.name, label: skill.name }))]}
-                                    {...register(`skills.${index}.name` as const)}
-                                />
+                               <Controller
+                                name={`skills.${index}.name`}
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        options={skillOptions}
+                                        disabled={!canEdit || isLoading}
+                                        {...field}
+                                    />
+                                )}
+                               />
                                 <ErrorMsg msg={skillErr?.name?.message} />
                             </div>
 
@@ -126,11 +142,17 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                                 />
                             </div>
                             <div className="col-span-4">
-                                <Input
-                                    type="text"
-                                    placeholder="Descrição"
-                                    maxLength={225}
-                                    {...register(`skills.${index}.description` as const)}
+                                <Controller
+                                    name={`skills.${index}.description`}
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Input
+                                            type="text"
+                                            placeholder="Descrição"
+                                            maxLength={225}
+                                            {...field}
+                                        />
+                                    )}
                                 />
                                 <ErrorMsg msg={skillErr?.description?.message} />
                             </div>
