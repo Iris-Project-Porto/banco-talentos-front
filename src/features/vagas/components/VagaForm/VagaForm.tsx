@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui";
+import { Button, PageHeader } from "@/components/ui";
 import { type JobPostingPayload } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
@@ -8,17 +8,18 @@ import { GeneralFields } from "../GeneralFields/GeneralFields";
 import { SkillsSection } from "../SkillsSection/SkillsSection";
 import { AdditionalInfoFields } from "../AdditionalInfoFields/AdditionalInfoFields";
 
+const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
 
-interface VagaModalProps {
+interface VagaFormProps {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
     onSave: (v: JobPostingPayload & { id?: string }) => void;
-    onClose: () => void;
+    onCancel: () => void;
 }
 
-export function VagaModal({ initial, saving, onSave, onClose }: VagaModalProps) {
+export function VagaForm({ initial, saving, onSave, onCancel }: VagaFormProps) {
     const isEdit = Boolean(initial.id);
-    const canEdit = isEdit ? ["OPEN", "SCREENING", "ALLOCATING"].includes(initial.status || "") : true;
+    const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
 
     const methods = useForm<VagaFormData>({
         resolver: zodResolver(vagaSchema),
@@ -40,7 +41,6 @@ export function VagaModal({ initial, saving, onSave, onClose }: VagaModalProps) 
 
     const vagaDependencies = useVagaDependencies(selectedProjectId, selectedSquadId, methods.setValue);
 
-
     const onSubmit = (data: VagaFormData) => {
         onSave({
             ...data,
@@ -52,42 +52,53 @@ export function VagaModal({ initial, saving, onSave, onClose }: VagaModalProps) 
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
-
-            <div className="relative bg-white rounded-2xl shadow-login w-full max-w-8xl max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200">
-                    <h2 className="text-lg font-bold text-slate-900">{isEdit ? "Editar vaga" : "Nova vaga"}</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
-                </div>
-
-                <FormProvider {...methods}>
-                    <form
-                        onSubmit={methods.handleSubmit(onSubmit, (err) => console.error("Erros de Validação:", err))}
-                        className="overflow-y-auto flex-1 px-7 py-6 flex flex-col gap-5"
-                    >
-                        {!canEdit && (
-                            <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
-                                Vagas com status <b>{initial.status}</b> não podem ser editadas (Apenas Abertas, Em Triagem ou Em Alocação).
-                            </div>
-                        )}
-
-                        <GeneralFields canEdit={canEdit} dependencies={vagaDependencies} />
-                        <SkillsSection canEdit={canEdit} />
-                        <AdditionalInfoFields canEdit={canEdit} />
-
-                    </form>
-                </FormProvider>
-
-                <div className="px-7 py-5 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
-                    <Button disabled={saving} onClick={onClose} type="button" variant="secondary">Cancelar</Button>
-                    {canEdit && (
-                        <Button loading={saving} onClick={methods.handleSubmit(onSubmit)} type="button" variant="primary">
-                            {isEdit ? "Salvar alterações" : "Criar vaga"}
+        <div className="flex flex-col gap-6">
+            <PageHeader
+                title={isEdit ? "Editar vaga" : "Nova vaga"}
+                subtitle="Preencha as informações da vaga"
+                onBack={onCancel}
+                backLabel="Voltar para vagas"
+                actions={
+                    <>
+                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
+                            Cancelar
                         </Button>
-                    )}
+                        {canEdit && (
+                            <Button
+                                type="button"
+                                variant="primary"
+                                loading={saving}
+                                onClick={methods.handleSubmit(onSubmit)}
+                            >
+                                {isEdit ? "Salvar alterações" : "Criar vaga"}
+                            </Button>
+                        )}
+                    </>
+                }
+            />
+
+            {!canEdit && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
+                    Vagas com status <b>{initial.status}</b> não podem ser editadas (Apenas Abertas, Em Triagem ou Em Alocação).
                 </div>
-            </div>
+            )}
+
+            <FormProvider {...methods}>
+                <form
+                    onSubmit={methods.handleSubmit(onSubmit)}
+                    className="flex flex-col gap-5"
+                >
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
+                        <GeneralFields canEdit={canEdit} dependencies={vagaDependencies} />
+                    </div>
+
+                    <SkillsSection canEdit={canEdit} />
+
+                    <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
+                        <AdditionalInfoFields canEdit={canEdit} />
+                    </div>
+                </form>
+            </FormProvider>
         </div>
     );
 }

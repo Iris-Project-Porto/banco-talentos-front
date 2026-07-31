@@ -37,7 +37,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
 
     return (
         <>
-        <fieldset disabled={!canEdit} className="border border-slate-200 rounded-xl p-6 bg-white flex flex-col gap-5 shadow-sm mt-2">
+        <fieldset disabled={!canEdit} className="border border-slate-200 rounded-xl px-7 py-6 bg-white flex flex-col gap-5 shadow-card">
             <div className="flex items-center gap-3 mb-1">
                 <FileText className="w-5 h-5 text-blue-500" />
                 <div className="flex items-center gap-2">

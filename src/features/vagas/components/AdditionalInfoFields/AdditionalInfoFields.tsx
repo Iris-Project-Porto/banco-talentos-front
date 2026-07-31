@@ -6,7 +6,7 @@ export function AdditionalInfoFields({ canEdit }: { canEdit: boolean }) {
     const { register } = useFormContext<VagaFormData>();
 
     return (
-        <fieldset disabled={!canEdit} className="flex flex-col gap-4 mt-2">
+        <fieldset disabled={!canEdit} className="flex flex-col gap-4">
             <Field label="Descrição da Vaga">
                 <textarea className={`${INPUT_CLS} min-h-[80px] resize-y`} placeholder="Conteúdo principal..." {...register("description")} />
             </Field>
