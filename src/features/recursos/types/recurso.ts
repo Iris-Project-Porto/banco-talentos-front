@@ -51,18 +51,14 @@ export interface Recurso {
   jobTitle?: string;
   area?: string;
   status: string;
-  // Seção 1
   statusRecurso: StatusRecurso;
   statusMatricula: StatusMatricula;
   numeroMatricula?: string;
   dataSolicitacaoMatricula?: string;
   observacoesMatricula?: string;
-  // Seção 2
   possuiMaquinaCliente: boolean;
   maquinas: Maquina[];
-  // Seção 3
   statusPropostaTecnica?: StatusPropostaTecnica;
-  // Seção 4
   areaContratante?: string;
   centroCustoContratante?: string;
   dataEntradaProjeto?: string;
@@ -71,9 +67,6 @@ export interface Recurso {
   gerenteProjeto?: string;
   projetoAlocacao?: string;
   squadAlocacao?: string;
-  // Seção 5
-  contato?: string;
-  endereco?: string;
   createdAt?: string;
   updatedAt?: string;
 }

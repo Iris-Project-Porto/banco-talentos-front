@@ -30,7 +30,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard label="Recursos Disponíveis" value={stats.disponiveisBench} accentColor="#10B981" to="/admin/talentos" />
         <StatCard label="Total de cadastros" value={stats.dashData.total} to="/admin/usuarios" />
-        <StatCard label="Perfis ativos" value={stats.dashData.active} accentColor="#E11D48" to="/admin/alocados" />
+        <StatCard label="Perfis ativos" value={stats.dashData.active} accentColor="#E11D48" to="/admin/talentos" />
         <StatCard label="Aguardando revisão" value={stats.dashData.pending} accentColor={stats.dashData.pending > 0 ? "#D97706" : undefined} to="/admin/fila" />
         <StatCard label="Vagas Ativas" value={vagasAtivas?.totalElements ?? 0} accentColor="#8B5CF6" to="/admin/vagas" />
       </div>
@@ -67,7 +67,6 @@ export default function Dashboard() {
               {[
                 { label: "Disponível (Bench)", value: stats.alocacaoMap["Disponível (Bench)"] ?? 0, color: "#10B981" },
                 { label: "Em Projetos", value: (stats.alocacaoMap["Alocado Integral (100%)"] ?? 0) + (stats.alocacaoMap["Alocado Parcial"] ?? 0) + (stats.alocacaoMap["Em Transição (saindo de projeto)"] ?? 0), color: "#3B82F6" },
-                { label: "Ausentes", value: stats.alocacaoMap["Férias / Licença"] ?? 0, color: "#8B5CF6" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

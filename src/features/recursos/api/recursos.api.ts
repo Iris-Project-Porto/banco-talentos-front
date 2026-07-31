@@ -1,5 +1,6 @@
 import { http } from "@/lib/axios";
 import type { Maquina, MatriculaHistorico, Recurso, RecursoFilterParams, RecursoPage, StatusMatricula } from "../types/recurso";
+import type { ResourceCreatePayload } from "../validations/resourceCreate";
 
 function buildParams(f: RecursoFilterParams & { page?: number; size?: number }): URLSearchParams {
   const p = new URLSearchParams();
@@ -18,6 +19,9 @@ function buildParams(f: RecursoFilterParams & { page?: number; size?: number }):
 }
 
 export const recursosApi = {
+  create: (data: ResourceCreatePayload) =>
+    http.post("/v1/admin/recursos", data).then((r) => r.data),
+
   listar: (filtros: RecursoFilterParams, page = 0, size = 20): Promise<RecursoPage> =>
     http.get(`/v1/admin/recursos?${buildParams({ ...filtros, page, size })}`).then((r) => r.data),
 
@@ -41,7 +45,4 @@ export const recursosApi = {
 
   removerMaquina: (id: string, maqId: string): Promise<void> =>
     http.delete(`/v1/admin/recursos/${id}/maquinas/${maqId}`).then((r) => r.data),
-
-  atualizarContato: (data: { contato?: string; endereco?: string }): Promise<Recurso> =>
-    http.patch("/v1/recurso/me/contato", data).then((r) => r.data),
 };

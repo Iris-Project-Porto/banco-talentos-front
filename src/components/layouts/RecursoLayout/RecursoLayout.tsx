@@ -39,7 +39,7 @@ export default function RecursoLayout() {
           <NavLink
             key={to}
             to={to}
-            end
+            end={to !== "/meu-perfil"}
             onClick={() => setIsMobileMenuOpen(false)}
             className={({ isActive }) =>
               `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
