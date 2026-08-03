@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
 import { type JobPostingPayload } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
@@ -9,6 +9,11 @@ import { SkillsSection } from "../SkillsSection/SkillsSection";
 import { AdditionalInfoFields } from "../AdditionalInfoFields/AdditionalInfoFields";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
+
+const VAGA_FORM_STEPS: StepperStep[] = [
+    { label: "Dados da Vaga", description: "Informações gerais" },
+    { label: "Match de Recursos", description: "Ranking automático" },
+];
 
 interface VagaFormProps {
     initial: Partial<JobPostingPayload> & { id?: string };
@@ -76,6 +81,8 @@ export function VagaForm({ initial, saving, onSave, onCancel }: VagaFormProps) {
                     </>
                 }
             />
+
+            <Stepper steps={VAGA_FORM_STEPS} currentStep={0} />
 
             {!canEdit && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
