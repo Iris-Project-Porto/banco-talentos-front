@@ -1,14 +1,9 @@
 import { Button, ConfirmModal, Pagination } from "@/components/ui";
 import { ProjectEditFormInput } from "@/features/projects/validations/validations";
-import { squadsApi } from "@/features/squads/api/squads.api";
-import { SquadFormModal } from "@/features/squads/components/SquadFormModal";
 import { Squad } from "@/features/squads/types/types";
-import { SquadFormData } from "@/features/squads/validations/validations";
-import { useMutation } from "@tanstack/react-query";
-import { PlusIcon, SearchIcon, UsersRoundIcon } from "lucide-react";
+import { SearchIcon, UsersRoundIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
 import { paginateLocally } from "@/features/projects/utils/projectsList";
 import { ParticipatingSquadsTable } from "./ParticipatingSquadsTable";
 import { SelectSquadsModal } from "./SelectSquadsModal";
@@ -21,7 +16,6 @@ const PAGE_SIZE = 7;
 
 type ModalState =
   | { type: "select" }
-  | { type: "add" }
   | { type: "remove"; squad: Squad };
 
 export function ParticipatingSquadsTab({ isEdit: _isEdit }: Props) {
@@ -43,19 +37,6 @@ export function ParticipatingSquadsTab({ isEdit: _isEdit }: Props) {
   }, [page, totalPages]);
 
   const closeModal = () => setModal(null);
-
-  const addSquadMutation = useMutation({
-    mutationFn: async (data: SquadFormData) => squadsApi.create(data),
-    onSuccess: (createdSquad) => {
-      const alreadySelected = selectedSquads.some((squad) => squad.id === createdSquad.id);
-      if (!alreadySelected) {
-        setValue("squads", [...selectedSquads, createdSquad], { shouldDirty: true });
-      }
-      toast.success("Squad salva com sucesso!");
-      closeModal();
-    },
-    onError: () => toast.error("Ocorreu um erro ao salvar a squad."),
-  });
 
   function confirmRemoveSquad() {
     if (modal?.type !== "remove") return;
@@ -90,23 +71,11 @@ export function ParticipatingSquadsTab({ isEdit: _isEdit }: Props) {
               variant="secondary"
               size="md"
               className="border-pink text-pink hover:bg-pink/5"
-              onClick={() => setModal({ type: "add" })}
-            >
-              <span className="flex items-center gap-2">
-                <PlusIcon className="w-4 h-4" />
-                Adicionar Squad
-              </span>
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="md"
-              className="border-pink text-pink hover:bg-pink/5"
               onClick={() => setModal({ type: "select" })}
             >
               <span className="flex items-center gap-2">
                 <SearchIcon className="w-4 h-4" />
-                Selecionar Squad
+                Selecionar Squads
               </span>
             </Button>
           </div>
@@ -140,15 +109,6 @@ export function ParticipatingSquadsTab({ isEdit: _isEdit }: Props) {
           onConfirm={(squads) =>
             setValue("squads", squads, { shouldDirty: true })
           }
-        />
-      )}
-
-      {modal?.type === "add" && (
-        <SquadFormModal
-          initial={{}}
-          saving={addSquadMutation.isPending}
-          onSave={(data) => addSquadMutation.mutate(data)}
-          onClose={closeModal}
         />
       )}
 

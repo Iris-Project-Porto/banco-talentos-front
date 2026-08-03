@@ -5,6 +5,13 @@ export const squadSchema = z.object({
     description: z.string({ required_error: "A descrição é obrigatória" }).min(1, "A descrição é obrigatória"),
     portoCoordinator: z.string({ required_error: "Coordenador Porto é obrigatório" }).min(1, "Coordenador Porto é obrigatório"),
     projectManager: z.string({ required_error: "Project Manager é obrigatório" }).min(1, "Project Manager é obrigatório"),
+    recursos: z.array(
+        z.object({
+            id: z.string(),
+            name: z.string(),
+            jobTitle: z.string().optional(),
+        })
+    ).optional(),
 });
 
 export type SquadFormData = z.infer<typeof squadSchema>;
