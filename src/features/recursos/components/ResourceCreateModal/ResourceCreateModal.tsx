@@ -50,7 +50,7 @@ export function ResourceCreateModal({ saving, onSave, onClose }: Props) {
             <div className="relative flex max-h-[92vh] w-full max-w-lg flex-col rounded-2xl bg-white shadow-login">
                 <div className="flex shrink-0 items-start justify-between border-b border-slate-200 px-7 py-5">
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900">Cadastrar Recurso</h2>
+                        <h2 className="text-lg font-bold text-slate-900">Cadastra Recurso</h2>
                         <p className="mt-0.5 text-sm text-slate-400">Cadastre um novo recurso na plataforma</p>
                     </div>
                     <button

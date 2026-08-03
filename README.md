@@ -29,8 +29,8 @@ Aplicação web central da **VILT** para gerenciamento de talentos e recursos hu
 
 ## ✨ Funcionalidades
 
-**Gestão de Recursos (Bench & Alocados)**
-Painéis dedicados para visualizar talentos em projetos ativos e filtros robustos para encontrar profissionais disponíveis no bench. Gestão de Hard e Soft Skills com níveis de proficiência de 1 a 10.
+**Gestão de Recursos**
+Listagem e filtros de recursos em `/admin/talentos`, com cadastro exclusivo pelo admin (nome, e-mail, CPF e grupo). O recurso recebe e-mail com senha provisória e completa o perfil em **Meu Perfil**. Hard e Soft Skills com níveis de proficiência de 1 a 10.
 
 **Gestão de Vagas**
 Módulo completo (CRUD) para controle de postos de trabalho (Abertas, Em andamento, Fechadas, Canceladas) e filtragem por requisitos técnicos ou senioridade.
@@ -42,11 +42,11 @@ CRUD de projetos com listagem paginada, filtros por nome e status (Ativo/Inativo
 Seção dedicada para visualização e acesso à URL dos formulários customizados gerados pelo *Banco de Talentos Form Builder* (Next.js) através de um iFrame embutido.
 
 **Perfis diferenciados por papel:**
-- **Admin / Recrutador** — acesso global ao Banco de Talentos, Vagas, Projetos, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
-- **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
+- **Admin / Recrutador** — acesso global ao Banco de Talentos (cadastro e consulta de recursos), Vagas, Projetos, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
+- **Recurso (Talento)** — sidebar com "Meu Perfil" e "Meu Histórico". No primeiro acesso, é direcionado a criar o perfil; depois pode visualizar e editar seus dados.
 
 **Autenticação completa e segura**
-Fluxo de login, logout, registro (com seleção de perfil e grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha (link com validade de 1 hora, validado ao abrir a página e no envio do formulário). A sessão utiliza access token e refresh token: o Axios renova tokens expirados automaticamente, repete a requisição original uma única vez e encerra a sessão caso a renovação falhe. No logout, o refresh token é invalidado no backend e os dados locais da sessão são removidos.
+Fluxo de login, logout, registro público **apenas para Administrador** (com seleção de grupo), verificação de e-mail por OTP de 6 dígitos, recuperação e redefinição de senha (link com validade de 1 hora, validado ao abrir a página e no envio do formulário). Recursos **não** se auto-cadastram em `/register` — são criados pelo admin. A sessão utiliza access token e refresh token: o Axios renova tokens expirados automaticamente, repete a requisição original uma única vez e encerra a sessão caso a renovação falhe. No logout, o refresh token é invalidado no backend e os dados locais da sessão são removidos.
 
 **Validação robusta de formulários**
 Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, incluindo:
@@ -119,9 +119,10 @@ src/
 │   │   │   ├── BancoTalentosList/  # Listagem do banco de talentos
 │   │   │   ├── PersonCard/         # Card de exibição de talento
 │   │   │   ├── ProfileReadOnly/    # Visualização do perfil em modo leitura
-│   │   │   └── StackInput/         # Input de skills com nível de proficiência
-│   │   ├── hooks/             # Hooks de dados de perfis
-│   │   ├── types/             # Tipos do domínio de perfis
+│   │   │   ├── StackInput/         # Input de skills com nível de proficiência
+│   │   │   └── TalentoDetalhe/     # Abas e campos do detalhe (admin)
+│   │   ├── hooks/             # Hooks de dados de perfis (incl. useMeuPerfilEditar)
+│   │   ├── types/             # Tipos do domínio de perfis (contato em EN)
 │   │   ├── utils/             # Funções auxiliares
 │   │   ├── profile.ts         # Lógica de mapeamento de perfil
 │   │   └── index.ts
@@ -136,7 +137,16 @@ src/
 │   │   ├── utils/             # Filtros e paginação local
 │   │   ├── validations/       # Schemas Zod
 │   │   └── index.ts
-│   ├── recursos/              # Consulta e gestão operacional de recursos
+│   ├── recursos/              # Cadastro e listagem de recursos (admin)
+│   │   ├── api/               # POST/GET/PATCH /v1/admin/recursos
+│   │   ├── components/
+│   │   │   ├── ResourceCreateModal/  # Modal de cadastro (nome, e-mail, CPF, grupo)
+│   │   │   ├── RecursosFilters/      # Filtros da listagem
+│   │   │   └── RecursosList/         # Tabela/listagem de recursos
+│   │   ├── hooks/             # useRecursosList
+│   │   ├── types/             # Tipos e labels de status
+│   │   ├── validations/       # Schema Zod do cadastro
+│   │   └── index.ts
 │   ├── squads/                # CRUD e regras de squads
 │   ├── skills/
 │   │   └── api/               # Endpoints e tipos de skills
@@ -152,24 +162,24 @@ src/
 ├── pages/
 │   ├── admin/
 │   │   ├── Dashboard.tsx          # KPIs e estatísticas gerais
-│   │   ├── BancoTalentos.tsx      # Listagem de todos os talentos
+│   │   ├── BancoTalentos.tsx      # Listagem e cadastro de recursos
 │   │   ├── TalentoDetalhe.tsx     # Perfil completo de um talento
 │   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
 │   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
 │   │   ├── Projetos.tsx           # Gestão de projetos
 │   │   ├── Squads.tsx             # Gestão de squads
 │   │   ├── Skills.tsx             # Gestão de skills
-│   │   ├── ConsultaRecursos.tsx   # Gestão operacional de recursos
 │   │   ├── Vagas.tsx              # Gestão de vagas
 │   │   └── Forms.tsx              # Integração com o Form Builder (iFrame)
 │   ├── public/
 │   │   ├── Login.tsx
-│   │   ├── Register.tsx           # Cadastro com seleção de perfil e grupo
+│   │   ├── Register.tsx           # Cadastro público apenas de Administrador
 │   │   ├── VerifyEmail.tsx        # Verificação via OTP de 6 dígitos
 │   │   ├── ForgotPassWord.tsx
 │   │   └── ResetPassword.tsx
 │   └── user/
-│       ├── MeuPerfil.tsx          # Edição do currículo do talento logado
+│       ├── MeuPerfil.tsx          # Visualização do perfil do recurso logado
+│       ├── MeuPerfilEditar.tsx    # Criação/edição do perfil (primeiro contato e updates)
 │       └── MeuHistorico.tsx       # Histórico do talento
 │
 ├── routes/
@@ -197,6 +207,7 @@ src/
 | `/forgot-password` | `ForgotPassword` | Público |
 | `/reset-password` | `ResetPassword` | Público (requer `?token=` e `?email=` válidos na URL) |
 | `/meu-perfil` | `MeuPerfil` | 🔒 Recurso |
+| `/meu-perfil/editar` | `MeuPerfilEditar` | 🔒 Recurso |
 | `/meu-historico` | `MeuHistorico` | 🔒 Recurso |
 | `/admin/dashboard` | `Dashboard` | 🔒 Admin |
 | `/admin/talentos` | `BancoTalentos` | 🔒 Admin |
@@ -206,7 +217,6 @@ src/
 | `/admin/projetos` | `Projetos` | 🔒 Admin |
 | `/admin/squads` | `Squads` | 🔒 Admin |
 | `/admin/skills` | `Skills` | 🔒 Admin |
-| `/admin/recursos` | `ConsultaRecursos` | 🔒 Admin |
 | `/admin/vagas` | `Vagas` | 🔒 Admin |
 | `/admin/forms` | `Forms` | 🔒 Admin |
 | `*` | — | Redireciona para `/login` |
@@ -297,7 +307,7 @@ Base path: `/v1/auth` (prefixo `/api` é adicionado pelo Axios em produção ou 
 | `POST` | `/v1/auth/login` | Autentica e retorna os tokens e dados do usuário (`name`, `email`, `role`, `hasProfile`) |
 | `POST` | `/v1/auth/refresh` | Renova a sessão e rotaciona os tokens |
 | `POST` | `/v1/auth/logout` | Invalida o refresh token e encerra a sessão |
-| `POST` | `/v1/auth/register` | Cria nova conta com nome, e-mail, senha, role e grupo |
+| `POST` | `/v1/auth/register` | Cria conta de **Administrador** (nome, e-mail, senha, role `ADMIN` e grupo). Recurso não é aceito neste endpoint |
 | `POST` | `/v1/auth/verify` | Valida o código OTP de ativação de e-mail |
 | `POST` | `/v1/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
 | `POST` | `/v1/auth/forgot-password` | Solicita e-mail de recuperação de senha |
@@ -312,12 +322,24 @@ O front persiste `token`, `refreshToken` e `user` no `localStorage`. O intercept
 3. Se o token estiver expirado ou inválido, exibe mensagem e orienta a solicitar novo link em `/forgot-password`.
 4. Se válido, exibe o formulário; ao salvar, chama `POST /v1/auth/reset-password` (validação repetida no backend).
 
-### 👤 Perfil do Talento
+### 👤 Perfil do Recurso
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/profile/me` | Busca os dados do talento logado |
-| `POST` | `/profile` | Salva ou atualiza o currículo do talento |
+| `GET` | `/v1/profile` | Busca o perfil do recurso logado |
+| `POST` | `/v1/profile` | Primeiro envio / criação do perfil (vai para revisão) |
+| `PATCH` | `/v1/profile` | Atualiza o próprio perfil (contato, skills, links etc.) |
+
+### 👥 Recursos (Admin)
+
+Base path: `/v1/admin/recursos`
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `POST` | `/v1/admin/recursos` | Cadastra recurso (nome, e-mail, CPF, grupo) e dispara e-mail com senha provisória |
+| `GET` | `/v1/admin/recursos` | Lista recursos com filtros e paginação |
+| `GET` | `/v1/admin/recursos/:id` | Busca um recurso por ID |
+| `PATCH` | `/v1/admin/recursos/:id` | Atualiza dados operacionais do recurso |
 
 ### 👑 Área Administrativa
 

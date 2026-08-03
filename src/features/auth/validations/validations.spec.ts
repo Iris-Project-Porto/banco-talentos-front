@@ -32,7 +32,7 @@ describe('Auth Validations', () => {
                 email: "joao@gmail.com",
                 password: "Senha@123",
                 confirm: "Senha@123",
-                role: UserRole.RESOURCE,
+                role: UserRole.ADMIN,
                 groupId: "1"
             });
             expect(result.success).toBe(false);
@@ -47,7 +47,7 @@ describe('Auth Validations', () => {
                 email: "joao@vilt-group.com",
                 password: "password123",
                 confirm: "password123",
-                role: UserRole.RESOURCE,
+                role: UserRole.ADMIN,
                 groupId: "1"
             });
             expect(result.success).toBe(false);
@@ -59,7 +59,7 @@ describe('Auth Validations', () => {
                 email: "joao@vilt-group.com",
                 password: "Senha@abc",
                 confirm: "Senha@abc",
-                role: UserRole.RESOURCE,
+                role: UserRole.ADMIN,
                 groupId: "1"
             });
             expect(result.success).toBe(false);

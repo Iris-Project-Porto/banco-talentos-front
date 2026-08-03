@@ -71,8 +71,7 @@ export default function Register() {
           label="Perfil"
           options={[
             { value: "", label: "Selecione o Perfil" },
-            { value: UserRole.RESOURCE, label: "Recurso" },
-            { value: UserRole.ADMIN, label: "Administrador" }
+            { value: UserRole.ADMIN, label: "Administrador" },
           ]}
           {...register("role")}
           error={errors.role?.message}

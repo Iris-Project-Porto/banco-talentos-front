@@ -39,7 +39,7 @@ describe("Componente ResourceCreateModal", () => {
     it("deve renderizar o cabeçalho e os campos do formulário", async () => {
         renderModal();
 
-        expect(screen.getByText("Cadastrar Recurso")).toBeInTheDocument();
+        expect(screen.getByText("Cadastra Recurso")).toBeInTheDocument();
         expect(screen.getByText("Nome completo *")).toBeInTheDocument();
         expect(screen.getByText("E-mail corporativo *")).toBeInTheDocument();
         expect(screen.getByText("CPF *")).toBeInTheDocument();
