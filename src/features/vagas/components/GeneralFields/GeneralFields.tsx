@@ -1,7 +1,7 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Input, Select } from "@/components/ui";
 import { type VagaFormData } from "../../validations/validations";
-import { useVagaDependencies } from "../VagaForm/hooks/useVagaDependencies/useVagaDependencies";
+import { useVagaDependencies } from "../VagaWizard/hooks/useVagaDependencies/useVagaDependencies";
 
 const EXPERIENCE_LEVEL_OPTIONS = [
     { value: "JUNIOR", label: "Júnior" },

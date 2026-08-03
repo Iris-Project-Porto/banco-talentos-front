@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { VagaForm } from './VagaForm';
+import { VagaWizard } from './VagaWizard';
 import { vagasApi } from '../../api/vagas.api';
 
 vi.mock('../../api/vagas.api', () => ({
@@ -35,7 +35,7 @@ const renderWithClient = (ui: React.ReactElement) => {
     );
 };
 
-describe('Componente VagaForm', () => {
+describe('Componente VagaWizard', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(vagasApi.getProjects).mockResolvedValue({ content: mockProjects } as any);
@@ -43,20 +43,20 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve renderizar o cabeçalho de Nova Vaga quando não houver ID inicial', () => {
-        renderWithClient(<VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
         expect(screen.getByText('Nova vaga')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Criar vaga' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Salvar e continuar' })).toBeInTheDocument();
     });
 
     it('deve renderizar o cabeçalho de Editar Vaga quando um ID inicial for fornecido', () => {
-        renderWithClient(<VagaForm initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
         expect(screen.getByText('Editar vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
     });
 
     it('deve bloquear a edição e esconder o botão de salvar caso o status da vaga não permita edição', async () => {
         renderWithClient(
-            <VagaForm
+            <VagaWizard
                 initial={{ id: 'vaga-123', status: 'FILLED' }}
                 saving={false}
                 onSave={vi.fn()}
@@ -72,7 +72,7 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve carregar os projetos e squads vindos da API nos seletores', async () => {
-        renderWithClient(<VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         await waitFor(() => {
             expect(vagasApi.getProjects).toHaveBeenCalledTimes(1);
@@ -86,7 +86,7 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve filtrar dinamicamente as squads com base no projeto selecionado', async () => {
-        renderWithClient(<VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         await waitFor(() => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
@@ -107,13 +107,13 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve exibir erros de validação do Zod ao submeter campos obrigatórios vazios', async () => {
-        renderWithClient(<VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         await waitFor(() => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
-        const submitButton = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -129,7 +129,7 @@ describe('Componente VagaForm', () => {
     it('deve invocar onSave com o payload correto e tratado após preenchimento válido', async () => {
         const handleSave = vi.fn();
         const { container } = renderWithClient(
-            <VagaForm
+            <VagaWizard
                 initial={{
                     skills: [
                         { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
@@ -172,7 +172,7 @@ describe('Componente VagaForm', () => {
             fireEvent.change(dateInput, { target: { value: '2026-07-01' } });
         }
 
-        const submitButton = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -199,7 +199,7 @@ describe('Componente VagaForm', () => {
     it('deve acionar onCancel ao clicar na flecha de voltar e no botão cancelar', () => {
         const handleCancel = vi.fn();
         renderWithClient(
-            <VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={handleCancel} />
+            <VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={handleCancel} />
         );
 
         fireEvent.click(screen.getByRole('button', { name: 'Voltar para vagas' }));
@@ -210,10 +210,10 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve desativar os botões e renderizar o indicador de carregamento quando saving for true', () => {
-        renderWithClient(<VagaForm initial={{}} saving={true} onSave={vi.fn()} onCancel={vi.fn()} />);
+        renderWithClient(<VagaWizard initial={{}} saving={true} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         const cancelBtn = screen.getByRole('button', { name: /cancelar/i });
-        const submitBtn = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitBtn = screen.getByRole('button', { name: 'Salvar e continuar' });
 
         expect(cancelBtn).toBeDisabled();
         expect(submitBtn).toBeDisabled();
@@ -221,9 +221,8 @@ describe('Componente VagaForm', () => {
     });
 
     it('deve resetar o campo de squad se o projeto mudar e a squad anterior se tornar inválida', async () => {
-
         renderWithClient(
-            <VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />
+            <VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />
         );
 
         await waitFor(() => {

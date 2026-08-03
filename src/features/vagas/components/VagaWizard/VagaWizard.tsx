@@ -1,28 +1,31 @@
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
 import { type JobPostingPayload } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
-import { GeneralFields } from "../GeneralFields/GeneralFields";
-import { SkillsSection } from "../SkillsSection/SkillsSection";
-import { AdditionalInfoFields } from "../AdditionalInfoFields/AdditionalInfoFields";
+import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
+import { MatchRecursos } from "../MatchRecursos/MatchRecursos";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
 
-const VAGA_FORM_STEPS: StepperStep[] = [
+const VAGA_WIZARD_STEPS: StepperStep[] = [
     { label: "Dados da Vaga", description: "Informações gerais" },
     { label: "Match de Recursos", description: "Ranking automático" },
 ];
 
-interface VagaFormProps {
+type VagaWizardStep = 0 | 1;
+
+interface Props {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
     onSave: (v: JobPostingPayload & { id?: string }) => void;
     onCancel: () => void;
 }
 
-export function VagaForm({ initial, saving, onSave, onCancel }: VagaFormProps) {
+export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
+    const [step] = useState<VagaWizardStep>(0);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
 
@@ -75,14 +78,14 @@ export function VagaForm({ initial, saving, onSave, onCancel }: VagaFormProps) {
                                 loading={saving}
                                 onClick={methods.handleSubmit(onSubmit)}
                             >
-                                {isEdit ? "Salvar alterações" : "Criar vaga"}
+                                {isEdit ? "Salvar alterações" : "Salvar e continuar"}
                             </Button>
                         )}
                     </>
                 }
             />
 
-            <Stepper steps={VAGA_FORM_STEPS} currentStep={0} />
+            <Stepper steps={VAGA_WIZARD_STEPS} currentStep={step} />
 
             {!canEdit && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
@@ -95,15 +98,13 @@ export function VagaForm({ initial, saving, onSave, onCancel }: VagaFormProps) {
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex flex-col gap-5"
                 >
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
-                        <GeneralFields canEdit={canEdit} dependencies={vagaDependencies} />
-                    </div>
+                    {step === 0 && (
+                        <VagaDataForm canEdit={canEdit} dependencies={vagaDependencies} />
+                    )}
 
-                    <SkillsSection canEdit={canEdit} />
-
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
-                        <AdditionalInfoFields canEdit={canEdit} />
-                    </div>
+                    {step === 1 && (
+                        <MatchRecursos vagaId={initial.id} />
+                    )}
                 </form>
             </FormProvider>
         </div>
