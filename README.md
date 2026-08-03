@@ -138,7 +138,7 @@ src/
 │   │   ├── validations/       # Schemas Zod
 │   │   └── index.ts
 │   ├── recursos/              # Cadastro e listagem de recursos (admin)
-│   │   ├── api/               # POST/GET/PATCH /v1/admin/recursos
+│   │   ├── api/               # POST/GET/PATCH /v1/admin/resources
 │   │   ├── components/
 │   │   │   ├── ResourceCreateModal/  # Modal de cadastro (nome, e-mail, CPF, grupo)
 │   │   │   ├── RecursosFilters/      # Filtros da listagem
@@ -332,14 +332,14 @@ O front persiste `token`, `refreshToken` e `user` no `localStorage`. O intercept
 
 ### 👥 Recursos (Admin)
 
-Base path: `/v1/admin/recursos`
+Base path: `/v1/admin/resources`
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `POST` | `/v1/admin/recursos` | Cadastra recurso (nome, e-mail, CPF, grupo) e dispara e-mail com senha provisória |
-| `GET` | `/v1/admin/recursos` | Lista recursos com filtros e paginação |
-| `GET` | `/v1/admin/recursos/:id` | Busca um recurso por ID |
-| `PATCH` | `/v1/admin/recursos/:id` | Atualiza dados operacionais do recurso |
+| `POST` | `/v1/admin/resources` | Cadastra recurso (nome, e-mail, CPF, grupo) e dispara e-mail com senha provisória |
+| `GET` | `/v1/admin/resources` | Lista recursos com filtros e paginação |
+| `GET` | `/v1/admin/resources/:id` | Busca um recurso por ID |
+| `PATCH` | `/v1/admin/resources/:id` | Atualiza dados operacionais do recurso |
 
 ### 👑 Área Administrativa
 

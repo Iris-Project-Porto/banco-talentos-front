@@ -20,29 +20,29 @@ function buildParams(f: RecursoFilterParams & { page?: number; size?: number }):
 
 export const recursosApi = {
   create: (data: ResourceCreatePayload) =>
-    http.post("/v1/admin/recursos", data).then((r) => r.data),
+    http.post("/v1/admin/resources", data).then((r) => r.data),
 
   listar: (filtros: RecursoFilterParams, page = 0, size = 20): Promise<RecursoPage> =>
-    http.get(`/v1/admin/recursos?${buildParams({ ...filtros, page, size })}`).then((r) => r.data),
+    http.get(`/v1/admin/resources?${buildParams({ ...filtros, page, size })}`).then((r) => r.data),
 
   buscar: (id: string): Promise<Recurso> =>
-    http.get(`/v1/admin/recursos/${id}`).then((r) => r.data),
+    http.get(`/v1/admin/resources/${id}`).then((r) => r.data),
 
   atualizar: (id: string, data: Partial<Recurso>): Promise<Recurso> =>
-    http.patch(`/v1/admin/recursos/${id}`, data).then((r) => r.data),
+    http.patch(`/v1/admin/resources/${id}`, data).then((r) => r.data),
 
   atualizarMatricula: (id: string, statusMatricula: StatusMatricula): Promise<Recurso> =>
-    http.patch(`/v1/admin/recursos/${id}/matricula`, { statusMatricula }).then((r) => r.data),
+    http.patch(`/v1/admin/resources/${id}/matricula`, { statusMatricula }).then((r) => r.data),
 
   listarHistorico: (id: string): Promise<MatriculaHistorico[]> =>
-    http.get(`/v1/admin/recursos/${id}/historico`).then((r) => r.data),
+    http.get(`/v1/admin/resources/${id}/historico`).then((r) => r.data),
 
   adicionarMaquina: (id: string, data: Omit<Maquina, "id" | "createdAt" | "updatedAt">): Promise<Maquina> =>
-    http.post(`/v1/admin/recursos/${id}/maquinas`, data).then((r) => r.data),
+    http.post(`/v1/admin/resources/${id}/maquinas`, data).then((r) => r.data),
 
   atualizarMaquina: (id: string, maqId: string, data: Partial<Maquina>): Promise<Maquina> =>
-    http.put(`/v1/admin/recursos/${id}/maquinas/${maqId}`, data).then((r) => r.data),
+    http.put(`/v1/admin/resources/${id}/maquinas/${maqId}`, data).then((r) => r.data),
 
   removerMaquina: (id: string, maqId: string): Promise<void> =>
-    http.delete(`/v1/admin/recursos/${id}/maquinas/${maqId}`).then((r) => r.data),
+    http.delete(`/v1/admin/resources/${id}/maquinas/${maqId}`).then((r) => r.data),
 };
