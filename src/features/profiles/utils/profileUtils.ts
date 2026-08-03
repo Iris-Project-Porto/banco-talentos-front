@@ -1,3 +1,9 @@
+import type { UserProfile } from "../types/profile";
+
+export function needsFirstProfileSubmit(profile?: UserProfile | null): boolean {
+    return !profile?.area?.trim();
+}
+
 export function getLevelLabel(level: number): string {
     if (level <= 3) return "Em desenvolvimento";
     if (level <= 6) return "Pratica com regularidade";

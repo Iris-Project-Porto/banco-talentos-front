@@ -27,6 +27,23 @@ describe('recursosApi', () => {
         vi.clearAllMocks();
     });
 
+    describe('create', () => {
+        it('deve chamar POST /v1/admin/recursos com os dados do recurso', async () => {
+            const payload = {
+                name: 'João Silva',
+                email: 'joao@vilt-group.com',
+                cpf: '12345678901',
+                groupId: 'group-1',
+            };
+            vi.mocked(http.post).mockResolvedValueOnce({ data: { profileId: 'p1', userId: 'u1', ...payload } });
+
+            const result = await recursosApi.create(payload);
+
+            expect(http.post).toHaveBeenCalledWith('/v1/admin/recursos', payload);
+            expect(result.email).toBe('joao@vilt-group.com');
+        });
+    });
+
     describe('listar', () => {
         it('deve chamar GET /v1/admin/recursos com parâmetros de paginação', async () => {
             vi.mocked(http.get).mockResolvedValueOnce({ data: { content: [mockRecurso], totalElements: 1, totalPages: 1, number: 0, size: 20 } });
@@ -118,17 +135,6 @@ describe('recursosApi', () => {
             await recursosApi.removerMaquina('uuid-1', 'maq-1');
 
             expect(http.delete).toHaveBeenCalledWith('/v1/admin/recursos/uuid-1/maquinas/maq-1');
-        });
-    });
-
-    describe('atualizarContato', () => {
-        it('deve chamar PATCH /v1/recurso/me/contato com contato e endereço', async () => {
-            vi.mocked(http.patch).mockResolvedValueOnce({ data: { ...mockRecurso, contato: '(11) 99999-9999', endereco: 'Rua A, 123' } });
-
-            const result = await recursosApi.atualizarContato({ contato: '(11) 99999-9999', endereco: 'Rua A, 123' });
-
-            expect(http.patch).toHaveBeenCalledWith('/v1/recurso/me/contato', { contato: '(11) 99999-9999', endereco: 'Rua A, 123' });
-            expect(result.contato).toBe('(11) 99999-9999');
         });
     });
 });

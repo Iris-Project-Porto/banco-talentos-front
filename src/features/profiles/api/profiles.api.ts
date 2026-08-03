@@ -3,6 +3,7 @@ import { http } from "@/lib/axios";
 export const profilesApi = {
     getMyProfile: () => http.get("/v1/profile").then((r) => r.data),
     submitProfile: (data: unknown) => http.post("/v1/profile", data).then((r) => r.data),
+    updateMyProfile: (data: unknown) => http.patch("/v1/profile", data).then((r) => r.data),
 
     getPendentes: (page = 0, size = 20) => http.get(`/v1/admin/profiles/pending?page=${page}&size=${size}`).then((r) => r.data),
 

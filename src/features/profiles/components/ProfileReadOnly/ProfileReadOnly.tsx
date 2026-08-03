@@ -1,6 +1,7 @@
 import type { UserProfile } from "../../types/profile";
 import { getLevelStyle, getLevelLabel, getRegistrationStatusLabel } from "../../utils/profileUtils";
 import { NIVEL_STYLE } from "../../profile";
+import { formatCep, formatEmail, formatTelephone } from "@/utils/masks";
 
 export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
     const isAtivo = profile.status === "ACTIVE";
@@ -66,6 +67,16 @@ export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
                             <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-pink-600 hover:underline">{profile.githubUrl}</a>
                         </div>
                     )}
+                    {profile.contact && <ReadField label="Contato" value={profile.contact} />}
+                    {profile.contactEmail && (
+                        <ReadField label="E-mail de contato" value={formatEmail(profile.contactEmail)} />
+                    )}
+                    {profile.phone && (
+                        <ReadField label="Telefone" value={formatTelephone(profile.phone)} />
+                    )}
+                    {profile.address && <ReadField label="Endereço" value={profile.address} />}
+                    {profile.postalCode && <ReadField label="CEP" value={formatCep(profile.postalCode)} />}
+                    {profile.cityState && <ReadField label="Cidade / UF" value={profile.cityState} />}
                 </div>
 
                 {profile.about && (
