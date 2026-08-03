@@ -41,7 +41,6 @@ describe('Componente SquadFormModal', () => {
         renderWithQueryClient(<SquadFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
         expect(screen.getByText('Nome da Squad *')).toBeInTheDocument();
-        expect(screen.getByText('ID do Projeto *')).toBeInTheDocument();
         expect(screen.getByText('Project Manager *')).toBeInTheDocument();
         expect(screen.getByText('Coordenador Porto *')).toBeInTheDocument();
         expect(screen.getByText('Descrição *')).toBeInTheDocument();
@@ -53,7 +52,6 @@ describe('Componente SquadFormModal', () => {
                 initial={{
                     id: '123',
                     name: 'Squad Alpha',
-                    projectId: 'proj-1',
                     projectManager: 'João',
                     portoCoordinator: 'Maria',
                     description: 'Uma squad',
@@ -76,7 +74,6 @@ describe('Componente SquadFormModal', () => {
                 initial={{
                     id: '123',
                     name: 'Squad Alpha',
-                    projectId: 'proj-1',
                     projectManager: 'João',
                     portoCoordinator: 'Maria',
                     description: 'Uma squad',
@@ -88,7 +85,6 @@ describe('Componente SquadFormModal', () => {
         );
 
         expect(screen.getByDisplayValue('Squad Alpha')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('proj-1')).toBeInTheDocument();
         expect(screen.getByDisplayValue('João')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Maria')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Uma squad')).toBeInTheDocument();
@@ -111,7 +107,6 @@ describe('Componente SquadFormModal', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Criar squad' }));
 
         expect(await screen.findByText('O nome da squad é obrigatório')).toBeInTheDocument();
-        expect(await screen.findByText('O projeto é obrigatório')).toBeInTheDocument();
         expect(await screen.findByText('Project Manager é obrigatório')).toBeInTheDocument();
         expect(await screen.findByText('A descrição é obrigatória')).toBeInTheDocument();
     });
@@ -123,16 +118,14 @@ describe('Componente SquadFormModal', () => {
         const inputs = screen.getAllByRole('textbox');
 
         await userEvent.type(inputs[0], 'Nova Squad Teste');
-        await userEvent.type(inputs[1], 'proj-xyz');
-        await userEvent.type(inputs[2], 'Fulano PM');
-        await userEvent.type(inputs[3], 'Ciclano Coord');
-        await userEvent.type(inputs[4], 'Descrição da squad de testes');
+        await userEvent.type(inputs[1], 'Fulano PM');
+        await userEvent.type(inputs[2], 'Ciclano Coord');
+        await userEvent.type(inputs[3], 'Descrição da squad de testes');
 
         await userEvent.click(screen.getByRole('button', { name: 'Criar squad' }));
 
         expect(handleSave).toHaveBeenCalledWith({
             name: 'Nova Squad Teste',
-            projectId: 'proj-xyz',
             projectManager: 'Fulano PM',
             portoCoordinator: 'Ciclano Coord',
             description: 'Descrição da squad de testes',

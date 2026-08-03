@@ -34,6 +34,11 @@ export type SoftSkillCategory =
 
 export type SkillCategory = HardSkillCategory | SoftSkillCategory;
 
+export interface SkillAvatar {
+  type: "PHOTO" | "INITIALS";
+  value: string;
+}
+
 export interface Skill {
   id: string;
   name: string;
@@ -43,7 +48,7 @@ export interface Skill {
   category: SkillCategory;
   resourcesCount: number;
   averageProficiency: number;
-  avatarUrls?: string[];
+  avatars?: SkillAvatar[];
 }
 
 export interface SkillsPaginatedResponse {

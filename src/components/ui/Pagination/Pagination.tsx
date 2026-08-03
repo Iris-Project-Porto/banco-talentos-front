@@ -13,13 +13,14 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
     if (totalPages <= 1) return null;
 
     return (
-        <div className={twMerge("flex items-center justify-between pt-4 mt-6 border-t border-slate-200", className)}>
+        <div className={twMerge("flex items-center justify-between pt-4 mt-6 border-t border-slate-200 gap-4", className)}>
             <span className="text-sm text-slate-500">
                 Página <span className="font-medium text-slate-900">{currentPage + 1}</span> de{" "}
                 <span className="font-medium text-slate-900">{totalPages}</span>
             </span>
             <div className="flex items-center gap-2">
                 <Button
+                    type="button"
                     variant="secondary"
                     size="sm"
                     disabled={currentPage === 0}
@@ -29,6 +30,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
                     Anterior
                 </Button>
                 <Button
+                    type="button"
                     variant="secondary"
                     size="sm"
                     disabled={currentPage >= totalPages - 1}

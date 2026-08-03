@@ -5,7 +5,10 @@ interface Props {
 }
 
 export function Avatar({ name, photoUrl, size = 44 }: Props) {
-  const initials = name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+  const isAlreadyInitials = name.length <= 2 && name === name.toUpperCase() && !name.includes(" ");
+  const initials = isAlreadyInitials 
+    ? name 
+    : name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 
   if (photoUrl) {
     return (

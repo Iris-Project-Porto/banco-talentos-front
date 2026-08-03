@@ -3,6 +3,8 @@ import { http } from "@/lib/axios";
 export const authApi = {
     login: (email: string, password: string) =>
         http.post("/v1/auth/login", { email, password }).then((r) => r.data),
+    logout: (refreshToken: string) =>
+        http.post("/v1/auth/logout", { refreshToken }).then((r) => r.data),
     register: (name: string, email: string, password: string, role: "ADMIN" | "RESOURCE", groupId: string) =>
         http.post("/v1/auth/register", { name, email, password, role, groupId }).then((r) => r.data),
     verifyEmail: (email: string, code: string) =>

@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "axios";
+import axios, { isAxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const BASE = import.meta.env.VITE_API_URL || "/api";
 const apiBase = BASE.endsWith("/") ? BASE.slice(0, -1) : BASE;
@@ -11,17 +11,48 @@ http.interceptors.request.use((config) => {
     return config;
 });
 
+interface RetriableRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
+
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshSession(): Promise<string> {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) throw new Error("Sessão expirada.");
+
+    const { data } = await axios.post<{ token: string; refreshToken: string }>(
+        `${apiBase}/v1/auth/refresh`,
+        { refreshToken }
+    );
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
+    return data.token;
+}
+
 http.interceptors.response.use(
     (r) => r,
-    (err) => {
-        if (err.response?.status === 401) {
-            const url = err.config?.url ?? "";
-            const isAuthRoute = url.includes("/auth/");
-            if (!isAuthRoute) {
-                window.dispatchEvent(new Event("unauthorized"));
-            }
+    async (err) => {
+        const original = err.config as RetriableRequestConfig | undefined;
+        const url = original?.url ?? "";
+        const isAuthRoute = url.includes("/auth/") && !url.includes("/auth/logout");
+
+        if (err.response?.status !== 401 || isAuthRoute || !original || original._retry) {
+            return Promise.reject(err);
         }
-        return Promise.reject(err);
+
+        original._retry = true;
+        try {
+            refreshPromise = refreshPromise ?? refreshSession();
+            const newToken = await refreshPromise;
+            original.headers.Authorization = `Bearer ${newToken}`;
+            return http(original);
+        } catch {
+            window.dispatchEvent(new Event("unauthorized"));
+            return Promise.reject(err);
+        } finally {
+            refreshPromise = null;
+        }
     }
 );
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 
@@ -13,7 +13,7 @@ vi.mock('react-router-dom', async () => {
     };
 });
 
-const mockLogout = vi.fn();
+const mockLogout = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/features/auth', () => ({
     useAuth: () => ({
         user: { name: 'Admin Silva', email: 'admin@vilt-group.com' },
@@ -42,14 +42,13 @@ describe('AdminLayout Component', () => {
         expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Fila de revisão').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Recursos').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('Alocados').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Usuários').length).toBeGreaterThan(0);
 
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Skills').length).toBeGreaterThan(0);
     });
 
-    it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', () => {
+    it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', async () => {
         render(
             <MemoryRouter>
                 <AdminLayout />
@@ -59,7 +58,7 @@ describe('AdminLayout Component', () => {
         fireEvent.click(logoutButtons[0]);
 
         expect(mockLogout).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/login'));
     });
 
     it('deve renderizar o Outlet (onde as rotas filhas são injetadas)', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RecursoLayout from './RecursoLayout';
 
@@ -15,7 +15,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 // 2. Fazer o mock do useAuth
-const mockLogout = vi.fn();
+const mockLogout = vi.fn().mockResolvedValue(undefined);
 vi.mock('@/features/auth', () => ({
     useAuth: () => ({
         user: { name: 'João Utilizador', email: 'joao@vilt-group.com' },
@@ -48,7 +48,7 @@ describe('RecursoLayout Component', () => {
         expect(screen.getAllByText('Meu Histórico').length).toBeGreaterThan(0);
     });
 
-    it('deve chamar a função de logout e navegar para /login ao clicar em Sair', () => {
+    it('deve chamar a função de logout e navegar para /login ao clicar em Sair', async () => {
         render(
             <MemoryRouter>
                 <RecursoLayout />
@@ -61,8 +61,8 @@ describe('RecursoLayout Component', () => {
 
         // Verifica se a função de contexto foi chamada
         expect(mockLogout).toHaveBeenCalledTimes(1);
-        // Verifica se o redirecionamento foi feito
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
+        // O logout é assíncrono: a navegação só ocorre após a promise resolver
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/login'));
     });
 
     it('deve renderizar o Outlet (conteúdo filho)', () => {

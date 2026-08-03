@@ -35,7 +35,7 @@ export default function TalentoDetalhe() {
   }
 
   const isPendente = profile.status === "PENDING";
-    const backLink = isPendente ? "/admin/fila" : "/admin/talentos";
+  const backLink = isPendente ? "/admin/fila" : "/admin/talentos";
 
   return (
     <div className="flex flex-col gap-6">

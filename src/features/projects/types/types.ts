@@ -1,3 +1,5 @@
+import { Squad, SquadPayload } from "@/features/squads/types/types";
+
 export interface Project {
     id: string;
     name: string;
@@ -7,11 +9,14 @@ export interface Project {
     updatedAt?: string;
     createdBy?: string;
     updatedBy?: string;
+    squads?: Squad[];
 }
 
 export interface ProjectPayload {
     name: string;
     description: string;
+    squadIds?: string[];
+    squad?: SquadPayload;
 }
 
 export interface ProjectsPaginatedResponse {

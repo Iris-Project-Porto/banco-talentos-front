@@ -13,7 +13,7 @@ interface AuthUser {
 export interface AuthContextType {
     user: AuthUser | null;
     login: (email: string, password: string) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     markProfileCreated: () => void;
     loading: boolean;
 }
@@ -28,11 +28,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
 
-    function logout() {
+    function clearSession() {
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
         setUser(null);
     }
+
+    async function logout() {
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (refreshToken) {
+          await authApi.logout(refreshToken).catch(() => {
+          });
+        }
+        clearSession();
+      }
 
     function markProfileCreated() {
         setUser((current) => {
@@ -57,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setLoading(false);
 
-        const handleUnauthorized = () => logout();
+        const handleUnauthorized = () => clearSession();
         window.addEventListener("unauthorized", handleUnauthorized);
 
         return () => window.removeEventListener("unauthorized", handleUnauthorized);
@@ -66,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function login(email: string, password: string) {
         const data = await authApi.login(email, password);
         localStorage.setItem("token", data.token);
+        localStorage.setItem("refreshToken", data.refreshToken);
         persistUser({
             name: data.name,
             email: data.email,

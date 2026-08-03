@@ -13,6 +13,9 @@ describe('Vagas Validations', () => {
         estimatedAllocationWeeks: 12,
         status: "OPEN",
         openingDate: "2024-01-01",
+        skills: [
+            { name: "React", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 100 },
+        ],
     };
 
     it('deve aprovar dados de vaga válidos', () => {

@@ -22,6 +22,7 @@ export interface Squad {
     createdBy?: string;
     updatedBy?: string;
     metrics?: SquadMetrics;
+    members?: number;
 }
 
 export interface SquadPayload {
@@ -29,7 +30,6 @@ export interface SquadPayload {
     description: string;
     portoCoordinator: string;
     projectManager: string;
-    projectId: string;
 }
 
 export interface PageableResponse<T> {

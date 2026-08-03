@@ -3,9 +3,9 @@ import { z } from "zod";
 export const jobSkillSchema = z.object({
     name: z.string().min(1, "O nome da skill é obrigatório"),
     type: z.enum(["MANDATORY", "DESIRABLE"]),
-    minLevel: z.enum(["BASIC", "INTERMEDIATE", "ADVANCED"]),
-    importanceWeight: z.coerce.number().min(0).max(100),
-    description: z.string().optional(),
+    minLevel: z.enum(["BASIC", "INTERMEDIATE", "ADVANCED", "SPECIALIST"]),
+    importanceWeight: z.coerce.number().int('O peso da skill deve ser um número inteiro').min(1, 'O peso da skill deve ser maior que 0').max(100, 'O peso da skill deve ser menor que 100'),
+    description: z.string().max(225, "A descrição da skill deve ter no máximo 225 caracteres").optional(),
 });
 
 export const vagaSchema = z.object({
@@ -32,14 +32,14 @@ export const vagaSchema = z.object({
     openingDate: z.string({ required_error: "A data de abertura é obrigatória" }).min(1, "A data de abertura é obrigatória"),
     closingDate: z.string().optional(),
     isUrgent: z.boolean().default(false),
-    skills: z.array(jobSkillSchema).default([]),
+    skills: z.array(jobSkillSchema).min(1, "O campo skills é obrigatório"),
 }).refine((data) => {
-    if (!data.skills || data.skills.length === 0) return true;
-    const sum = data.skills.reduce((acc, curr) => acc + (curr.importanceWeight || 0), 0);
-    return sum === 100;
+    if (!data.skills?.length) return true;
+    const names = data.skills.map((s) => s.name).filter(Boolean);
+    return new Set(names).size === names.length;
 }, {
-    message: "A soma dos pesos das skills deve totalizar 100%.",
-    path: ["skills"]
+    message: "As skills não podem ter nomes duplicados.",
+    path: ["skills"],
 });
 
 export type VagaFormData = z.infer<typeof vagaSchema>;

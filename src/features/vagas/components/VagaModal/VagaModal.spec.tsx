@@ -129,7 +129,16 @@ describe('Componente VagaModal', () => {
     it('deve invocar onSave com o payload correto e tratado após preenchimento válido', async () => {
         const handleSave = vi.fn();
         const { container } = renderWithClient(
-            <VagaModal initial={{}} saving={false} onSave={handleSave} onClose={vi.fn()} />
+            <VagaModal
+                initial={{
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onClose={vi.fn()}
+            />
         );
 
         await waitFor(() => {
@@ -151,7 +160,7 @@ describe('Componente VagaModal', () => {
         fireEvent.change(screen.getByPlaceholderText('Ex: VAG-001'), { target: { value: 'VAG-123' } });
         fireEvent.change(screen.getByPlaceholderText('Ex: Desenvolvedor React Sênior'), { target: { value: 'Frontend Developer' } });
         fireEvent.change(screen.getByPlaceholderText('Nome do recrutador'), { target: { value: 'Paula RH' } });
-        fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '12' } });
+        fireEvent.change(container.querySelector('input[name="estimatedAllocationWeeks"]')!, { target: { value: '12' } });
         fireEvent.change(screen.getByPlaceholderText('Conteúdo principal...'), { target: { value: 'Desenvolvedor Frontend' } });
         fireEvent.change(screen.getByPlaceholderText('Notas de alinhamento...'), { target: { value: 'Urgente' } });
 

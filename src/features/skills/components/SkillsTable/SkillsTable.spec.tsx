@@ -13,7 +13,7 @@ const mockSkills: Skill[] = [
         description: 'Biblioteca JS',
         resourcesCount: 342,
         averageProficiency: 75,
-        avatarUrls: ['https://example.com/a.jpg'],
+        avatars: [{ type: 'PHOTO', value: 'https://example.com/a.jpg' }],
     },
     {
         id: '2',
@@ -68,7 +68,7 @@ describe('Componente SkillsTable', () => {
             ...mockSkills[0],
             averageProficiency: undefined,
             resourcesCount: undefined,
-            avatarUrls: undefined,
+            avatars: undefined,
         } as unknown as Skill;
 
         render(<SkillsTable data={[skillWithoutMetrics]} />);
@@ -77,7 +77,7 @@ describe('Componente SkillsTable', () => {
         expect(screen.getByText('0')).toBeInTheDocument();
     });
 
-    it('deve exibir avatares quando avatarUrls vier da API', () => {
+    it('deve exibir avatares quando avatars vier da API', () => {
         render(<SkillsTable data={mockSkills} />);
 
         expect(screen.getByAltText('React.js 1')).toBeInTheDocument();
@@ -93,10 +93,10 @@ describe('Componente SkillsTable', () => {
         const skillWithThree = {
             ...mockSkills[0],
             resourcesCount: 3,
-            avatarUrls: [
-                'https://example.com/a.jpg',
-                'https://example.com/b.jpg',
-                'https://example.com/c.jpg',
+            avatars: [
+                { type: 'PHOTO' as const, value: 'https://example.com/a.jpg' },
+                { type: 'PHOTO' as const, value: 'https://example.com/b.jpg' },
+                { type: 'PHOTO' as const, value: 'https://example.com/c.jpg' },
             ],
         };
 
@@ -113,10 +113,10 @@ describe('Componente SkillsTable', () => {
         const skillWithMany = {
             ...mockSkills[0],
             resourcesCount: 342,
-            avatarUrls: [
-                'https://example.com/a.jpg',
-                'https://example.com/b.jpg',
-                'https://example.com/c.jpg',
+            avatars: [
+                { type: 'PHOTO' as const, value: 'https://example.com/a.jpg' },
+                { type: 'PHOTO' as const, value: 'https://example.com/b.jpg' },
+                { type: 'PHOTO' as const, value: 'https://example.com/c.jpg' },
             ],
         };
 
@@ -133,7 +133,10 @@ describe('Componente SkillsTable', () => {
         const skillWithTwo = {
             ...mockSkills[0],
             resourcesCount: 2,
-            avatarUrls: ['https://example.com/a.jpg', 'https://example.com/b.jpg'],
+            avatars: [
+                { type: 'PHOTO' as const, value: 'https://example.com/a.jpg' },
+                { type: 'PHOTO' as const, value: 'https://example.com/b.jpg' },
+            ],
         };
 
         render(<SkillsTable data={[skillWithTwo]} />);
