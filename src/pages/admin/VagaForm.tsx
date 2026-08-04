@@ -24,7 +24,6 @@ export default function VagaForm() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["vagas"] });
             toast.success("Vaga salva com sucesso!");
-            navigate("/admin/vagas");
         },
         onError: (error) => {
             toast.error(
@@ -35,6 +34,10 @@ export default function VagaForm() {
             );
         },
     });
+
+    function handleSave(payload: SavePayload) {
+        return saveMutation.mutateAsync(payload);
+    }
 
     function goBack() {
         navigate("/admin/vagas");
@@ -52,7 +55,7 @@ export default function VagaForm() {
         <VagaWizard
             initial={vaga ?? {}}
             saving={saveMutation.isPending}
-            onSave={(payload) => saveMutation.mutate(payload)}
+            onSave={handleSave}
             onCancel={goBack}
         />
     );

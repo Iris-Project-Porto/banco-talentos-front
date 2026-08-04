@@ -127,7 +127,7 @@ describe('Componente VagaWizard', () => {
     });
 
     it('deve invocar onSave com o payload correto e tratado após preenchimento válido', async () => {
-        const handleSave = vi.fn();
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-nova' });
         const { container } = renderWithClient(
             <VagaWizard
                 initial={{

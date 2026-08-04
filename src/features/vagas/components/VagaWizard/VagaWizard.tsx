@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
-import { type JobPostingPayload } from "../../types/types";
+import { type JobPosting, type JobPostingPayload } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
 import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
@@ -20,12 +20,13 @@ type VagaWizardStep = 0 | 1;
 interface Props {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
-    onSave: (v: JobPostingPayload & { id?: string }) => void;
+    onSave: (v: JobPostingPayload & { id?: string }) => Promise<JobPosting>;
     onCancel: () => void;
 }
 
 export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
-    const [step] = useState<VagaWizardStep>(0);
+    const [step, setStep] = useState<VagaWizardStep>(0);
+    const [savedVagaId, setSavedVagaId] = useState(initial.id);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
 
@@ -49,15 +50,23 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
 
     const vagaDependencies = useVagaDependencies(selectedProjectId, selectedSquadId, methods.setValue);
 
-    const onSubmit = (data: VagaFormData) => {
-        onSave({
+    async function onSubmit(data: VagaFormData) {
+        const payload = {
             ...data,
             description: data.description || "", requirements: data.requirements || "", notes: data.notes || "",
             openingDate: new Date(data.openingDate).toISOString(),
             closingDate: data.closingDate ? new Date(data.closingDate).toISOString() : undefined,
-            id: initial.id
-        });
-    };
+            id: savedVagaId ?? initial.id,
+        };
+
+        try {
+            const saved = await onSave(payload);
+            setSavedVagaId(saved.id);
+            setStep(1);
+        } catch {
+            // Erro tratado no pai (toast). Permanece no step 0.
+        }
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -103,7 +112,7 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
                     )}
 
                     {step === 1 && (
-                        <MatchRecursos vagaId={initial.id} />
+                        <MatchRecursos vagaId={savedVagaId} />
                     )}
                 </form>
             </FormProvider>
