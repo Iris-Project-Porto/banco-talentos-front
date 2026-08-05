@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Search, Pencil } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { PageHeader, Button, Badge, Card, Input, Pagination, Select } from "@/components/ui";
-import { squadsApi, SquadFormModal, type SquadFormData } from "@/features/squads";
+import { squadsApi } from "@/features/squads";
 
 const STATUS_OPTIONS = [
     { value: "ACTIVE", label: "Ativa" },
@@ -13,9 +13,7 @@ const STATUS_OPTIONS = [
 const filterLabelCls = "block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5";
 
 export default function Squads() {
-    const queryClient = useQueryClient();
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editing, setEditing] = useState<(Partial<SquadFormData> & { id?: string; active?: boolean }) | null>(null);
+    const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [statusType, setStatusType] = useState<"ACTIVE" | "INACTIVE">("ACTIVE");
     const [page, setPage] = useState(0);
@@ -24,20 +22,8 @@ export default function Squads() {
         setPage(0);
     }, [search, statusType]);
 
-    const saveMutation = useMutation({
-        mutationFn: async (data: SquadFormData & { id?: string }) =>
-            data.id ? squadsApi.update(data.id, data) : squadsApi.create(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['squads'] });
-            closeModal();
-            toast.success("Squad salva com sucesso!");
-        },
-        onError: () => toast.error("Ocorreu um erro ao salvar a squad.")
-    });
-
-    function openNew() { setEditing({}); setModalOpen(true); }
-    function openEdit(squad: any) { setEditing(squad); setModalOpen(true); }
-    function closeModal() { setModalOpen(false); setEditing(null); }
+    function openNew() { navigate("/admin/squads/novo"); }
+    function openEdit(squad: any) { navigate(`/admin/squads/${squad.id}`); }
 
     const { data, isLoading } = useQuery({
         queryKey: ['squads', statusType, page, search],
@@ -141,15 +127,6 @@ export default function Squads() {
 
                 <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
             </Card>
-
-            {modalOpen && editing && (
-                <SquadFormModal
-                    initial={editing}
-                    saving={saveMutation.isPending}
-                    onSave={(data) => saveMutation.mutate(data)}
-                    onClose={closeModal}
-                />
-            )}
         </div>
     );
 }
