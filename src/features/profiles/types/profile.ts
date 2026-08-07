@@ -15,9 +15,10 @@ export interface UserProfile {
     nivel?: string;
     level?: string;
     levelOverride?: string;
-    levelScore?: number; // NOVO
-    levelJustification?: string; // NOVO
+    levelScore?: number;
+    levelJustification?: string;
     photoUrl?: string;
+    cpf?: string;
     area?: string;
     about?: string;
     allocationStatus?: string;
@@ -27,6 +28,12 @@ export interface UserProfile {
     githubUrl?: string;
     registrationNumber?: string;
     registrationStatus?: string;
+    contact?: string;
+    contactEmail?: string;
+    phone?: string;
+    address?: string;
+    postalCode?: string;
+    cityState?: string;
     skills?: ProfileSkill[];
     createdAt?: string;
     name?: string;
@@ -46,5 +53,11 @@ export interface ProfileFormState {
     levelOverride: string;
     registrationNumber: string;
     registrationStatus: string;
+    contact: string;
+    contactEmail: string;
+    phone: string;
+    address: string;
+    postalCode: string;
+    cityState: string;
     softSkills: { name: string; level: number }[];
 }

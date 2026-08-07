@@ -29,8 +29,8 @@ export const registerSchema = z.object({
     password: strongPasswordSchema,
     confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
         .min(1, "Confirme sua senha"),
-    role: z.nativeEnum(UserRole, {
-        errorMap: () => ({ message: "O perfil é obrigatório" })
+    role: z.literal(UserRole.ADMIN, {
+        errorMap: () => ({ message: "O perfil é obrigatório" }),
     }),
     groupId: z.string({ required_error: "O grupo é obrigatório" })
         .min(1, "Selecione um grupo"),

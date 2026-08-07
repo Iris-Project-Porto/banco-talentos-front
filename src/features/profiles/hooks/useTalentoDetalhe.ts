@@ -6,6 +6,7 @@ import type { StackItem } from "../components/StackInput/StackInput";
 import { SOFTSKILLS_LIST } from "../profile";
 import { profilesApi } from "../api/profiles.api";
 import type { ProfileFormState, UserProfile } from "../types/profile";
+import { formatCep, formatEmail, formatTelephone } from "@/utils/masks";
 
 export function useTalentoDetalhe(id: string | undefined) {
     const navigate = useNavigate();
@@ -16,7 +17,9 @@ export function useTalentoDetalhe(id: string | undefined) {
     const [form, setForm] = useState<ProfileFormState>({
         area: "", about: "", allocationStatus: "", careerPath: "",
         experienceYears: "", linkedinUrl: "", githubUrl: "", levelOverride: "",
-        registrationNumber: "", registrationStatus: "NOT_REQUESTED", softSkills: [],
+        registrationNumber: "", registrationStatus: "NOT_REQUESTED",
+        contact: "", contactEmail: "", phone: "", address: "", postalCode: "", cityState: "",
+        softSkills: [],
     });
 
     const { data: fetchedProfile, isLoading: loading } = useQuery({
@@ -60,6 +63,12 @@ export function useTalentoDetalhe(id: string | undefined) {
             levelOverride: p.levelOverride ?? "",
             registrationNumber: p.registrationNumber ?? "",
             registrationStatus: p.registrationStatus ?? "NOT_REQUESTED",
+            contact: p.contact ?? "",
+            contactEmail: formatEmail(p.contactEmail ?? ""),
+            phone: formatTelephone(p.phone ?? ""),
+            address: p.address ?? "",
+            postalCode: formatCep(p.postalCode ?? ""),
+            cityState: p.cityState ?? "",
             softSkills: loadedSofts,
         });
     }, [fetchedProfile]);
@@ -89,18 +98,15 @@ export function useTalentoDetalhe(id: string | undefined) {
             setProfile(updated);
             queryClient.invalidateQueries({ queryKey: ['talento', variables.id] });
 
-            // Verifica o status de alocação que acabou de ser salvo
             const isPendente = variables.payload.status === "PENDING" || variables.payload.status === "PENDENTE";
 
-            // Redireciona para a lista correta
             if (isPendente) {
                 navigate("/admin/fila");
             } else {
                 navigate("/admin/talentos");
             }
         },
-        onError: (error) => {
-            console.error("Erro ao salvar", error);
+        onError: () => {
             toast.error("Ocorreu um erro ao atualizar o recurso. Por favor, tente novamente.");
         }
     });

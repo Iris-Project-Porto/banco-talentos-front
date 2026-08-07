@@ -67,7 +67,6 @@ export default function Dashboard() {
               {[
                 { label: "Disponível (Bench)", value: stats.alocacaoMap["Disponível (Bench)"] ?? 0, color: "#10B981" },
                 { label: "Em Projetos", value: (stats.alocacaoMap["Alocado Integral (100%)"] ?? 0) + (stats.alocacaoMap["Alocado Parcial"] ?? 0) + (stats.alocacaoMap["Em Transição (saindo de projeto)"] ?? 0), color: "#3B82F6" },
-                { label: "Ausentes", value: stats.alocacaoMap["Férias / Licença"] ?? 0, color: "#8B5CF6" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

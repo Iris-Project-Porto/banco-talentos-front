@@ -19,6 +19,7 @@ const ResetPassword = lazy(() => import("@/pages/public/ResetPassword"));
 
 // Páginas Privadas (Recurso)
 const MeuPerfil = lazy(() => import("@/pages/user/MeuPerfil"));
+const MeuPerfilEditar = lazy(() => import("@/pages/user/MeuPerfilEditar"));
 const MeuHistorico = lazy(() => import("@/pages/user/MeuHistorico"));
 
 // Páginas Admin
@@ -35,7 +36,6 @@ const Squads = lazy(() => import("@/pages/admin/Squads"));
 const SquadForm = lazy(() => import("@/pages/admin/SquadForm"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
 const ProjetoForm = lazy(() => import("@/pages/admin/ProjetoForm"));
-const ConsultaRecursos = lazy(() => import("@/pages/admin/ConsultaRecursos"));
 
 // DEFINIÇÃO DAS ROTAS
 
@@ -67,6 +67,7 @@ export const router = createBrowserRouter([
                 children: [
                     { index: true, element: <Navigate to="/meu-perfil" replace /> },
                     { path: "meu-perfil", element: <MeuPerfil /> },
+                    { path: "meu-perfil/editar", element: <MeuPerfilEditar /> },
                     { path: "meu-historico", element: <MeuHistorico /> },
                 ],
             },
@@ -98,7 +99,6 @@ export const router = createBrowserRouter([
                     { path: "projetos", element: <Projetos /> },
                     { path: "projetos/novo", element: <ProjetoForm /> },
                     { path: "projetos/:id/editar", element: <ProjetoForm /> },
-                    { path: "recursos", element: <ConsultaRecursos /> },
                 ],
             },
         ],
