@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { vagasApi, VagaCard, VagaModal, type JobPosting, type JobPostingPayload } from "@/features/vagas";
+import { vagasApi, VagaCard, type JobPosting, type JobPostingPayload } from "@/features/vagas";
 import { PageHeader, Button, ConfirmModal, Input, Pagination } from "@/components/ui";
 
 export default function Vagas() {
   const queryClient = useQueryClient();
-  const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [vagaToCancel, setVagaToCancel] = useState<JobPosting | null>(null);
-  const [editing, setEditing] = useState<(Partial<JobPostingPayload> & { id?: string }) | null>(null);
   const [viewActive, setViewActive] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -27,18 +27,17 @@ export default function Vagas() {
     queryFn: () => vagasApi.getInactive(page)
   });
 
-  const saveMutation = useMutation({
-    mutationFn: async (data: JobPostingPayload & { id?: string }) =>
-      data.id ? vagasApi.update(data.id, data) : vagasApi.create(data),
+  const cancelMutation = useMutation({
+    mutationFn: async (data: JobPostingPayload & { id: string }) =>
+      vagasApi.update(data.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vagas'] });
-      closeModal();
       setVagaToCancel(null);
-      toast.success("Vaga salva com sucesso!");
+      toast.success("Vaga cancelada com sucesso!");
     },
     onError: (error) => {
-      console.error("Erro ao salvar", error);
-      toast.error("Ocorreu um erro ao atualizar a vaga. Verifique os dados e tente novamente.");
+      console.error("Erro ao cancelar", error);
+      toast.error("Ocorreu um erro ao cancelar a vaga. Tente novamente.");
     }
   });
 
@@ -58,9 +57,8 @@ export default function Vagas() {
       (v.experienceLevel?.toLowerCase() || "").includes(q);
   });
 
-  function openNew() { setEditing({}); setModalOpen(true); }
-  function openEdit(v: JobPosting) { setEditing(v); setModalOpen(true); }
-  function closeModal() { setModalOpen(false); setEditing(null); }
+  function openNew() { navigate("/admin/vagas/nova"); }
+  function openEdit(v: JobPosting) { navigate(`/admin/vagas/${v.id}/editar`); }
 
   function handleCancelJob(vaga: JobPosting) {
     setVagaToCancel(vaga);
@@ -68,7 +66,7 @@ export default function Vagas() {
 
   function confirmCancelJob() {
     if (vagaToCancel) {
-      saveMutation.mutate({ ...vagaToCancel, status: "CANCELLED" });
+      cancelMutation.mutate({ ...vagaToCancel, status: "CANCELLED" });
     }
   }
 
@@ -127,21 +125,12 @@ export default function Vagas() {
         </>
       )}
 
-      {modalOpen && editing && (
-        <VagaModal
-          initial={editing}
-          saving={saveMutation.isPending}
-          onSave={(data) => saveMutation.mutate(data)}
-          onClose={closeModal}
-        />
-      )}
-
       {vagaToCancel && (
         <ConfirmModal
           title="Cancelar vaga"
           message={`Deseja realmente cancelar a vaga ${vagaToCancel.vacancyCode}?`}
           confirmLabel="Cancelar vaga"
-          loading={saveMutation.isPending}
+          loading={cancelMutation.isPending}
           onConfirm={confirmCancelJob}
           onClose={() => setVagaToCancel(null)}
         />

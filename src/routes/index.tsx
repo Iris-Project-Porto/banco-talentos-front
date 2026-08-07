@@ -29,6 +29,7 @@ const TalentoDetalhe = lazy(() => import("@/pages/admin/TalentoDetalhe"));
 const UsuariosPendentes = lazy(() => import("@/pages/admin/UsuariosPendentes"));
 const Skills = lazy(() => import("@/pages/admin/Skills"));
 const Vagas = lazy(() => import("@/pages/admin/Vagas"));
+const VagaForm = lazy(() => import("@/pages/admin/VagaForm"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 const Squads = lazy(() => import("@/pages/admin/Squads"));
 const SquadForm = lazy(() => import("@/pages/admin/SquadForm"));
@@ -88,6 +89,8 @@ export const router = createBrowserRouter([
                     { path: "usuarios", element: <UsuariosPendentes /> },
                     { path: "skills", element: <Skills /> },
                     { path: "vagas", element: <Vagas /> },
+                    { path: "vagas/nova", element: <VagaForm /> },
+                    { path: "vagas/:id/editar", element: <VagaForm /> },
                     { path: "forms", element: <Forms /> },
                     { path: "squads", element: <Squads /> },
                     { path: "squads/novo", element: <SquadForm /> },

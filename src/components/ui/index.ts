@@ -7,6 +7,7 @@ export * from "./Input/Input";
 export * from "./PageHeader/PageHeader";
 export * from "./Section/Section";
 export * from "./Select/Select";
+export * from "./Stepper/Stepper";
 export * from "./StatCard/StatCard";
 export * from "./Tag/Tag";
 export * from "./Pagination/Pagination";
