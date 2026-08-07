@@ -6,7 +6,7 @@ import { type JobPosting, type JobPostingPayload } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
 import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
-import { MatchRecursos } from "../MatchRecursos/MatchRecursos";
+import { MatchResources } from "../ResourceMatch/ResourceMatch";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
 
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
-    const [step, setStep] = useState<VagaWizardStep>(0);
+    const [step, setStep] = useState<VagaWizardStep>(1);
     const [savedVagaId, setSavedVagaId] = useState(initial.id);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
@@ -112,7 +112,7 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
                     )}
 
                     {step === 1 && (
-                        <MatchRecursos vagaId={savedVagaId} />
+                        <MatchResources vagaId={savedVagaId} />
                     )}
                 </form>
             </FormProvider>

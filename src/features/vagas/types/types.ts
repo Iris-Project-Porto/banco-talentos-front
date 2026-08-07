@@ -42,4 +42,27 @@ export interface JobPosting {
   updatedBy?: string;
 }
 
+export type MatchAvailability = "available" | "in_project";
+
+export type MatchSquadFilter = "all" | string;
+
+export type MatchAvailabilityFilter = "all" | MatchAvailability;
+
+export interface MatchSkillContribution {
+  name: string;
+  contributionPercent: number;
+}
+
+export interface Match {
+  id: string;
+  name: string;
+  photoUrl?: string;
+  description: string;
+  squadName: string;
+  avaiability: MatchAvailability;
+  matchScore: number;
+  mainSkills: MatchSkillContribution[];
+  rankingScore: number;
+}
+
 export type JobPostingPayload = Omit<JobPosting, "id" | "projectName" | "squadName" | "active" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "experienceLevelDescription">;
