@@ -17,6 +17,8 @@ export function ProgressRing({
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const progressOffset = circumference * (1 - normalizedValue / 100);
+    const valueSizeClass =
+        size >= 72 ? "text-base" : size >= 56 ? "text-xs" : "text-2xs";
 
     return (
         <div
@@ -57,7 +59,7 @@ export function ProgressRing({
                     strokeDashoffset={progressOffset}
                 />
             </svg>
-            <span className="absolute text-2xs font-bold tabular-nums text-slate-700">
+            <span className={twMerge("absolute font-bold tabular-nums text-slate-900", valueSizeClass)}>
                 {normalizedValue}%
             </span>
         </div>

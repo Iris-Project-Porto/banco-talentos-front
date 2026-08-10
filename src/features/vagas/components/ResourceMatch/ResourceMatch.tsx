@@ -3,13 +3,14 @@ import { UsersRoundIcon } from "lucide-react";
 import { MatchTable } from "../MatchTable/MatchTable";
 import { useEffect, useMemo, useState } from "react";
 import { MatchFilters } from "../MatchFilters/MatchFilters";
-import type { MatchAvailabilityFilter, MatchSquadFilter } from "../../types/types";
+import type { Match, MatchAvailabilityFilter, MatchSquadFilter } from "../../types/types";
 import {
     filterMatches,
     MATCH_PAGE_SIZE,
     MOCK_MATCHES,
     paginateLocally,
 } from "../../utils/matchList";
+import { SummaryMatchModal } from "../SummaryMatchModal/SummaryMatchModal";
 
 interface Props {
     vagaId?: string;
@@ -20,6 +21,7 @@ export function MatchResources({ vagaId: _vagaId }: Props) {
     const [search, setSearch] = useState("");
     const [squad, setSquad] = useState<MatchSquadFilter>("all");
     const [availability, setAvailability] = useState<MatchAvailabilityFilter>("all");
+    const [modalOpen, setModalOpen] = useState(false);
 
     const trimmedSearch = search.trim();
 
@@ -43,6 +45,10 @@ export function MatchResources({ vagaId: _vagaId }: Props) {
         setAvailability("all");
         setPage(0);
     }
+    function handleView(match: Match) {
+        setModalOpen(true);
+    }
+    
 
     return (
         <div className="flex flex-col gap-6">
@@ -67,7 +73,7 @@ export function MatchResources({ vagaId: _vagaId }: Props) {
             />
 
             <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-                <MatchTable data={listResult.content} />
+                <MatchTable data={listResult.content} onView={handleView} />
                 <Pagination
                     className="mt-0 py-4 px-4 border-t-0"
                     currentPage={page}
@@ -75,6 +81,12 @@ export function MatchResources({ vagaId: _vagaId }: Props) {
                     onPageChange={setPage}
                 />
             </div>
+
+            {modalOpen && (
+                <SummaryMatchModal
+                    onClose={() => setModalOpen(false)}
+                />
+            )}
         </div>
     );
 }
