@@ -33,16 +33,28 @@ Aplicação web central da **VILT** para gerenciamento de talentos e recursos hu
 Painéis dedicados para visualizar talentos em projetos ativos e filtros robustos para encontrar profissionais disponíveis no bench. Gestão de Hard e Soft Skills com níveis de proficiência de 1 a 10.
 
 **Gestão de Vagas**
-Módulo completo (CRUD) para controle de postos de trabalho (Abertas, Em andamento, Fechadas, Canceladas) e filtragem por requisitos técnicos ou senioridade.
+Módulo completo (CRUD) para controle de postos de trabalho (Aberta, Em triagem, Em alocação, Preenchida, Fechada, Cancelada) e filtragem por código, título, projeto, recrutador ou senioridade. Cadastro e edição em páginas dedicadas, com wizard de duas etapas: dados da vaga (projeto, squad, modalidade, skills obrigatórias/desejáveis com nível e peso) e ranking de match de recursos. Edição permitida apenas nos status Aberta, Em triagem e Em alocação; cancelamento com modal de confirmação.
+
+**Match de Recursos**
+Ranking de aderência dos talentos aos requisitos da vaga, com score visual, filtros por squad e disponibilidade, e modal de resumo do match.
 
 **Gestão de Projetos**
-CRUD de projetos com listagem paginada, filtros por nome e status (Ativo/Inativo), cards de resumo, modal de cadastro/edição com alteração de status e visualização de detalhes com metadados de auditoria.
+CRUD de projetos com listagem paginada, filtros por nome e status (Ativo/Inativo), cards de resumo e visualização de detalhes com metadados de auditoria. Cadastro e edição em páginas dedicadas, com abas de Dados Gerais e Squads Participantes (vincular squads existentes ou criar uma nova).
+
+**Gestão de Skills**
+CRUD de hard e soft skills com categoria, filtros por nome e categoria, listagem paginada e inativação com confirmação.
+
+**Gestão de Squads**
+CRUD de squads com listagem paginada, filtros por nome e status (Ativa/Inativa) e modal de cadastro/edição.
+
+**Gestão operacional de Recursos**
+Consulta do ciclo de vida dos recursos com filtros por status, matrícula, gerente, projeto, billable, onboarding Porto e período de entrada. Cobertura de matrícula, histórico, máquinas e atualização de contato.
 
 **Integração com Form Builder**
 Seção dedicada para visualização e acesso à URL dos formulários customizados gerados pelo *Banco de Talentos Form Builder* (Next.js) através de um iFrame embutido.
 
 **Perfis diferenciados por papel:**
-- **Admin / Recrutador** — acesso global ao Banco de Talentos, Vagas, Projetos, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
+- **Admin / Recrutador** — acesso global ao Banco de Talentos, Vagas, Projetos, Squads, Skills, Gestão de Recursos, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
 - **Recurso (Talento)** — sidebar exclusiva com "Meu Perfil" e "Meu Histórico", permitindo ao talento atualizar seus dados e acompanhar seu progresso.
 
 **Autenticação completa e segura**
@@ -51,7 +63,7 @@ Fluxo de login, logout, registro (com seleção de perfil e grupo), verificaçã
 **Validação robusta de formulários**
 Todos os formulários utilizam **React Hook Form** + **Zod** para validação de schema, incluindo:
 - Registro restrito a e-mails `@vilt-group.com`
-- Senha com regras de complexidade (maiúscula + caractere especial)
+- Senha com regras de complexidade (mínimo 8 caracteres, maiúscula, número e caractere especial), exibidas em tempo real via `PasswordRequirements`
 - Código OTP com exatamente 6 dígitos
 
 **Tratamento global de erros**
@@ -96,12 +108,17 @@ src/
 │       ├── Badge/
 │       ├── Button/
 │       ├── Card/
+│       ├── ConfirmModal/
 │       ├── Input/
 │       ├── PageHeader/
 │       ├── Pagination/
+│       ├── PasswordRequirements/
+│       ├── ProgressRing/
 │       ├── Section/
 │       ├── Select/
 │       ├── StatCard/
+│       ├── Stepper/
+│       ├── Table/
 │       ├── Tag/
 │       └── index.ts           # Barrel export dos componentes UI
 │
@@ -111,7 +128,7 @@ src/
 │   │   ├── contexts/          # AuthContext e AuthProvider
 │   │   ├── hooks/             # Hooks personalizados (useAuth, etc.)
 │   │   ├── types/             # Tipos e enums (UserRole)
-│   │   ├── validations/       # Schemas Zod (login, register, verify, reset, forgot)
+│   │   ├── validations/       # Schemas Zod (login, register, verify, reset, forgot) e regras de senha
 │   │   └── index.ts           # Barrel export do módulo auth
 │   ├── profiles/
 │   │   ├── api/               # Endpoints de perfil e listagem
@@ -129,21 +146,47 @@ src/
 │   │   ├── api/               # Endpoints de projetos (CRUD, activate/inactivate)
 │   │   ├── components/
 │   │   │   ├── ProjectDetailModal/   # Visualização de detalhes
-│   │   │   ├── ProjectFormModal/     # Cadastro e edição
+│   │   │   ├── ProjectForm/          # Cadastro e edição (abas Dados Gerais e Squads)
 │   │   │   ├── ProjectsFilters/      # Filtros de busca e status
 │   │   │   └── ProjectsTable/        # Tabela de listagem
 │   │   ├── types/             # Tipos do domínio de projetos
 │   │   ├── utils/             # Filtros e paginação local
 │   │   ├── validations/       # Schemas Zod
 │   │   └── index.ts
-│   ├── recursos/              # Consulta e gestão operacional de recursos
-│   ├── squads/                # CRUD e regras de squads
+│   ├── recursos/
+│   │   ├── api/               # Endpoints de recursos, matrícula, máquinas e contato
+│   │   └── types/             # Tipos do ciclo de vida do recurso
+│   ├── squads/
+│   │   ├── api/               # Endpoints de squads (CRUD, activate/inactivate)
+│   │   ├── components/
+│   │   │   └── SquadFormModal/       # Cadastro e edição
+│   │   ├── types/             # Tipos do domínio de squads
+│   │   ├── validations/       # Schemas Zod
+│   │   └── index.ts
 │   ├── skills/
-│   │   └── api/               # Endpoints e tipos de skills
+│   │   ├── api/               # Endpoints de skills (CRUD, listagem e inativação)
+│   │   ├── components/
+│   │   │   ├── SkillFormModal/       # Cadastro e edição
+│   │   │   ├── SkillsFilters/        # Filtros por nome e categoria
+│   │   │   ├── SkillsTable/          # Tabela de listagem
+│   │   │   └── SkillCategoryBadge/   # Badge de categoria
+│   │   ├── types/             # Tipos do domínio de skills
+│   │   ├── utils/             # Categorias, normalização e exibição
+│   │   ├── validations/       # Schemas Zod
+│   │   └── index.ts
 │   └── vagas/
 │       ├── api/               # Endpoints de vagas (CRUD)
-│       ├── components/        # Componentes de listagem e formulário de vagas
-│       ├── types.ts           # Tipos do domínio de vagas
+│       ├── components/
+│       │   ├── VagaCard/             # Card de listagem
+│       │   ├── VagaWizard/           # Wizard de cadastro/edição (dados + match)
+│       │   ├── VagaDataForm/         # Formulário de dados da vaga
+│       │   ├── SkillsSection/        # Skills obrigatórias e desejáveis
+│       │   ├── ResourceMatch/        # Ranking de match de recursos
+│       │   ├── MatchFilters/         # Filtros do ranking
+│       │   ├── MatchTable/           # Tabela do ranking
+│       │   └── SummaryMatchModal/    # Resumo do match
+│       ├── types/             # Tipos do domínio de vagas
+│       ├── validations/       # Schemas Zod
 │       └── index.ts
 │
 ├── lib/
@@ -157,10 +200,12 @@ src/
 │   │   ├── FilaRevisao.tsx        # Currículos aguardando aprovação
 │   │   ├── UsuariosPendentes.tsx  # Usuários aguardando liberação de acesso
 │   │   ├── Projetos.tsx           # Gestão de projetos
+│   │   ├── ProjetoForm.tsx        # Cadastro e edição de projeto
 │   │   ├── Squads.tsx             # Gestão de squads
 │   │   ├── Skills.tsx             # Gestão de skills
 │   │   ├── ConsultaRecursos.tsx   # Gestão operacional de recursos
 │   │   ├── Vagas.tsx              # Gestão de vagas
+│   │   ├── VagaForm.tsx           # Cadastro e edição de vaga (wizard)
 │   │   └── Forms.tsx              # Integração com o Form Builder (iFrame)
 │   ├── public/
 │   │   ├── Login.tsx
@@ -204,10 +249,14 @@ src/
 | `/admin/fila` | `FilaRevisao` | 🔒 Admin |
 | `/admin/usuarios` | `UsuariosPendentes` | 🔒 Admin |
 | `/admin/projetos` | `Projetos` | 🔒 Admin |
+| `/admin/projetos/novo` | `ProjetoForm` | 🔒 Admin |
+| `/admin/projetos/:id/editar` | `ProjetoForm` | 🔒 Admin |
 | `/admin/squads` | `Squads` | 🔒 Admin |
 | `/admin/skills` | `Skills` | 🔒 Admin |
 | `/admin/recursos` | `ConsultaRecursos` | 🔒 Admin |
 | `/admin/vagas` | `Vagas` | 🔒 Admin |
+| `/admin/vagas/nova` | `VagaForm` | 🔒 Admin |
+| `/admin/vagas/:id/editar` | `VagaForm` | 🔒 Admin |
 | `/admin/forms` | `Forms` | 🔒 Admin |
 | `*` | — | Redireciona para `/login` |
 
@@ -316,22 +365,22 @@ O front persiste `token`, `refreshToken` e `user` no `localStorage`. O intercept
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/profile/me` | Busca os dados do talento logado |
-| `POST` | `/profile` | Salva ou atualiza o currículo do talento |
+| `GET` | `/v1/profile` | Busca os dados do talento logado |
+| `POST` | `/v1/profile` | Salva ou atualiza o currículo do talento |
 
 ### 👑 Área Administrativa
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/admin/dashboard` | Busca estatísticas e KPIs gerais |
-| `GET` | `/admin/users/pending` | Lista usuários aguardando aprovação |
-| `POST` | `/admin/users/:id/approve` | Aprova acesso de um usuário |
-| `POST` | `/admin/users/:id/reject` | Rejeita ou bloqueia acesso de um usuário |
-| `GET` | `/admin/profiles` | Lista irrestrita de todos os perfis |
-| `GET` | `/admin/profiles/ativos` | Lista talentos ativos (Banco de Talentos e Alocados) |
-| `GET` | `/admin/profiles/pendentes` | Lista currículos na fila de revisão |
-| `GET` | `/admin/profiles/:id` | Abre o perfil completo de um talento |
-| `PATCH` | `/admin/profiles/:id` | Edita o status de um talento |
+| `GET` | `/v1/admin/dashboard` | Busca estatísticas e KPIs gerais |
+| `GET` | `/v1/admin/users/pending` | Lista usuários aguardando aprovação |
+| `POST` | `/v1/admin/users/:id/approve` | Aprova acesso de um usuário |
+| `POST` | `/v1/admin/users/:id/reject` | Rejeita ou bloqueia acesso de um usuário |
+| `GET` | `/v1/admin/profiles` | Lista irrestrita de todos os perfis |
+| `GET` | `/v1/admin/profiles/active` | Lista talentos ativos (Banco de Talentos e Alocados) |
+| `GET` | `/v1/admin/profiles/pending` | Lista currículos na fila de revisão |
+| `GET` | `/v1/admin/profiles/:id` | Abre o perfil completo de um talento |
+| `PATCH` | `/v1/admin/profiles/:id` | Edita o status de um talento |
 
 ### 🏢 Grupos
 
@@ -343,45 +392,63 @@ O front persiste `token`, `refreshToken` e `user` no `localStorage`. O intercept
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/admin/job-postings/active` | Lista as vagas ativas (paginado) |
-| `GET` | `/admin/job-postings/inactive` | Lista as vagas inativas (paginado) |
-| `GET` | `/admin/job-postings/:id` | Busca detalhes de uma vaga específica |
-| `POST` | `/admin/job-postings` | Cria uma nova vaga |
-| `PUT` | `/admin/job-postings/:id` | Atualiza os dados de uma vaga |
-| `PATCH`| `/admin/job-postings/:id/activate` | Ativa uma vaga |
-| `PATCH`| `/admin/job-postings/:id/deactivate` | Desativa uma vaga |
+| `GET` | `/v1/admin/job-postings/active` | Lista as vagas ativas (paginado) |
+| `GET` | `/v1/admin/job-postings/inactive` | Lista as vagas inativas (paginado) |
+| `GET` | `/v1/admin/job-postings/:id` | Busca detalhes de uma vaga específica |
+| `POST` | `/v1/admin/job-postings` | Cria uma nova vaga |
+| `PUT` | `/v1/admin/job-postings/:id` | Atualiza os dados de uma vaga |
+| `PATCH`| `/v1/admin/job-postings/:id/activate` | Ativa uma vaga |
+| `PATCH`| `/v1/admin/job-postings/:id/deactivate` | Desativa uma vaga |
+
+> **Campos da vaga:** `vacancyCode`, `title`, `projectId`, `squadId`, `experienceLevel`, `modality`, `recruiter`, `estimatedAllocationWeeks`, `status`, `openingDate`, `skills` (obrigatórias/desejáveis, nível mínimo e peso). Edição bloqueada fora de `OPEN`, `SCREENING` e `ALLOCATING`.
 
 ### 🛡️ Squads e Projetos
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/admin/squads/active` | Lista os squads ativos (paginado) |
-| `GET` | `/admin/squads/inactive` | Lista os squads inativas (paginado) |
-| `GET` | `/admin/squads/:id` | Busca detalhes de um squad |
-| `POST` | `/admin/squads` | Cria um novo squad |
-| `PUT` | `/admin/squads/:id` | Atualiza os dados de um squad |
-| `PATCH`| `/admin/squads/:id/activate` | Ativa um squad |
-| `PATCH`| `/admin/squads/:id/inactivate` | Inativa um squad |
+| `GET` | `/v1/admin/squads/active` | Lista os squads ativos (paginado) |
+| `GET` | `/v1/admin/squads/inactive` | Lista os squads inativos (paginado) |
+| `GET` | `/v1/admin/squads/:id` | Busca detalhes de um squad |
+| `POST` | `/v1/admin/squads` | Cria um novo squad |
+| `PUT` | `/v1/admin/squads/:id` | Atualiza os dados de um squad |
+| `PATCH`| `/v1/admin/squads/:id/activate` | Ativa um squad |
+| `PATCH`| `/v1/admin/squads/:id/inactivate` | Inativa um squad |
 | `GET` | `/v1/admin/projects/active` | Lista os projetos ativos (paginado) |
 | `GET` | `/v1/admin/projects/inactive` | Lista os projetos inativos (paginado) |
 | `GET` | `/v1/admin/projects/:id` | Busca detalhes de um projeto |
 | `POST` | `/v1/admin/projects` | Cria um novo projeto |
-| `PUT` | `/v1/admin/projects/:id` | Atualiza nome e descrição |
+| `PUT` | `/v1/admin/projects/:id` | Atualiza nome, descrição e squads participantes |
 | `PATCH`| `/v1/admin/projects/:id/activate` | Reativa um projeto |
 | `PATCH`| `/v1/admin/projects/:id/inactivate` | Inativa um projeto (exclusão lógica) |
 
-> **Campos do projeto:** `name` (obrigatório, único), `description` (obrigatório), `active` (padrão `true`). Metadados de auditoria: `createdAt`, `updatedAt`, `createdBy`, `updatedBy`.
+> **Campos do projeto:** `name` (obrigatório, único), `description` (obrigatório), `squadIds` (squads participantes), `active` (padrão `true`). Metadados de auditoria: `createdAt`, `updatedAt`, `createdBy`, `updatedBy`. Uma squad não pode estar vinculada a mais de um projeto.
 
 ### 🛠️ Skills
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/admin/skills/active` | Lista as skills ativas |
-| `GET` | `/admin/skills/inactive` | Lista as skills inativas |
-| `GET` | `/admin/skills/:id` | Busca detalhes de uma skill |
-| `PUT` | `/admin/skills/:id` | Atualiza os dados de uma skill |
-| `PATCH`| `/admin/skills/:id/activate` | Ativa uma skill |
-| `PATCH`| `/admin/skills/:id/inactivate` | Inativa uma skill |
+| `GET` | `/v1/admin/skills` | Lista skills para gestão (paginado; filtros `name` e `category`) |
+| `GET` | `/v1/admin/skills/active` | Lista as skills ativas |
+| `GET` | `/v1/admin/skills/inactive` | Lista as skills inativas |
+| `POST` | `/v1/admin/skills` | Cria uma nova skill |
+| `PUT` | `/v1/admin/skills/:id` | Atualiza os dados de uma skill |
+| `PATCH`| `/v1/admin/skills/:id/inactivate` | Inativa uma skill |
+
+> **Campos da skill:** `name` (obrigatório, único), `type` (`HARD` / `SOFT`), `category` (compatível com o tipo), `description` (opcional).
+
+### 👷 Recursos (Gestão operacional)
+
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/v1/admin/recursos` | Lista recursos com filtros (nome, status, matrícula, gerente, projeto, billable, onboarding, período) |
+| `GET` | `/v1/admin/recursos/:id` | Busca detalhes de um recurso |
+| `PATCH` | `/v1/admin/recursos/:id` | Atualiza dados operacionais do recurso |
+| `PATCH` | `/v1/admin/recursos/:id/matricula` | Atualiza o status de matrícula |
+| `GET` | `/v1/admin/recursos/:id/historico` | Lista o histórico de matrícula |
+| `POST` | `/v1/admin/recursos/:id/maquinas` | Adiciona uma máquina ao recurso |
+| `PUT` | `/v1/admin/recursos/:id/maquinas/:maqId` | Atualiza uma máquina |
+| `DELETE` | `/v1/admin/recursos/:id/maquinas/:maqId` | Remove uma máquina |
+| `PATCH` | `/v1/recurso/me/contato` | Atualiza contato e endereço do recurso logado |
 
 ---
 
