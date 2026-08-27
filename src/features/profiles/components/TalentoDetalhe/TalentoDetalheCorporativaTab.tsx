@@ -1,54 +1,63 @@
-import { Button, Input, Select, Section } from "@/components/ui";
-import { ALOCACAO_OPTIONS, REGISTRATION_STATUS_OPTIONS, TRILHA_OPTIONS } from "../../profile";
-import type { ProfileFormState } from "../../types/profile";
+import { Button } from "@/components/ui";
+import type { ProfileFormState, UserProfile } from "../../types/profile";
 import type { ProfileFormUpdater } from "./ContactAddressFields";
+import { CorporateCard } from "./CorporateCard";
+import { MatriculaStatusFields } from "./MatriculaStatusFields";
+import { ClientMachinesSection } from "./ClientMachinesSection";
+import { ProjectDataSection } from "./ProjectDataSection";
+import { TechnicalProposalSection } from "./TechnicalProposalSection";
 
 interface Props {
+    profileId: string;
+    profile: UserProfile | null;
     form: ProfileFormState;
     updateField: ProfileFormUpdater;
     saving: boolean;
     onSave: () => void;
 }
 
-export function TalentoDetalheCorporativaTab({ form, updateField, saving, onSave }: Props) {
+export function TalentoDetalheCorporativaTab({
+    profileId,
+    profile,
+    form,
+    updateField,
+    saving,
+    onSave,
+}: Props) {
+    const showRegistrationDetails = form.registrationStatus !== "NOT_REQUIRED";
+
     return (
-        <div className="grid max-w-3xl grid-cols-1 gap-4">
-            <Section title="Identificação Corporativa">
-                <Input
-                    label="Matrícula"
-                    value={form.registrationNumber}
-                    onChange={(e) => updateField("registrationNumber", e.target.value)}
-                    placeholder="Matrícula"
+        <div className="flex max-w-3xl flex-col gap-5">
+            <CorporateCard title="Matrícula e Status Geral">
+                <MatriculaStatusFields
+                    form={form}
+                    resourceStatus={profile?.resourceStatus}
+                    updateField={updateField}
                 />
-                <Select
-                    label="Status da Matrícula"
-                    value={form.registrationStatus}
-                    onChange={(e) => updateField("registrationStatus", e.target.value)}
-                    options={REGISTRATION_STATUS_OPTIONS}
-                />
-            </Section>
-            <Section title="Alocação e carreira">
-                <Select
-                    label="Situação de alocação"
-                    value={form.allocationStatus}
-                    onChange={(e) => updateField("allocationStatus", e.target.value)}
-                    options={ALOCACAO_OPTIONS}
-                />
-                <Select
-                    label="Trilha de carreira"
-                    value={form.careerPath}
-                    onChange={(e) => updateField("careerPath", e.target.value)}
-                    options={TRILHA_OPTIONS}
-                />
-            </Section>
-            <div className="flex flex-wrap items-center gap-3">
-                <Button
-                    type="button"
-                    variant="primary"
-                    onClick={onSave}
-                    loading={saving}
-                    disabled={saving}
-                >
+            </CorporateCard>
+
+            {showRegistrationDetails && (
+                <>
+                    <CorporateCard title="Máquina do Cliente">
+                        <ClientMachinesSection
+                            profileId={profileId}
+                            hasClientMachine={form.hasClientMachine}
+                            onHasClientMachineChange={(v) => updateField("hasClientMachine", v)}
+                        />
+                    </CorporateCard>
+
+                    <CorporateCard title="Dados do Projeto">
+                        <ProjectDataSection form={form} updateField={updateField} />
+                    </CorporateCard>
+
+                    <CorporateCard title="Proposta Técnica">
+                        <TechnicalProposalSection form={form} updateField={updateField} />
+                    </CorporateCard>
+                </>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Button type="button" variant="primary" onClick={onSave} loading={saving} disabled={saving}>
                     {saving ? "Salvando..." : "Salvar alterações"}
                 </Button>
             </div>

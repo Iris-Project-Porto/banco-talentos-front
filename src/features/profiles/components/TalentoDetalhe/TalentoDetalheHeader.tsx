@@ -27,6 +27,11 @@ export function TalentoDetalheHeader({ profile, form, isPendente }: Props) {
                             {profile.name}
                         </h1>
                         <p className="text-sm text-gray-400">{profile.email}</p>
+                        {form.registrationNumber?.trim() && (
+                            <p className="mt-0.5 text-sm font-medium text-slate-600">
+                                Matrícula: {form.registrationNumber.trim()}
+                            </p>
+                        )}
                         {form.area && <p className="text-sm text-gray-500 mt-0.5">{form.area}</p>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">

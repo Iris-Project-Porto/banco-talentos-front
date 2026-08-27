@@ -19,8 +19,7 @@ export function RecursosList() {
         isError,
         skillParam,
         clearSkillFilter,
-        areas,
-        groups,
+        projects,
     } = useRecursosList();
 
     function handleClearFilters() {
@@ -32,8 +31,7 @@ export function RecursosList() {
         <>
             <RecursosFilters
                 filters={filters}
-                areas={areas}
-                groups={groups}
+                projects={projects}
                 onChange={setFilter}
                 onApply={applyFilters}
                 onClear={handleClearFilters}

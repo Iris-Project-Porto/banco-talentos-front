@@ -37,7 +37,7 @@ export function TalentoDetalheSkillsTab({
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex max-w-3xl flex-col gap-4">
             <Section title="Stack tecnológica">
                 <StackInput value={stacks} onChange={setStacks} />
             </Section>

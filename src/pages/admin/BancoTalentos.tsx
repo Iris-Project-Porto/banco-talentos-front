@@ -14,6 +14,7 @@ export default function BancoTalentos() {
     mutationFn: (payload: ResourceCreatePayload) => recursosApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profiles-catalog"] });
+      queryClient.invalidateQueries({ queryKey: ["profiles-pendentes"] });
       setCreateModalOpen(false);
       toast.success("Recurso cadastrado com sucesso! Um e-mail com as credenciais foi enviado.");
     },

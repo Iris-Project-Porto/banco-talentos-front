@@ -9,6 +9,19 @@ export interface ProfileSkill {
     };
 }
 
+export interface ResourceEquipment {
+    id: string;
+    tag?: string;
+    hostname?: string;
+    assetNumber?: string;
+    brandOs?: string;
+    processor?: string;
+    status: string;
+    notes?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
 export interface UserProfile {
     id: string;
     status: "PENDING" | "ACTIVE" | string;
@@ -28,6 +41,25 @@ export interface UserProfile {
     githubUrl?: string;
     registrationNumber?: string;
     registrationStatus?: string;
+    resourceStatus?: "AVAILABLE" | "WAITING" | "ALLOCATED" | string;
+    registrationRequestedAt?: string;
+    registrationNotes?: string;
+    hasClientMachine?: boolean;
+    contractingArea?: string;
+    costCenter?: string;
+    projectEntryDate?: string;
+    billable?: boolean | null;
+    portoOnboarding?: boolean | null;
+    projectManagerName?: string;
+    allocationProjectId?: string;
+    allocationProjectName?: string;
+    allocationSquadId?: string;
+    allocationSquadName?: string;
+    technicalProposalStatus?: string;
+    technicalProposalNumber?: string;
+    technicalProposalSentAt?: string;
+    technicalProposalNotes?: string;
+    equipments?: ResourceEquipment[];
     contact?: string;
     contactEmail?: string;
     phone?: string;
@@ -53,6 +85,21 @@ export interface ProfileFormState {
     levelOverride: string;
     registrationNumber: string;
     registrationStatus: string;
+    registrationRequestedAt: string;
+    registrationNotes: string;
+    hasClientMachine: boolean;
+    contractingArea: string;
+    costCenter: string;
+    projectEntryDate: string;
+    billable: boolean | null;
+    portoOnboarding: boolean | null;
+    projectManagerName: string;
+    allocationProjectId: string;
+    allocationSquadId: string;
+    technicalProposalStatus: string;
+    technicalProposalNumber: string;
+    technicalProposalSentAt: string;
+    technicalProposalNotes: string;
     contact: string;
     contactEmail: string;
     phone: string;

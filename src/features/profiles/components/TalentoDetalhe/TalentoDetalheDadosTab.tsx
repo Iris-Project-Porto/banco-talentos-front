@@ -1,10 +1,12 @@
 import { Button, Input, Select, Section } from "@/components/ui";
 import { AREA_OPTIONS, EXPERIENCE_OPTIONS, NIVEL_OPTIONS } from "../../profile";
-import type { ProfileFormState } from "../../types/profile";
+import type { ProfileFormState, UserProfile } from "../../types/profile";
 import { ContactAddressFields, type ProfileFormUpdater } from "./ContactAddressFields";
+import { MatriculaStatusFields } from "./MatriculaStatusFields";
 
 interface Props {
     form: ProfileFormState;
+    profile: UserProfile;
     updateField: ProfileFormUpdater;
     isPendente: boolean;
     saving: boolean;
@@ -13,6 +15,7 @@ interface Props {
 
 export function TalentoDetalheDadosTab({
     form,
+    profile,
     updateField,
     isPendente,
     saving,
@@ -20,6 +23,13 @@ export function TalentoDetalheDadosTab({
 }: Props) {
     return (
         <div className="flex max-w-3xl flex-col gap-4">
+            <Section title="Matrícula e Status Geral">
+                <MatriculaStatusFields
+                    form={form}
+                    resourceStatus={profile.resourceStatus}
+                    updateField={updateField}
+                />
+            </Section>
             <Section title="Override de nível">
                 <Select
                     value={form.levelOverride}

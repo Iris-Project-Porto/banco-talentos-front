@@ -32,8 +32,7 @@ describe("Componente RecursosList", () => {
         isError: false,
         skillParam: "",
         clearSkillFilter: vi.fn(),
-        areas: [],
-        groups: [],
+        projects: [],
     };
 
     beforeEach(() => {
