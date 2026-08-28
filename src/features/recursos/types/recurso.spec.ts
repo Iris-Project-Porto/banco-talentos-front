@@ -9,9 +9,9 @@ import {
 describe('recurso type labels', () => {
     describe('STATUS_RECURSO_LABELS', () => {
         it('deve mapear todos os valores de StatusRecurso para labels em PT-BR', () => {
-            expect(STATUS_RECURSO_LABELS['DISPONIVEL']).toBe('Disponível');
-            expect(STATUS_RECURSO_LABELS['AGUARDANDO']).toBe('Aguardando');
-            expect(STATUS_RECURSO_LABELS['ALOCADO']).toBe('Alocado');
+            expect(STATUS_RECURSO_LABELS['AVAILABLE']).toBe('Disponível');
+            expect(STATUS_RECURSO_LABELS['WAITING']).toBe('Aguardando');
+            expect(STATUS_RECURSO_LABELS['ALLOCATED']).toBe('Alocado');
         });
 
         it('deve cobrir todos os 3 status possíveis', () => {
@@ -21,11 +21,11 @@ describe('recurso type labels', () => {
 
     describe('STATUS_MATRICULA_LABELS', () => {
         it('deve mapear todos os valores de StatusMatricula para labels em PT-BR', () => {
-            expect(STATUS_MATRICULA_LABELS['NAO_NECESSARIO']).toBe('Não necessário');
-            expect(STATUS_MATRICULA_LABELS['SOLICITADO_VIA_CHAMADO']).toBe('Solicitado via chamado');
-            expect(STATUS_MATRICULA_LABELS['CHAMADO_AGUARDANDO_APROVACAO']).toBe('Aguardando aprovação');
-            expect(STATUS_MATRICULA_LABELS['CHAMADO_AGUARDANDO_ATENDIMENTO']).toBe('Aguardando atendimento');
-            expect(STATUS_MATRICULA_LABELS['LIBERADA']).toBe('Liberada');
+            expect(STATUS_MATRICULA_LABELS['NOT_REQUIRED']).toBe('Não Necessário');
+            expect(STATUS_MATRICULA_LABELS['REQUESTED_VIA_TICKET']).toBe('Solicitado via chamado');
+            expect(STATUS_MATRICULA_LABELS['TICKET_AWAITING_APPROVAL']).toBe('Aguardando aprovação');
+            expect(STATUS_MATRICULA_LABELS['TICKET_AWAITING_SERVICE']).toBe('Aguardando atendimento');
+            expect(STATUS_MATRICULA_LABELS['RELEASED']).toBe('Liberada');
         });
 
         it('deve cobrir todos os 5 status possíveis', () => {
@@ -34,31 +34,32 @@ describe('recurso type labels', () => {
     });
 
     describe('STATUS_MAQUINA_LABELS', () => {
-        it('deve retornar traço para VAZIO', () => {
-            expect(STATUS_MAQUINA_LABELS['VAZIO']).toBe('—');
+        it('deve retornar Vazio para EMPTY', () => {
+            expect(STATUS_MAQUINA_LABELS['EMPTY']).toBe('Vazio');
         });
 
         it('deve mapear os demais status de máquina corretamente', () => {
-            expect(STATUS_MAQUINA_LABELS['EM_PROCESSO_DE_SOLICITACAO']).toBe('Em processo');
-            expect(STATUS_MAQUINA_LABELS['SOLICITADO']).toBe('Solicitado');
-            expect(STATUS_MAQUINA_LABELS['RETIRADO']).toBe('Retirado');
-            expect(STATUS_MAQUINA_LABELS['ENVIO_PARA_O_RECURSO']).toBe('Enviado ao recurso');
-            expect(STATUS_MAQUINA_LABELS['EM_USO']).toBe('Em uso');
-            expect(STATUS_MAQUINA_LABELS['DEVOLVIDO']).toBe('Devolvido');
+            expect(STATUS_MAQUINA_LABELS['REQUEST_IN_PROGRESS']).toBe('Em processo de solicitação');
+            expect(STATUS_MAQUINA_LABELS['REQUESTED']).toBe('Solicitado');
+            expect(STATUS_MAQUINA_LABELS['WITHDRAWN']).toBe('Retirado');
+            expect(STATUS_MAQUINA_LABELS['SENT_TO_RESOURCE']).toBe('Envio para o recurso');
+            expect(STATUS_MAQUINA_LABELS['IN_USE']).toBe('Em Uso');
+            expect(STATUS_MAQUINA_LABELS['RETURNED']).toBe('Devolvido');
+            expect(STATUS_MAQUINA_LABELS['INACTIVE']).toBe('Inativo');
         });
 
-        it('deve cobrir todos os 7 status possíveis', () => {
-            expect(Object.keys(STATUS_MAQUINA_LABELS)).toHaveLength(7);
+        it('deve cobrir todos os 8 status possíveis', () => {
+            expect(Object.keys(STATUS_MAQUINA_LABELS)).toHaveLength(8);
         });
     });
 
     describe('STATUS_PROPOSTA_LABELS', () => {
         it('deve mapear todos os status de proposta técnica', () => {
-            expect(STATUS_PROPOSTA_LABELS['PENDENTE_DE_ENVIO']).toBe('Pendente de envio');
-            expect(STATUS_PROPOSTA_LABELS['ENVIADO_AO_COORDENADOR']).toBe('Enviado ao Coordenador');
-            expect(STATUS_PROPOSTA_LABELS['COBRAR_RETORNO']).toBe('Cobrar retorno');
-            expect(STATUS_PROPOSTA_LABELS['ASSINADO']).toBe('Assinado');
-            expect(STATUS_PROPOSTA_LABELS['ERRO_DE_ASSINATURA']).toBe('Erro de assinatura');
+            expect(STATUS_PROPOSTA_LABELS['PENDING_SEND']).toBe('Pendente de envio');
+            expect(STATUS_PROPOSTA_LABELS['SENT_TO_COORDINATOR']).toBe('Enviado ao Coordenador');
+            expect(STATUS_PROPOSTA_LABELS['FOLLOW_UP_REQUIRED']).toBe('Cobrar retorno');
+            expect(STATUS_PROPOSTA_LABELS['SIGNED']).toBe('Assinado');
+            expect(STATUS_PROPOSTA_LABELS['SIGNATURE_ERROR']).toBe('Erro de assinatura');
         });
 
         it('deve cobrir todos os 5 status possíveis', () => {

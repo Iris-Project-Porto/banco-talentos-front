@@ -16,8 +16,8 @@ const mockRecurso = {
     id: 'uuid-1',
     name: 'João Silva',
     email: 'joao@vilt-group.com',
-    statusRecurso: 'DISPONIVEL',
-    statusMatricula: 'NAO_NECESSARIO',
+    statusRecurso: 'AVAILABLE',
+    statusMatricula: 'NOT_REQUIRED',
     possuiMaquinaCliente: false,
     maquinas: [],
 };
@@ -58,11 +58,11 @@ describe('recursosApi', () => {
         it('deve incluir filtros na query string quando fornecidos', async () => {
             vi.mocked(http.get).mockResolvedValueOnce({ data: { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 } });
 
-            await recursosApi.listar({ nome: 'João', statusRecurso: 'ALOCADO', billable: true }, 0, 20);
+            await recursosApi.listar({ nome: 'João', statusRecurso: 'ALLOCATED', billable: true }, 0, 20);
 
             const url = vi.mocked(http.get).mock.calls[0][0] as string;
             expect(url).toContain('nome=Jo%C3%A3o');
-            expect(url).toContain('statusRecurso=ALOCADO');
+            expect(url).toContain('statusRecurso=ALLOCATED');
             expect(url).toContain('billable=true');
         });
 
@@ -91,19 +91,19 @@ describe('recursosApi', () => {
 
     describe('atualizarMatricula', () => {
         it('deve chamar PATCH /v1/admin/resources/:id/matricula com o novo status', async () => {
-            vi.mocked(http.patch).mockResolvedValueOnce({ data: { ...mockRecurso, statusMatricula: 'SOLICITADO_VIA_CHAMADO', statusRecurso: 'AGUARDANDO' } });
+            vi.mocked(http.patch).mockResolvedValueOnce({ data: { ...mockRecurso, statusMatricula: 'REQUESTED_VIA_TICKET', statusRecurso: 'WAITING' } });
 
-            const result = await recursosApi.atualizarMatricula('uuid-1', 'SOLICITADO_VIA_CHAMADO');
+            const result = await recursosApi.atualizarMatricula('uuid-1', 'REQUESTED_VIA_TICKET');
 
-            expect(http.patch).toHaveBeenCalledWith('/v1/admin/resources/uuid-1/matricula', { statusMatricula: 'SOLICITADO_VIA_CHAMADO' });
-            expect(result.statusMatricula).toBe('SOLICITADO_VIA_CHAMADO');
+            expect(http.patch).toHaveBeenCalledWith('/v1/admin/resources/uuid-1/matricula', { statusMatricula: 'REQUESTED_VIA_TICKET' });
+            expect(result.statusMatricula).toBe('REQUESTED_VIA_TICKET');
         });
     });
 
     describe('listarHistorico', () => {
         it('deve chamar GET /v1/admin/resources/:id/historico', async () => {
             const mockHistorico = [
-                { id: 'h1', valorAnterior: 'NAO_NECESSARIO', valorNovo: 'SOLICITADO_VIA_CHAMADO', alteradoPorNome: 'Admin', alteradoEm: '2026-01-01T00:00:00Z' }
+                { id: 'h1', valorAnterior: 'NOT_REQUIRED', valorNovo: 'REQUESTED_VIA_TICKET', alteradoPorNome: 'Admin', alteradoEm: '2026-01-01T00:00:00Z' }
             ];
             vi.mocked(http.get).mockResolvedValueOnce({ data: mockHistorico });
 
@@ -111,13 +111,13 @@ describe('recursosApi', () => {
 
             expect(http.get).toHaveBeenCalledWith('/v1/admin/resources/uuid-1/historico');
             expect(result).toHaveLength(1);
-            expect(result[0].valorNovo).toBe('SOLICITADO_VIA_CHAMADO');
+            expect(result[0].valorNovo).toBe('REQUESTED_VIA_TICKET');
         });
     });
 
     describe('adicionarMaquina', () => {
         it('deve chamar POST /v1/admin/resources/:id/maquinas com os dados da máquina', async () => {
-            const novaMaquina = { tagNumeroSerie: 'TAG-001', hostname: 'PC-001', statusMaquina: 'VAZIO' as const };
+            const novaMaquina = { tagNumeroSerie: 'TAG-001', hostname: 'PC-001', statusMaquina: 'EMPTY' as const };
             const mockMaquinaResponse = { id: 'm1', ...novaMaquina, createdAt: '2026-01-01T00:00:00Z', updatedAt: null };
             vi.mocked(http.post).mockResolvedValueOnce({ data: mockMaquinaResponse });
 

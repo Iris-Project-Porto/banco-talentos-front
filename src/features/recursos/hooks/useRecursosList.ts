@@ -2,12 +2,34 @@ import { useCallback, useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { profilesApi, type UserProfile } from "@/features/profiles";
+import { projectsApi } from "@/features/projects/api/projects.api";
 import type { ProfileListFilters } from "../types/profileFilters";
 import { EMPTY_PROFILE_FILTERS } from "../types/profileFilters";
+import type { StatusRecurso } from "../types/recurso";
 import { RECURSOS_PAGE_SIZE } from "../utils/profileFilterOptions";
 
-function profileNivel(profile: UserProfile): string {
-    return profile.levelOverride ?? profile.level ?? profile.nivel ?? "";
+export function deriveStatusRecurso(profile: UserProfile): StatusRecurso {
+    if (
+        profile.resourceStatus === "AVAILABLE" ||
+        profile.resourceStatus === "WAITING" ||
+        profile.resourceStatus === "ALLOCATED"
+    ) {
+        return profile.resourceStatus;
+    }
+
+    if (!profile.registrationStatus || profile.registrationStatus === "NOT_REQUIRED") {
+        return "AVAILABLE";
+    }
+    if (profile.registrationStatus === "RELEASED") {
+        return "ALLOCATED";
+    }
+    return "WAITING";
+}
+
+function matchesBooleanFilter(value: boolean | null | undefined, filter: string): boolean {
+    if (!filter) return true;
+    if (value == null) return false;
+    return String(value) === filter;
 }
 
 function matchesProfileFilters(profile: UserProfile, filters: ProfileListFilters): boolean {
@@ -16,17 +38,36 @@ function matchesProfileFilters(profile: UserProfile, filters: ProfileListFilters
         const matchesText =
             profile.name?.toLowerCase().includes(q) ||
             profile.email?.toLowerCase().includes(q) ||
-            profile.jobTitle?.toLowerCase().includes(q) ||
             false;
         if (!matchesText) return false;
     }
 
-    if (filters.area && profile.area !== filters.area) return false;
-    if (filters.groupName && profile.groupName !== filters.groupName) return false;
-    if (filters.status && profile.status !== filters.status) return false;
-    if (filters.allocationStatus && profile.allocationStatus !== filters.allocationStatus) return false;
+    if (filters.statusRecurso && deriveStatusRecurso(profile) !== filters.statusRecurso) return false;
     if (filters.registrationStatus && profile.registrationStatus !== filters.registrationStatus) return false;
-    if (filters.nivel && profileNivel(profile) !== filters.nivel) return false;
+
+    if (filters.projectManagerName.trim()) {
+        const q = filters.projectManagerName.trim().toLowerCase();
+        if (!profile.projectManagerName?.toLowerCase().includes(q)) return false;
+    }
+
+    if (filters.allocationProjectId && profile.allocationProjectId !== filters.allocationProjectId) {
+        return false;
+    }
+
+    if (!matchesBooleanFilter(profile.billable, filters.billable)) return false;
+    if (!matchesBooleanFilter(profile.portoOnboarding, filters.portoOnboarding)) return false;
+
+    if (filters.projectEntryDateFrom) {
+        if (!profile.projectEntryDate || profile.projectEntryDate < filters.projectEntryDateFrom) {
+            return false;
+        }
+    }
+
+    if (filters.projectEntryDateTo) {
+        if (!profile.projectEntryDate || profile.projectEntryDate > filters.projectEntryDateTo) {
+            return false;
+        }
+    }
 
     return true;
 }
@@ -34,12 +75,14 @@ function matchesProfileFilters(profile: UserProfile, filters: ProfileListFilters
 export function hasProfileFilters(filters: ProfileListFilters): boolean {
     return Boolean(
         filters.nome.trim() ||
-        filters.area ||
-        filters.groupName ||
-        filters.status ||
-        filters.allocationStatus ||
+        filters.statusRecurso ||
         filters.registrationStatus ||
-        filters.nivel,
+        filters.projectManagerName.trim() ||
+        filters.allocationProjectId ||
+        filters.billable ||
+        filters.portoOnboarding ||
+        filters.projectEntryDateFrom ||
+        filters.projectEntryDateTo,
     );
 }
 
@@ -53,8 +96,14 @@ export function useRecursosList() {
 
     const catalogQuery = useQuery({
         queryKey: ["profiles-catalog", skillParam],
-        queryFn: () => profilesApi.getAllProfiles(0, 1000, skillParam || undefined),
+        queryFn: () => profilesApi.getAtivos(0, 1000, skillParam || undefined),
         placeholderData: keepPreviousData,
+        staleTime: 60_000,
+    });
+
+    const projectsQuery = useQuery({
+        queryKey: ["projects-active-filter"],
+        queryFn: () => projectsApi.getActive({ page: 0, size: 200 }),
         staleTime: 60_000,
     });
 
@@ -63,14 +112,13 @@ export function useRecursosList() {
         [catalogQuery.data?.content],
     );
 
-    const areas = useMemo(
-        () => Array.from(new Set(allProfiles.map((p) => p.area).filter((a): a is string => Boolean(a)))).sort(),
-        [allProfiles],
-    );
-
-    const groups = useMemo(
-        () => Array.from(new Set(allProfiles.map((p) => p.groupName).filter((g): g is string => Boolean(g)))).sort(),
-        [allProfiles],
+    const projects = useMemo(
+        () =>
+            (projectsQuery.data?.content ?? []).map((project) => ({
+                id: project.id,
+                name: project.name,
+            })),
+        [projectsQuery.data?.content],
     );
 
     const filteredProfiles = useMemo(() => {
@@ -126,7 +174,6 @@ export function useRecursosList() {
         isError: catalogQuery.isError,
         skillParam,
         clearSkillFilter,
-        areas,
-        groups,
+        projects,
     };
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -30,6 +30,16 @@ export default function TalentoDetalhe() {
 
   const [tab, setTab] = useState<Tab>("dados");
 
+  const showInformacoesRecurso = Boolean(
+    profile?.registrationStatus && profile.registrationStatus !== "NOT_REQUIRED",
+  );
+
+  useEffect(() => {
+    if (!showInformacoesRecurso && tab === "corporativa") {
+      setTab("dados");
+    }
+  }, [showInformacoesRecurso, tab]);
+
   if (loading || !profile) {
     return <p className="text-gray-400 text-sm">Carregando...</p>;
   }
@@ -58,14 +68,17 @@ export default function TalentoDetalhe() {
                 <ProfileTabButton active={tab === "skills"} onClick={() => setTab("skills")}>
           Skills
                 </ProfileTabButton>
-                <ProfileTabButton active={tab === "corporativa"} onClick={() => setTab("corporativa")}>
-          Identificação Corporativa
-                </ProfileTabButton>
+                {showInformacoesRecurso && (
+                    <ProfileTabButton active={tab === "corporativa"} onClick={() => setTab("corporativa")}>
+                        Informações do Recurso
+                    </ProfileTabButton>
+                )}
             </div>
 
             {tab === "dados" && (
                 <TalentoDetalheDadosTab
                     form={form}
+                    profile={profile}
                     updateField={updateField}
                     isPendente={isPendente}
                     saving={saving}
@@ -85,8 +98,10 @@ export default function TalentoDetalhe() {
                 />
             )}
 
-            {tab === "corporativa" && (
+            {tab === "corporativa" && showInformacoesRecurso && (
                 <TalentoDetalheCorporativaTab
+                    profileId={id!}
+                    profile={profile}
                     form={form}
                     updateField={updateField}
                     saving={saving}

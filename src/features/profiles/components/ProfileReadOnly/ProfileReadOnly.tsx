@@ -1,5 +1,10 @@
 import type { UserProfile } from "../../types/profile";
-import { getLevelStyle, getLevelLabel, getRegistrationStatusLabel } from "../../utils/profileUtils";
+import {
+    getLevelStyle,
+    getLevelLabel,
+    getRegistrationStatusLabel,
+    getResourceStatusLabel,
+} from "../../utils/profileUtils";
 import { NIVEL_STYLE } from "../../profile";
 import { formatCep, formatEmail, formatTelephone } from "@/utils/masks";
 
@@ -38,10 +43,20 @@ export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
 
                 <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <ReadField
+                        label="Status do Recurso"
+                        value={getResourceStatusLabel(profile.resourceStatus)}
+                    />
+                    <ReadField
                         label="Status da matrícula"
                         value={getRegistrationStatusLabel(profile.registrationStatus)}
                     />
-                    {profile.registrationNumber && <ReadField label="Matrícula" value={profile.registrationNumber} />}
+                    {(Boolean(profile.registrationNumber?.trim()) ||
+                        (profile.registrationStatus && profile.registrationStatus !== "NOT_REQUIRED")) && (
+                        <ReadField
+                            label="Nº da Matrícula"
+                            value={profile.registrationNumber?.trim() || "—"}
+                        />
+                    )}
                     {profile.area && <ReadField label="Área" value={profile.area} />}
                     {profile.experienceYears != null && (
                         <ReadField
@@ -118,9 +133,8 @@ export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
     );
 }
 
-// Subcomponente utilitário usado apenas na view
 function ReadField({ label, value }: { label: string; value?: string | null }) {
-    if (!value) return null;
+    if (value == null || value === "") return null;
     return (
         <div>
             <p className="text-xs text-gray-400 mb-0.5">{label}</p>

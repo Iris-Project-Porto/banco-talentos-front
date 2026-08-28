@@ -23,6 +23,15 @@ export const profilesApi = {
     updateProfile: (id: string, data: unknown) => http.patch(`/v1/admin/profiles/${id}`, data).then((r) => r.data),
     getDashboard: () => http.get("v1/admin/dashboard").then((r) => r.data),
 
+    listEquipments: (profileId: string) =>
+        http.get(`/v1/admin/profiles/${profileId}/equipments`).then((r) => r.data),
+    createEquipment: (profileId: string, data: unknown) =>
+        http.post(`/v1/admin/profiles/${profileId}/equipments`, data).then((r) => r.data),
+    updateEquipment: (profileId: string, equipmentId: string, data: unknown) =>
+        http.put(`/v1/admin/profiles/${profileId}/equipments/${equipmentId}`, data).then((r) => r.data),
+    deleteEquipment: (profileId: string, equipmentId: string) =>
+        http.delete(`/v1/admin/profiles/${profileId}/equipments/${equipmentId}`).then((r) => r.data),
+
     getPendingUsers: (page = 0, size = 20) => http.get(`/v1/admin/users/pending?page=${page}&size=${size}`).then((r) => r.data),
     approveUser: (id: string) => http.post(`/v1/admin/users/${id}/approve`).then((r) => r.data),
     rejectUser: (id: string) => http.post(`/v1/admin/users/${id}/reject`).then((r) => r.data),

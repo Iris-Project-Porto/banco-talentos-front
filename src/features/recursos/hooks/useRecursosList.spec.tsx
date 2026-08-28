@@ -2,8 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { useRecursosList, hasProfileFilters } from "./useRecursosList";
+import { useRecursosList, hasProfileFilters, deriveStatusRecurso } from "./useRecursosList";
 import { profilesApi } from "@/features/profiles";
+import { projectsApi } from "@/features/projects/api/projects.api";
 import { EMPTY_PROFILE_FILTERS } from "../types/profileFilters";
 
 vi.mock("@/features/profiles", async () => {
@@ -11,10 +12,16 @@ vi.mock("@/features/profiles", async () => {
     return {
         ...actual,
         profilesApi: {
-            getAllProfiles: vi.fn(),
+            getAtivos: vi.fn(),
         },
     };
 });
+
+vi.mock("@/features/projects/api/projects.api", () => ({
+    projectsApi: {
+        getActive: vi.fn(),
+    },
+}));
 
 const wrapperFactory = (initialEntries = ["/admin/talentos"]) => {
     const queryClient = new QueryClient({
@@ -33,48 +40,61 @@ describe("Hook useRecursosList", () => {
             id: "1",
             name: "Carlos Ramos",
             email: "carlos@vilt-group.com",
-            area: "Backend",
-            groupName: "Delivery",
             status: "ACTIVE",
-            allocationStatus: "Disponível (Bench)",
-            registrationStatus: "APPROVED",
-            level: "Pleno",
+            resourceStatus: "AVAILABLE",
+            registrationStatus: "NOT_REQUIRED",
+            projectManagerName: "Maria Silva",
+            allocationProjectId: undefined,
+            billable: true,
+            portoOnboarding: false,
+            projectEntryDate: "2025-07-10",
         },
         {
             id: "2",
             name: "Ana Costa",
             email: "ana@vilt-group.com",
-            area: "Frontend",
-            groupName: "Platform",
-            status: "PENDING",
-            allocationStatus: "Disponível (Bench)",
-            registrationStatus: "AWAITING_APPROVAL",
-            level: "Jr",
+            status: "ACTIVE",
+            resourceStatus: "WAITING",
+            registrationStatus: "REQUESTED_VIA_TICKET",
+            projectManagerName: "João Pedro",
+            allocationProjectId: undefined,
+            billable: false,
+            portoOnboarding: true,
+            projectEntryDate: "2025-08-01",
         },
         {
             id: "3",
             name: "Rui Santos",
             email: "rui@vilt-group.com",
-            area: "DevOps",
-            groupName: "Delivery",
             status: "ACTIVE",
-            allocationStatus: "Alocado Integral (100%)",
-            registrationStatus: "APPROVED",
-            levelOverride: "Sr",
-            level: "Pleno",
+            resourceStatus: "ALLOCATED",
+            registrationStatus: "RELEASED",
+            projectManagerName: "Maria Silva",
+            allocationProjectId: "p2",
+            billable: true,
+            portoOnboarding: true,
+            projectEntryDate: "2025-06-15",
         },
     ];
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(profilesApi.getAllProfiles).mockResolvedValue({
+        vi.mocked(profilesApi.getAtivos).mockResolvedValue({
             content: mockProfiles,
             totalPages: 1,
             totalElements: 3,
         } as never);
+        vi.mocked(projectsApi.getActive).mockResolvedValue({
+            content: [
+                { id: "p1", name: "Plataforma Digital" },
+                { id: "p2", name: "Portal Cliente" },
+            ],
+            totalPages: 1,
+            totalElements: 2,
+        } as never);
     });
 
-    it("deve carregar os perfis da API e montar áreas e grupos", async () => {
+    it("deve carregar os perfis da API e montar projetos", async () => {
         const { result } = renderHook(() => useRecursosList(), { wrapper: wrapperFactory() });
 
         expect(result.current.isLoading).toBe(true);
@@ -84,9 +104,13 @@ describe("Hook useRecursosList", () => {
         });
 
         expect(result.current.profiles).toHaveLength(3);
-        expect(result.current.areas).toEqual(["Backend", "DevOps", "Frontend"]);
-        expect(result.current.groups).toEqual(["Delivery", "Platform"]);
-        expect(profilesApi.getAllProfiles).toHaveBeenCalledWith(0, 1000, undefined);
+        await waitFor(() => {
+            expect(result.current.projects).toEqual([
+                { id: "p1", name: "Plataforma Digital" },
+                { id: "p2", name: "Portal Cliente" },
+            ]);
+        });
+        expect(profilesApi.getAtivos).toHaveBeenCalledWith(0, 1000, undefined);
     });
 
     it("deve aplicar filtro por nome somente após applyFilters", async () => {
@@ -107,15 +131,13 @@ describe("Hook useRecursosList", () => {
         expect(result.current.totalElements).toBe(1);
     });
 
-    it("deve filtrar por área e nível override", async () => {
+    it("deve filtrar por status do recurso e billable", async () => {
         const { result } = renderHook(() => useRecursosList(), { wrapper: wrapperFactory() });
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-            result.current.setFilter("area", "DevOps");
-        });
-        act(() => {
-            result.current.setFilter("nivel", "Sr");
+            result.current.setFilter("statusRecurso", "ALLOCATED");
+            result.current.setFilter("billable", "true");
         });
         act(() => {
             result.current.applyFilters();
@@ -130,7 +152,7 @@ describe("Hook useRecursosList", () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-            result.current.setFilter("status", "PENDING");
+            result.current.setFilter("statusRecurso", "WAITING");
         });
         act(() => {
             result.current.applyFilters();
@@ -153,7 +175,24 @@ describe("Hook useRecursosList", () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         expect(result.current.skillParam).toBe("React");
-        expect(profilesApi.getAllProfiles).toHaveBeenCalledWith(0, 1000, "React");
+        expect(profilesApi.getAtivos).toHaveBeenCalledWith(0, 1000, "React");
+    });
+});
+
+describe("deriveStatusRecurso", () => {
+    it("deve preferir resourceStatus persistido", () => {
+        expect(deriveStatusRecurso({ id: "1", status: "ACTIVE", resourceStatus: "WAITING" })).toBe("WAITING");
+        expect(deriveStatusRecurso({ id: "2", status: "ACTIVE", resourceStatus: "ALLOCATED" })).toBe("ALLOCATED");
+    });
+
+    it("deve derivar da matrícula quando resourceStatus estiver ausente (RN003)", () => {
+        expect(deriveStatusRecurso({ id: "1", status: "ACTIVE", registrationStatus: "NOT_REQUIRED" })).toBe(
+            "AVAILABLE",
+        );
+        expect(deriveStatusRecurso({ id: "2", status: "ACTIVE", registrationStatus: "REQUESTED_VIA_TICKET" })).toBe(
+            "WAITING",
+        );
+        expect(deriveStatusRecurso({ id: "3", status: "ACTIVE", registrationStatus: "RELEASED" })).toBe("ALLOCATED");
     });
 });
 
@@ -163,7 +202,7 @@ describe("hasProfileFilters", () => {
     });
 
     it("deve retornar true quando houver algum filtro preenchido", () => {
-        expect(hasProfileFilters({ ...EMPTY_PROFILE_FILTERS, area: "Frontend" })).toBe(true);
+        expect(hasProfileFilters({ ...EMPTY_PROFILE_FILTERS, statusRecurso: "WAITING" })).toBe(true);
         expect(hasProfileFilters({ ...EMPTY_PROFILE_FILTERS, nome: "  Ana  " })).toBe(true);
     });
 });

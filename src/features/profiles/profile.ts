@@ -41,9 +41,38 @@ export const EXPERIENCE_OPTIONS = [
 ];
 
 export const REGISTRATION_STATUS_OPTIONS = [
-    { value: "NOT_REQUESTED", label: "NÃO SOLICITADO" },
-    { value: "REQUESTED", label: "SOLICITADO" },
-    { value: "AWAITING_APPROVAL", label: "AGUARDANDO APROVAÇÃO" },
-    { value: "APPROVED", label: "APROVADO" },
-    { value: "REJECTED", label: "RECUSADO" },
+    { value: "NOT_REQUIRED", label: "Não Necessário" },
+    { value: "REQUESTED_VIA_TICKET", label: "Solicitado via chamado" },
+    { value: "TICKET_AWAITING_APPROVAL", label: "Chamado aguardando aprovação" },
+    { value: "TICKET_AWAITING_SERVICE", label: "Chamado aguardando atendimento" },
+    { value: "RELEASED", label: "Liberada" },
 ];
+
+export const RESOURCE_STATUS_LABELS: Record<string, string> = {
+    AVAILABLE: "Disponível",
+    WAITING: "Aguardando",
+    ALLOCATED: "Alocado",
+};
+
+export const TECHNICAL_PROPOSAL_STATUS_OPTIONS = [
+    { value: "PENDING_SEND", label: "Pendente de envio" },
+    { value: "SENT_TO_COORDINATOR", label: "Enviado ao coordenador Porto" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Cobrar retorno" },
+    { value: "SIGNED", label: "Assinado" },
+    { value: "SIGNATURE_ERROR", label: "Erro de assinatura" },
+];
+
+export const EQUIPMENT_STATUS_OPTIONS = [
+    { value: "EMPTY", label: "Vazio" },
+    { value: "REQUEST_IN_PROGRESS", label: "Em processo de solicitação" },
+    { value: "REQUESTED", label: "Solicitado" },
+    { value: "WITHDRAWN", label: "Retirado" },
+    { value: "SENT_TO_RESOURCE", label: "Envio para o recurso" },
+    { value: "IN_USE", label: "Em Uso" },
+    { value: "RETURNED", label: "Devolvido" },
+    { value: "INACTIVE", label: "Inativo" },
+];
+
+export const EQUIPMENT_STATUS_LABELS: Record<string, string> = Object.fromEntries(
+    EQUIPMENT_STATUS_OPTIONS.map((o) => [o.value, o.label])
+);
