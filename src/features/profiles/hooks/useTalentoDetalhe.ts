@@ -144,7 +144,6 @@ export function useTalentoDetalhe(id: string | undefined) {
         mutationFn: async ({
             id,
             payload,
-            activate,
         }: {
             id: string;
             payload: any;
