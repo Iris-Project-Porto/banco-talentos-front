@@ -1,3 +1,5 @@
+import type { EquipmentStatus } from "./types/profile";
+
 export const NIVEL_OPTIONS = [
     { value: "Jr", label: "Jr" },
     { value: "Pleno", label: "Pleno" },
@@ -62,7 +64,7 @@ export const TECHNICAL_PROPOSAL_STATUS_OPTIONS = [
     { value: "SIGNATURE_ERROR", label: "Erro de assinatura" },
 ];
 
-export const EQUIPMENT_STATUS_OPTIONS = [
+export const EQUIPMENT_STATUS_OPTIONS: { value: EquipmentStatus; label: string }[] = [
     { value: "EMPTY", label: "Vazio" },
     { value: "REQUEST_IN_PROGRESS", label: "Em processo de solicitação" },
     { value: "REQUESTED", label: "Solicitado" },
@@ -73,6 +75,6 @@ export const EQUIPMENT_STATUS_OPTIONS = [
     { value: "INACTIVE", label: "Inativo" },
 ];
 
-export const EQUIPMENT_STATUS_LABELS: Record<string, string> = Object.fromEntries(
+export const EQUIPMENT_STATUS_LABELS: Record<EquipmentStatus, string> = Object.fromEntries(
     EQUIPMENT_STATUS_OPTIONS.map((o) => [o.value, o.label])
-);
+) as Record<EquipmentStatus, string>;

@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Button, Input, Select, Badge } from "@/components/ui";
 import { Table } from "@/components/ui/Table/Table";
 import { EQUIPMENT_STATUS_LABELS, EQUIPMENT_STATUS_OPTIONS } from "../../profile";
-import type { ResourceEquipment } from "../../types/profile";
+import type { EquipmentStatus, ResourceEquipment } from "../../types/profile";
 import { profilesApi } from "../../api/profiles.api";
 import { YesNoRadio } from "./YesNoRadio";
 
@@ -14,7 +14,7 @@ const emptyEquipmentForm = {
     assetNumber: "",
     brandOs: "",
     processor: "",
-    status: "EMPTY",
+    status: "EMPTY" as EquipmentStatus,
     notes: "",
 };
 
@@ -171,13 +171,14 @@ export function ClientMachinesSection({ profileId, hasClientMachine, onHasClient
                             <Select
                                 label="Status da Máquina"
                                 value={equipmentForm.status}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                    const status = e.target.value as EquipmentStatus;
                                     setEquipmentForm((p) => ({
                                         ...p,
-                                        status: e.target.value,
-                                        notes: e.target.value === "INACTIVE" ? p.notes : "",
-                                    }))
-                                }
+                                        status,
+                                        notes: status === "INACTIVE" ? p.notes : "",
+                                    }));
+                                }}
                                 options={EQUIPMENT_STATUS_OPTIONS}
                             />
                             {equipmentForm.status === "INACTIVE" && (

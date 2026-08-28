@@ -9,6 +9,16 @@ export interface ProfileSkill {
     };
 }
 
+export type EquipmentStatus =
+    | "EMPTY"
+    | "REQUEST_IN_PROGRESS"
+    | "REQUESTED"
+    | "WITHDRAWN"
+    | "SENT_TO_RESOURCE"
+    | "IN_USE"
+    | "RETURNED"
+    | "INACTIVE";
+
 export interface ResourceEquipment {
     id: string;
     tag?: string;
@@ -16,7 +26,7 @@ export interface ResourceEquipment {
     assetNumber?: string;
     brandOs?: string;
     processor?: string;
-    status: string;
+    status: EquipmentStatus;
     notes?: string;
     createdAt?: string;
     updatedAt?: string;
