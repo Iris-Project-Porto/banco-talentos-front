@@ -26,7 +26,7 @@ const ErrorMsg = ({ msg }: { msg?: string }) =>
 
 interface Props {
     initial: Partial<SkillPayload> & { id?: string };
-    existingSkills?: Pick<Skill, "id" | "name">[];
+    existingSkills?: Pick<Skill, "id" | "name" | "active"> [];
     saving: boolean;
     onSave: (data: SkillPayload & { id?: string }) => void;
     onClose: () => void;
