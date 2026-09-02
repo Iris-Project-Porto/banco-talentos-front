@@ -60,7 +60,7 @@ describe('Componente SkillFormModal', () => {
         render(
             <SkillFormModal
                 initial={{}}
-                existingSkills={[{ id: '1', name: 'React' }]}
+                existingSkills={[{ id: '1', name: 'React', active: true}]}
                 saving={false}
                 onSave={vi.fn()}
                 onClose={vi.fn()}
