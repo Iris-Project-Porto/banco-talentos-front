@@ -30,6 +30,7 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
             description: initial.description || "",
             portoCoordinator: initial.portoCoordinator || "",
             projectManager: initial.projectManager || "",
+            status: initial.active === false ? "INACTIVE" : "ACTIVE",
             recursos: initial.recursos || [],
         },
     });
@@ -47,7 +48,7 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
     );
 
     function onSubmit(data: SquadFormData) {
-        const payload: SquadPayload & { id?: string; active?: boolean; initialActive?: boolean } = {
+        const payload: SquadPayload & { id?: string; active?: boolean; initialActive?: boolean; } = {
             name: data.name,
             description: data.description,
             portoCoordinator: data.portoCoordinator,
@@ -57,7 +58,7 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
 
         if (isEdit) {
             payload.id = initial.id;
-            payload.active = initial.active ?? true;
+            payload.active = data.status === "ACTIVE";
             payload.initialActive = initial.active ?? true;
         }
 
@@ -108,7 +109,7 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
                 <FormProvider {...methods}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col">
                         <div className={activeTab === "general" ? "block" : "hidden"}>
-                            <GeneralDataTab />
+                            <GeneralDataTab isEdit={isEdit} />
                         </div>
                         <div className={activeTab === "resources" ? "block" : "hidden"}>
                             <SquadResourcesTab />

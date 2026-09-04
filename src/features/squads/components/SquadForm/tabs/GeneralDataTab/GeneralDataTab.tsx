@@ -1,8 +1,17 @@
 import { useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui";
+import {Input, Select} from "@/components/ui";
 import type { SquadFormData } from "../../../../validations/validations";
 
-export function GeneralDataTab() {
+const STATUS_OPTIONS = [
+    { value: "ACTIVE", label: "Ativo" },
+    { value: "INACTIVE", label: "Inativo" },
+];
+
+interface Props {
+    isEdit: boolean;
+}
+
+export function GeneralDataTab({ isEdit }: Props) {
     const {
         register,
         formState: { errors },
@@ -18,6 +27,13 @@ export function GeneralDataTab() {
                     error={errors.name?.message}
                 />
 
+                {isEdit && (
+                    <Select
+                        label="Status"
+                        options={STATUS_OPTIONS}
+                        {...register("status")}
+                    />
+                )}
                 <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium text-slate-700">Descrição</label>
                     <textarea
