@@ -75,7 +75,7 @@ export function ProjectDataSection({ form, updateField }: Props) {
                     onChange={(v) => updateField("portoOnboarding", v)}
                 />
                 <Input
-                    label="Gerente do Projeto *"
+                    label="Gerente de Projeto *"
                     value={form.projectManagerName}
                     onChange={(e) => updateField("projectManagerName", e.target.value)}
                     placeholder="Nome do gerente"

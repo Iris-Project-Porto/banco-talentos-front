@@ -44,13 +44,13 @@ describe('Componente VagaForm', () => {
 
     it('deve renderizar o cabeçalho de Nova Vaga quando não houver ID inicial', () => {
         renderWithClient(<VagaForm initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
-        expect(screen.getByText('Nova vaga')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Criar vaga' })).toBeInTheDocument();
+        expect(screen.getByText('Cadastrar Vaga')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Salvar' })).toBeInTheDocument();
     });
 
     it('deve renderizar o cabeçalho de Editar Vaga quando um ID inicial for fornecido', () => {
         renderWithClient(<VagaForm initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
-        expect(screen.getByText('Editar vaga')).toBeInTheDocument();
+        expect(screen.getByText('Editar Vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
     });
 
@@ -113,7 +113,7 @@ describe('Componente VagaForm', () => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
-        const submitButton = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitButton = screen.getByRole('button', { name: 'Salvar' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -172,7 +172,7 @@ describe('Componente VagaForm', () => {
             fireEvent.change(dateInput, { target: { value: '2026-07-01' } });
         }
 
-        const submitButton = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitButton = screen.getByRole('button', { name: 'Salvar' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -213,7 +213,7 @@ describe('Componente VagaForm', () => {
         renderWithClient(<VagaForm initial={{}} saving={true} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         const cancelBtn = screen.getByRole('button', { name: /cancelar/i });
-        const submitBtn = screen.getByRole('button', { name: 'Criar vaga' });
+        const submitBtn = screen.getByRole('button', { name: 'Salvar' });
 
         expect(cancelBtn).toBeDisabled();
         expect(submitBtn).toBeDisabled();

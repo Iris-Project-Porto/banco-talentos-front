@@ -32,6 +32,21 @@ describe('Componente ConfirmModal', () => {
         expect(handleClose).toHaveBeenCalled();
     });
 
+    it('deve invocar onClose ao clicar no botão de fechar', () => {
+        const handleClose = vi.fn();
+        render(
+            <ConfirmModal
+                title="Excluir skill"
+                message="Deseja realmente excluir este item?"
+                onConfirm={vi.fn()}
+                onClose={handleClose}
+            />
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+        expect(handleClose).toHaveBeenCalled();
+    });
+
     it('deve invocar onConfirm ao clicar no botão de confirmação', () => {
         const handleConfirm = vi.fn();
         render(

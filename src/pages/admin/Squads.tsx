@@ -102,7 +102,7 @@ export default function Squads() {
                                     </td>
                                     <td className="py-4 px-4">
                                         <div className="flex flex-col gap-0.5">
-                                            <span className="font-medium text-slate-800 text-xs" title="Project Manager">PM: {squad.projectManager}</span>
+                                            <span className="font-medium text-slate-800 text-xs" title="Gerente de Projeto">GP: {squad.projectManager}</span>
                                             <span className="text-slate-500 text-xs" title="Coordenador Porto">Coord: {squad.portoCoordinator}</span>
                                         </div>
                                     </td>

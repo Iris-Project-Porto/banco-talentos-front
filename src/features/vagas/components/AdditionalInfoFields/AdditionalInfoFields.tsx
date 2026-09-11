@@ -7,10 +7,10 @@ export function AdditionalInfoFields({ canEdit }: { canEdit: boolean }) {
 
     return (
         <fieldset disabled={!canEdit} className="flex flex-col gap-4">
-            <Field label="Descrição da Vaga">
+            <Field label="Descrição da Vaga (Opcional)">
                 <textarea className={`${INPUT_CLS} min-h-[80px] resize-y`} placeholder="Conteúdo principal..." {...register("description")} />
             </Field>
-            <Field label="Anotações Internas (Exclusivo RH)">
+            <Field label="Anotações Internas (Exclusivo RH) (Opcional)">
                 <textarea className={`${INPUT_CLS} min-h-[60px] resize-y`} placeholder="Notas de alinhamento..." {...register("notes")} />
             </Field>
         </fieldset>

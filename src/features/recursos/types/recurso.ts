@@ -8,7 +8,7 @@ export type StatusMatricula =
   | "RELEASED";
 
 export type StatusMaquina =
-  | "EMPTY"
+  // | "EMPTY"
   | "REQUEST_IN_PROGRESS"
   | "REQUESTED"
   | "WITHDRAWN"
@@ -107,7 +107,7 @@ export const STATUS_MATRICULA_LABELS: Record<StatusMatricula, string> = {
 };
 
 export const STATUS_MAQUINA_LABELS: Record<StatusMaquina, string> = {
-  EMPTY: "Vazio",
+  // EMPTY: "Vazio",
   REQUEST_IN_PROGRESS: "Em processo de solicitação",
   REQUESTED: "Solicitado",
   WITHDRAWN: "Retirado",

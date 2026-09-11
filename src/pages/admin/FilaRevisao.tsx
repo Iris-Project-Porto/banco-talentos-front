@@ -55,7 +55,7 @@ export default function FilaRevisao() {
                   <span className="text-xs text-slate-400">
                     {p.createdAt ? new Date(p.createdAt).toLocaleDateString("pt-BR") : ""}
                   </span>
-                  <Badge variant="pending">Aguardando revisão →</Badge>
+                  <Badge variant="pending">Revisar →</Badge>
                 </div>
               </div>
 

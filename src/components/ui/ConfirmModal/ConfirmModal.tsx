@@ -23,8 +23,17 @@ export function ConfirmModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
             <div className="relative bg-white rounded-2xl shadow-login w-full max-w-md">
-                <div className="px-7 py-5 border-b border-slate-200">
+                <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200">
                     <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={loading}
+                        aria-label="Fechar"
+                        className="text-slate-400 hover:text-slate-600 text-xl leading-none disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                        &times;
+                    </button>
                 </div>
                 <div className="px-7 py-6">
                     <p className="text-sm text-slate-600">{message}</p>

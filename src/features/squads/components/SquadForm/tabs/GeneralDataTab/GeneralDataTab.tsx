@@ -56,8 +56,8 @@ export function GeneralDataTab({ isEdit }: Props) {
                     />
 
                     <Input
-                        label="Project Manager"
-                        placeholder="Nome do PM"
+                        label="Gerente de Projeto"
+                        placeholder="Nome do Gerente de Projeto"
                         {...register("projectManager")}
                         error={errors.projectManager?.message}
                     />

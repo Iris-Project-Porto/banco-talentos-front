@@ -90,7 +90,7 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
                             onClick={handleSubmit(onSubmit)}
                             disabled={!canSave || saving}
                         >
-                            Salvar
+                            {isEdit ? "Salvar alterações" : "Salvar"}
                         </Button>
                     </>
                 }

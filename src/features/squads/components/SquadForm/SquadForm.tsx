@@ -98,7 +98,7 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
                         onClick={handleSubmit(onSubmit)}
                         disabled={!canSave || saving}
                     >
-                        Salvar
+                        {isEdit ? "Salvar alterações" : "Salvar"}
                     </Button>
                 </div>
             </header>

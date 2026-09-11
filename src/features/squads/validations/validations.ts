@@ -4,7 +4,7 @@ export const squadSchema = z.object({
     name: z.string({ required_error: "O nome da squad é obrigatório" }).min(1, "O nome da squad é obrigatório"),
     description: z.string({ required_error: "A descrição é obrigatória" }).min(1, "A descrição é obrigatória"),
     portoCoordinator: z.string({ required_error: "Coordenador Porto é obrigatório" }).min(1, "Coordenador Porto é obrigatório"),
-    projectManager: z.string({ required_error: "Project Manager é obrigatório" }).min(1, "Project Manager é obrigatório"),
+    projectManager: z.string({ required_error: "Gerente de Projeto é obrigatório" }).min(1, "Gerente de Projeto é obrigatório"),
     status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
     recursos: z.array(
         z.object({

@@ -38,14 +38,14 @@ export default function Login() {
 
   return (
     <AuthLayout
-      footer={
-        <p className="text-xs text-slate-400">
-          Não tem conta?{" "}
-          <Link to="/register" className="text-pink font-medium hover:underline">
-            Cadastrar-se
-          </Link>
-        </p>
-      }
+      // footer={
+      //   <p className="text-xs text-slate-400">
+      //     Não tem conta?{" "}
+      //     <Link to="/register" className="text-pink font-medium hover:underline">
+      //       Cadastrar-se
+      //     </Link>
+      //   </p>
+      // }
     >
       <h1 className="text-lg font-bold text-slate-900 mb-1">Acesso interno</h1>
       <p className="text-sm text-slate-400 mb-7">Entre com suas credenciais corporativas</p>

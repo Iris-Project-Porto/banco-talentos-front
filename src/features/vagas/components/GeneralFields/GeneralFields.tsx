@@ -138,7 +138,7 @@ export function GeneralFields({ canEdit, dependencies }: Props) {
                     {...register("recruiter")}
                 />
                 <Input
-                    label="Semanas de Alocação Estimadas *"
+                    label="Semanas de Alocação Estimadas (Opcional)"
                     type="number"
                     error={errors.estimatedAllocationWeeks?.message}
                     {...register("estimatedAllocationWeeks")}

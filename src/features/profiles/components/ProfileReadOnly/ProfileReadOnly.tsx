@@ -82,7 +82,6 @@ export function ProfileReadOnly({ profile }: { profile: UserProfile }) {
                             <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-pink-600 hover:underline">{profile.githubUrl}</a>
                         </div>
                     )}
-                    {profile.contact && <ReadField label="Contato" value={profile.contact} />}
                     {profile.contactEmail && (
                         <ReadField label="E-mail de contato" value={formatEmail(profile.contactEmail)} />
                     )}

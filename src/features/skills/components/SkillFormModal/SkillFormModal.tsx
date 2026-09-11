@@ -79,7 +79,7 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
             <div className="relative bg-white rounded-2xl shadow-login w-full max-w-md max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between px-7 py-5 border-b border-slate-200">
                     <h2 className="text-lg font-bold text-slate-900">
-                        {isEdit ? "Editar skill" : "Nova skill"}
+                        {isEdit ? "Editar Skill" : "Cadastrar Skill"}
                     </h2>
                     <button
                         type="button"
@@ -140,7 +140,7 @@ export function SkillFormModal({ initial, existingSkills = [], saving, onSave, o
                         loading={saving}
                         onClick={handleSubmit(onSubmit)}
                     >
-                        {isEdit ? "Salvar alterações" : "Criar skill"}
+                        {isEdit ? "Salvar alterações" : "Salvar"}
                     </Button>
                 </div>
             </div>
