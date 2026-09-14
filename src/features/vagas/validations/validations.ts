@@ -5,7 +5,7 @@ export const jobSkillSchema = z.object({
     type: z.enum(["MANDATORY", "DESIRABLE"]),
     minLevel: z.enum(["BASIC", "INTERMEDIATE", "ADVANCED", "SPECIALIST"]),
     importanceWeight: z.coerce.number().int('O peso da skill deve ser um número inteiro').min(1, 'O peso da skill deve ser maior que 0').max(100, 'O peso da skill deve ser menor que 100'),
-    description: z.string().max(225, "A descrição da skill deve ter no máximo 225 caracteres").optional(),
+    description: z.string().max(255, "A descrição da skill deve ter no máximo 255 caracteres").optional(),
 });
 
 export const vagaSchema = z.object({

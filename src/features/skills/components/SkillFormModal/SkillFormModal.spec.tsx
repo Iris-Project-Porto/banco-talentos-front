@@ -6,8 +6,8 @@ import { SkillFormModal } from './SkillFormModal';
 describe('Componente SkillFormModal', () => {
     it('deve renderizar o cabeçalho de Nova skill quando não houver ID inicial', () => {
         render(<SkillFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
-        expect(screen.getByText('Nova skill')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Criar skill' })).toBeInTheDocument();
+        expect(screen.getByText('Cadastrar Skill')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Salvar' })).toBeInTheDocument();
     });
 
     it('deve renderizar os campos do formulário com labels', () => {
@@ -34,7 +34,7 @@ describe('Componente SkillFormModal', () => {
                 onClose={vi.fn()}
             />
         );
-        expect(screen.getByText('Editar skill')).toBeInTheDocument();
+        expect(screen.getByText('Editar Skill')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
     });
 
@@ -49,7 +49,7 @@ describe('Componente SkillFormModal', () => {
     it('deve exibir erros de validação ao submeter formulário vazio', async () => {
         render(<SkillFormModal initial={{}} saving={false} onSave={vi.fn()} onClose={vi.fn()} />);
 
-        await userEvent.click(screen.getByRole('button', { name: 'Criar skill' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
 
         expect(screen.getByText('Nome da skill é obrigatório')).toBeInTheDocument();
         expect(screen.getByText('Tipo é obrigatório')).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('Componente SkillFormModal', () => {
         await userEvent.type(nameInput, 'React');
         await userEvent.selectOptions(selects[0], 'HARD');
         await userEvent.selectOptions(selects[1], 'FRONTEND');
-        await userEvent.click(screen.getByRole('button', { name: 'Criar skill' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
 
         expect(screen.getByText('Já existe uma skill com este nome')).toBeInTheDocument();
     });
@@ -88,7 +88,7 @@ describe('Componente SkillFormModal', () => {
         await userEvent.type(nameInput, 'React');
         await userEvent.selectOptions(selects[0], 'HARD');
         await userEvent.selectOptions(selects[1], 'FRONTEND');
-        await userEvent.click(screen.getByRole('button', { name: 'Criar skill' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
 
         expect(handleSave).toHaveBeenCalledWith({
             name: 'React',
@@ -109,7 +109,7 @@ describe('Componente SkillFormModal', () => {
     it('deve desabilitar o botão de salvar durante o envio', () => {
         render(<SkillFormModal initial={{}} saving={true} onSave={vi.fn()} onClose={vi.fn()} />);
 
-        expect(screen.getByRole('button', { name: 'Criar skill' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
     });
 
     it('deve preencher os campos ao editar uma skill', () => {

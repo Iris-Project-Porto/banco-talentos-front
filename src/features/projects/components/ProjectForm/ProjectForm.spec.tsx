@@ -35,6 +35,7 @@ describe("Componente ProjectForm", () => {
 
         expect(screen.getByText("Editar Projeto")).toBeInTheDocument();
         expect(screen.getByText("STATUS")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Salvar alterações" })).toBeInTheDocument();
     });
 
     it("deve invocar onCancel ao clicar em voltar", async () => {
@@ -129,7 +130,7 @@ describe("Componente ProjectForm", () => {
         );
 
         await userEvent.selectOptions(screen.getByRole("combobox"), "ACTIVE");
-        await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
+        await userEvent.click(screen.getByRole("button", { name: "Salvar alterações" }));
 
         expect(handleSave).toHaveBeenCalledWith({
             name: "Legado",

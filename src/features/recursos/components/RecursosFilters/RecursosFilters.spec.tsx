@@ -22,7 +22,7 @@ describe("Componente RecursosFilters", () => {
         expect(screen.getByText("Nome ou E-mail")).toBeInTheDocument();
         expect(screen.getByText("Status do Recurso")).toBeInTheDocument();
         expect(screen.getByText("Status da Matrícula")).toBeInTheDocument();
-        expect(screen.getByText("Gerente do Projeto")).toBeInTheDocument();
+        expect(screen.getByText("Gerente de Projeto")).toBeInTheDocument();
         expect(screen.getByText("Projeto")).toBeInTheDocument();
         expect(screen.getByText("Billable")).toBeInTheDocument();
         expect(screen.getByText("Onboarding Porto realizado?")).toBeInTheDocument();

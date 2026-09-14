@@ -71,11 +71,11 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
             </div>
 
             <div className="grid grid-cols-12 gap-x-3 px-1 pb-3 border-b border-slate-100 text-xs font-bold text-slate-700">
-                <div className="col-span-3">Skill</div>
-                <div className="col-span-1">Tipo</div>
-                <div className="col-span-1">Peso (%)</div>
-                <div className="col-span-2">Nível Mínimo</div>
-                <div className="col-span-4">Descrição</div>
+                <div className="col-span-3">Skill *</div>
+                <div className="col-span-1">Tipo *</div>
+                <div className="col-span-1">Peso (%) *</div>
+                <div className="col-span-2">Nível Mínimo *</div>
+                <div className="col-span-4">Descrição (Opcional)</div>
                 <div className="col-span-1 text-center">Ações</div>
             </div>
 
@@ -149,7 +149,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                                         <Input
                                             type="text"
                                             placeholder="Descrição"
-                                            maxLength={225}
+                                            maxLength={255}
                                             {...field}
                                         />
                                     )}

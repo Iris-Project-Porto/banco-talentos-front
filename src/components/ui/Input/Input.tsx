@@ -9,11 +9,13 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, Props>(
-  ({ label, error, labelRight, className = "", type, ...props }, ref) => {
+  ({ label, error, labelRight, className = "", type, max, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
 
     const isPasswordType = type === "password";
+    const isDateType = type === "date";
     const inputType = isPasswordType && showPassword ? "text" : type;
+    const resolvedMax = max ?? (isDateType ? "9999-12-31" : undefined);
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -28,6 +30,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(
           <input
             ref={ref}
             type={inputType}
+            max={resolvedMax}
             className={twMerge(
               "h-10 w-full rounded-lg border bg-white px-3 font-sans text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-pink focus:shadow-focus-pink",
               error ? "border-red-400" : "border-slate-300",

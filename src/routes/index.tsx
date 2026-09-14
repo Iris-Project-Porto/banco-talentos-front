@@ -12,7 +12,6 @@ import RecursoLayout from "@/components/layouts/RecursoLayout/RecursoLayout";
 
 // Páginas Públicas
 const Login = lazy(() => import("@/pages/public/Login"));
-const Register = lazy(() => import("@/pages/public/Register"));
 const VerifyEmail = lazy(() => import("@/pages/public/VerifyEmail"));
 const ForgotPassword = lazy(() => import("@/pages/public/ForgotPassWord"));
 const ResetPassword = lazy(() => import("@/pages/public/ResetPassword"));
@@ -44,7 +43,6 @@ export const router = createBrowserRouter([
     {
         element: <PublicRoute />,
         children: [
-            { path: "/register", element: <Register /> },
             { path: "/verify", element: <VerifyEmail /> },
         ]
     },

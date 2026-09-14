@@ -14,7 +14,7 @@ const emptyEquipmentForm = {
     assetNumber: "",
     brandOs: "",
     processor: "",
-    status: "EMPTY" as EquipmentStatus,
+    status: "REQUEST_IN_PROGRESS" as EquipmentStatus,
     notes: "",
 };
 
@@ -79,7 +79,7 @@ export function ClientMachinesSection({ profileId, hasClientMachine, onHasClient
             assetNumber: equipment.assetNumber ?? "",
             brandOs: equipment.brandOs ?? "",
             processor: equipment.processor ?? "",
-            status: equipment.status ?? "EMPTY",
+            status: equipment.status ?? "REQUEST_IN_PROGRESS",
             notes: equipment.notes ?? "",
         });
         setShowEquipmentForm(true);

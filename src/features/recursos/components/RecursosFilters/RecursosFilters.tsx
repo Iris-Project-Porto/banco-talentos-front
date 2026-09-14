@@ -75,7 +75,7 @@ export function RecursosFilters({ filters, projects = [], onChange, onApply, onC
                     />
                 </div>
                 <SearchField
-                    label="Gerente do Projeto"
+                    label="Gerente de Projeto"
                     placeholder="Digitar nome do gerente"
                     value={filters.projectManagerName}
                     onChange={(value) => onChange("projectManagerName", value)}

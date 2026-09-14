@@ -30,7 +30,7 @@ export default function BancoTalentos() {
         subtitle="Consulta e cadastro de recursos na plataforma"
         actions={
           <Button variant="primary" size="md" type="button" onClick={() => setCreateModalOpen(true)}>
-            + Cadastra Recurso
+            + Novo Recurso
           </Button>
         }
       />

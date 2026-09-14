@@ -75,7 +75,7 @@ export default function Vagas() {
       <PageHeader
         title="Vagas Externas"
         subtitle="Gestão de vagas, requisições e matching"
-        actions={<Button variant="primary" size="md" onClick={openNew}>+ Nova vaga</Button>}
+        actions={<Button variant="primary" size="md" onClick={openNew}>+ Nova Vaga</Button>}
       />
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4 flex items-center gap-4 flex-wrap">
@@ -127,9 +127,10 @@ export default function Vagas() {
 
       {vagaToCancel && (
         <ConfirmModal
-          title="Cancelar vaga"
-          message={`Deseja realmente cancelar a vaga ${vagaToCancel.vacancyCode}?`}
+          title="Cancelar esta vaga?"
+          message={`Deseja realmente cancelar a vaga ${vagaToCancel.vacancyCode}? Esta ação pode ser irreversível no fluxo operacional.`}
           confirmLabel="Cancelar vaga"
+          cancelLabel="Voltar"
           loading={cancelMutation.isPending}
           onConfirm={confirmCancelJob}
           onClose={() => setVagaToCancel(null)}
