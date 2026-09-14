@@ -117,7 +117,7 @@ describe('recursosApi', () => {
 
     describe('adicionarMaquina', () => {
         it('deve chamar POST /v1/admin/resources/:id/maquinas com os dados da máquina', async () => {
-            const novaMaquina = { tagNumeroSerie: 'TAG-001', hostname: 'PC-001', statusMaquina: 'EMPTY' as const };
+            const novaMaquina = { tagNumeroSerie: 'TAG-001', hostname: 'PC-001', statusMaquina: 'REQUEST_IN_PROGRESS' as const };
             const mockMaquinaResponse = { id: 'm1', ...novaMaquina, createdAt: '2026-01-01T00:00:00Z', updatedAt: null };
             vi.mocked(http.post).mockResolvedValueOnce({ data: mockMaquinaResponse });
 

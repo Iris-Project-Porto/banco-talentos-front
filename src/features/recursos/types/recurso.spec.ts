@@ -44,8 +44,8 @@ describe('recurso type labels', () => {
             expect(STATUS_MAQUINA_LABELS['INACTIVE']).toBe('Inativo');
         });
 
-        it('deve cobrir todos os 8 status possíveis', () => {
-            expect(Object.keys(STATUS_MAQUINA_LABELS)).toHaveLength(8);
+        it('deve cobrir todos os 7 status possíveis', () => {
+            expect(Object.keys(STATUS_MAQUINA_LABELS)).toHaveLength(7);
         });
     });
 

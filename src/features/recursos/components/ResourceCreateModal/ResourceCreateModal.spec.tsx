@@ -66,7 +66,7 @@ describe("Componente ResourceCreateModal", () => {
     it("deve exibir erros de validação ao submeter formulário vazio", async () => {
         renderModal();
 
-        await userEvent.click(screen.getByRole("button", { name: "Cadastrar" }));
+        await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
 
         expect(await screen.findByText("Nome é obrigatório")).toBeInTheDocument();
         expect(screen.getByText("E-mail é obrigatório")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("Componente ResourceCreateModal", () => {
         await userEvent.type(screen.getByPlaceholderText("usuario@empresa.com"), "joao@vilt-group.com");
         await userEvent.type(screen.getByPlaceholderText("000.000.000-00"), "12345678901");
         await userEvent.selectOptions(screen.getByRole("combobox"), "group-1");
-        await userEvent.click(screen.getByRole("button", { name: "Cadastrar" }));
+        await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
 
         expect(onSave).toHaveBeenCalled();
         expect(onSave.mock.calls[0][0]).toEqual({
@@ -95,9 +95,9 @@ describe("Componente ResourceCreateModal", () => {
         });
     });
 
-    it("deve desabilitar o botão de cadastrar durante o envio", () => {
+    it("deve desabilitar o botão de salvar durante o envio", () => {
         renderModal({ saving: true });
 
-        expect(screen.getByRole("button", { name: "Cadastrar" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: "Salvar" })).toBeDisabled();
     });
 });
