@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
     loginSchema,
-    registerSchema,
     resetPasswordSchema,
     forgotPasswordSchema,
     verifyEmailSchema
 } from './validations';
-import { UserRole } from '../types/roles';
 
 describe('Auth Validations', () => {
 
@@ -22,47 +20,6 @@ describe('Auth Validations', () => {
             if (!result.success) {
                 expect(result.error.issues[0].message).toBe("E-mail inválido");
             }
-        });
-    });
-
-    describe('registerSchema', () => {
-        it('deve rejeitar e-mail que não seja corporativo', () => {
-            const result = registerSchema.safeParse({
-                name: "João",
-                email: "joao@gmail.com",
-                password: "Senha@123",
-                confirm: "Senha@123",
-                role: UserRole.ADMIN,
-                groupId: "1"
-            });
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Use seu e-mail corporativo");
-            }
-        });
-
-        it('deve rejeitar senha que não tenha caracteres especiais ou letra maiúscula', () => {
-            const result = registerSchema.safeParse({
-                name: "João",
-                email: "joao@vilt-group.com",
-                password: "password123",
-                confirm: "password123",
-                role: UserRole.ADMIN,
-                groupId: "1"
-            });
-            expect(result.success).toBe(false);
-        });
-
-        it('deve rejeitar senha sem número', () => {
-            const result = registerSchema.safeParse({
-                name: "João",
-                email: "joao@vilt-group.com",
-                password: "Senha@abc",
-                confirm: "Senha@abc",
-                role: UserRole.ADMIN,
-                groupId: "1"
-            });
-            expect(result.success).toBe(false);
         });
     });
 

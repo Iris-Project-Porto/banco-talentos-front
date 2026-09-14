@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { UserRole } from "../types/roles";
 import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX } from "./passwordRules";
 
 const strongPasswordSchema = z
@@ -17,30 +16,6 @@ export const loginSchema = z.object({
     password: z.string({ required_error: "A senha é obrigatória" })
         .min(1, "A senha é obrigatória")
 });
-
-export const registerSchema = z.object({
-    name: z.string({ required_error: "O nome é obrigatório" })
-        .min(1, "O nome é obrigatório")
-        .min(3, "O nome deve ter no mínimo 3 caracteres"),
-    email: z.string({ required_error: "O e-mail é obrigatório" })
-        .min(1, "O e-mail é obrigatório")
-        .email("Formato de e-mail inválido")
-        .endsWith("@vilt-group.com", "Use seu e-mail corporativo"),
-    password: strongPasswordSchema,
-    confirm: z.string({ required_error: "A confirmação de senha é obrigatória" })
-        .min(1, "Confirme sua senha"),
-    role: z.literal(UserRole.ADMIN, {
-        errorMap: () => ({ message: "O perfil é obrigatório" }),
-    }),
-    groupId: z.string({ required_error: "O grupo é obrigatório" })
-        .min(1, "Selecione um grupo"),
-}).refine((data) => data.password === data.confirm, {
-    message: "As senhas não coincidem",
-    path: ["confirm"],
-
-});
-
-
 
 export const resetPasswordSchema = z.object({
     email: z.string({ required_error: "O e-mail é obrigatório" })
@@ -71,7 +46,6 @@ export const verifyEmailSchema = z.object({
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
-export type RegisterFormData = z.infer<typeof registerSchema>;
 export type VerifyEmailFormData = z.infer<typeof verifyEmailSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
