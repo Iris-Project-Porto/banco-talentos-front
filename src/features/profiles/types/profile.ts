@@ -10,7 +10,6 @@ export interface ProfileSkill {
 }
 
 export type EquipmentStatus =
-    // | "EMPTY"
     | "REQUEST_IN_PROGRESS"
     | "REQUESTED"
     | "WITHDRAWN"

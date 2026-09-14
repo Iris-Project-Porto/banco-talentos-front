@@ -34,10 +34,6 @@ describe('recurso type labels', () => {
     });
 
     describe('STATUS_MAQUINA_LABELS', () => {
-        // it('deve retornar Vazio para EMPTY', () => {
-        //     expect(STATUS_MAQUINA_LABELS['EMPTY']).toBe('Vazio');
-        // });
-
         it('deve mapear os demais status de máquina corretamente', () => {
             expect(STATUS_MAQUINA_LABELS['REQUEST_IN_PROGRESS']).toBe('Em processo de solicitação');
             expect(STATUS_MAQUINA_LABELS['REQUESTED']).toBe('Solicitado');

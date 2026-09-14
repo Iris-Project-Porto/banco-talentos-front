@@ -65,7 +65,6 @@ export const TECHNICAL_PROPOSAL_STATUS_OPTIONS = [
 ];
 
 export const EQUIPMENT_STATUS_OPTIONS: { value: EquipmentStatus; label: string }[] = [
-    // { value: "EMPTY", label: "Vazio" },
     { value: "REQUEST_IN_PROGRESS", label: "Em processo de solicitação" },
     { value: "REQUESTED", label: "Solicitado" },
     { value: "WITHDRAWN", label: "Retirado" },
