@@ -58,7 +58,7 @@ export function createSkillSchema(
         if (hasDuplicate) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Já existe uma skill ativa com este nome",
+                message: "Já existe uma skill com este nome",
                 path: ["name"],
             });
         }

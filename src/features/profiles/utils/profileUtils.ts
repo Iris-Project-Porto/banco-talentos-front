@@ -30,16 +30,25 @@ export function getRegistrationStatusLabel(status?: string): string {
 
     switch (status) {
         case "REQUESTED":
-        case "REQUESTED_VIA_TICKET":
-        case "AWAITING_APPROVAL":
-        case "TICKET_AWAITING_APPROVAL":
-        case "TICKET_AWAITING_SERVICE":
             return "Em andamento";
+        case "REQUESTED_VIA_TICKET":
+            return "Solicitado via chamado";
+        case "AWAITING_APPROVAL":
+            return "Em andamento";
+        case "TICKET_AWAITING_APPROVAL":
+            return "Chamado aguardando aprovação";
+        case "TICKET_AWAITING_SERVICE":
+            return "Chamado aguardando atendimento";
         case "APPROVED":
-        case "RELEASED":
             return "Concluído";
+        case "REJECTED":
+            return "Concluído";
+        case "RELEASED":
+            return "Liberada";
         case "NOT_REQUESTED":
+            return "Não solicitado";
         case "NOT_REQUIRED":
+            return "Não Necessário";
         default:
             return "Não solicitado";
     }
