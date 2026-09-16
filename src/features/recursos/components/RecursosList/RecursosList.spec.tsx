@@ -5,9 +5,13 @@ import { RecursosList } from "./RecursosList";
 import { useRecursosList } from "../../hooks/useRecursosList";
 import { EMPTY_PROFILE_FILTERS } from "../../types/profileFilters";
 
-vi.mock("../../hooks/useRecursosList", () => ({
-    useRecursosList: vi.fn(),
-}));
+vi.mock("../../hooks/useRecursosList", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../hooks/useRecursosList")>();
+    return {
+        ...actual,
+        useRecursosList: vi.fn(),
+    };
+});
 
 vi.mock("@/features/profiles", async () => {
     const actual = await vi.importActual<typeof import("@/features/profiles")>("@/features/profiles");

@@ -109,7 +109,7 @@ export function VagaCard({ vaga, onEdit, onCancel }: Props) {
                 </span>
                 <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
-                    {new Date(vaga.openingDate).toLocaleDateString("pt-BR")}
+                    {vaga.openingDate.slice(0, 10).split("-").reverse().join("/")}
                 </span>
             </div>
         </div>

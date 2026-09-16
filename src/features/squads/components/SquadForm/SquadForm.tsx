@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui";
 import type { Squad, SquadPayload } from "../../types/types";
 import {
-    squadSchema,
+    createSquadSchema,
     type SquadFormData,
+    type SquadFormInput,
 } from "../../validations/validations";
 import { GeneralDataTab } from "./tabs/GeneralDataTab/GeneralDataTab";
 import { SquadFormTabs, type SquadFormTab } from "./SquadFormTabs";
@@ -14,17 +15,23 @@ import { SquadResourcesTab } from "./tabs/SquadResourcesTab/SquadResourcesTab";
 
 interface Props {
     initial: Partial<Squad> & { id?: string };
+    existingSquads?: Pick<Squad, "id" | "name">[];
     saving: boolean;
     onSave: (data: SquadPayload & { id?: string; active?: boolean; initialActive?: boolean }) => void;
     onCancel: () => void;
 }
 
-export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
+export function SquadForm({ initial, existingSquads = [], saving, onSave, onCancel }: Props) {
     const isEdit = Boolean(initial.id);
     const [activeTab, setActiveTab] = useState<SquadFormTab>("general");
 
-    const methods = useForm<SquadFormData>({
-        resolver: zodResolver(squadSchema),
+    const schema = useMemo(
+        () => createSquadSchema(existingSquads, initial.id),
+        [existingSquads, initial.id],
+    );
+
+    const methods = useForm<SquadFormInput>({
+        resolver: zodResolver(schema),
         defaultValues: {
             name: initial.name || "",
             description: initial.description || "",
@@ -44,15 +51,15 @@ export function SquadForm({ initial, saving, onSave, onCancel }: Props) {
     ]);
 
     const canSave = Boolean(
-        name?.trim() && description?.trim() && portoCoordinator?.trim() && projectManager?.trim()
+        name?.trim() && description?.trim() && portoCoordinator?.trim() && projectManager?.trim(),
     );
 
     function onSubmit(data: SquadFormData) {
-        const payload: SquadPayload & { id?: string; active?: boolean; initialActive?: boolean; } = {
-            name: data.name,
-            description: data.description,
-            portoCoordinator: data.portoCoordinator,
-            projectManager: data.projectManager,
+        const payload: SquadPayload & { id?: string; active?: boolean; initialActive?: boolean } = {
+            name: data.name.trim(),
+            description: data.description.trim(),
+            portoCoordinator: data.portoCoordinator.trim(),
+            projectManager: data.projectManager.trim(),
             recursoIds: (data.recursos || []).map((r) => r.id),
         };
 

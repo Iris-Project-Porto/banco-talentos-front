@@ -69,8 +69,10 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
         {
             header: "Skill",
             render: (skill: Skill) => (
-                <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate">{skill.name}</p>
+                <div className="min-w-0 max-w-xs">
+                    <p className="font-bold text-slate-900 truncate" title={skill.name}>
+                        {skill.name}
+                    </p>
                     <p className="text-xs text-slate-500 truncate mt-0.5">
                         {skill.type}
                     </p>

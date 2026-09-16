@@ -1,7 +1,7 @@
 import { Card, Pagination } from "@/components/ui";
 import { PersonCard } from "@/features/profiles";
 import type { UserProfile } from "@/features/profiles";
-import { useRecursosList } from "../../hooks/useRecursosList";
+import { useRecursosList, deriveStatusRecurso } from "../../hooks/useRecursosList";
 import { RecursosFilters } from "../RecursosFilters/RecursosFilters";
 
 export function RecursosList() {
@@ -79,7 +79,7 @@ export function RecursosList() {
                                         photoUrl={profile.photoUrl}
                                         area={profile.area}
                                         nivel={profile.levelOverride ?? profile.level ?? profile.nivel}
-                                        allocationStatus={profile.allocationStatus}
+                                        resourceStatus={deriveStatusRecurso(profile)}
                                         skills={profile.skills}
                                         createdAt={profile.createdAt}
                                         registrationStatus={profile.registrationStatus}

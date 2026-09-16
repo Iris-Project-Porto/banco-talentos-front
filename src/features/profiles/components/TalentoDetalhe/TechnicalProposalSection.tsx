@@ -28,14 +28,14 @@ export function TechnicalProposalSection({ form, updateField }: Props) {
                     placeholder="Número da Proposta Técnica"
                 />
                 <Input
-                    label="Data do Envio"
+                    label="Data do Envio *"
                     type="date"
                     value={form.technicalProposalSentAt}
                     onChange={(e) => updateField("technicalProposalSentAt", e.target.value)}
                 />
             </div>
             <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-slate-600">Observações</span>
+                <span className="text-xs font-medium text-slate-600">Observações *</span>
                 <textarea
                     className="min-h-[96px] w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 outline-none focus:border-sky-500"
                     value={form.technicalProposalNotes}

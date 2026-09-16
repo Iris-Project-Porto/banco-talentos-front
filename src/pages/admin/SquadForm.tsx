@@ -10,6 +10,8 @@ type SavePayload = SquadPayload & {
     initialActive?: boolean;
 };
 
+const CATALOG_PAGE_SIZE = 500;
+
 export default function SquadForm() {
     const { id } = useParams<{ id: string }>();
     const isEdit = Boolean(id);
@@ -20,6 +22,20 @@ export default function SquadForm() {
         queryKey: ["squads", "detail", id],
         queryFn: () => squadsApi.getById(id!),
         enabled: isEdit,
+    });
+
+    const { data: existingSquads = [], isLoading: loadingCatalog } = useQuery({
+        queryKey: ["squads", "catalog"],
+        queryFn: async () => {
+            const [active, inactive] = await Promise.all([
+                squadsApi.getActive({ page: 0, size: CATALOG_PAGE_SIZE }),
+                squadsApi.getInactive({ page: 0, size: CATALOG_PAGE_SIZE }),
+            ]);
+            return [...(active.content ?? []), ...(inactive.content ?? [])].map((item) => ({
+                id: item.id,
+                name: item.name,
+            }));
+        },
     });
 
     const saveMutation = useMutation({
@@ -63,7 +79,7 @@ export default function SquadForm() {
         navigate("/admin/squads");
     }
 
-    if (loadingSquad) {
+    if (loadingSquad || loadingCatalog) {
         return <p className="text-sm text-slate-400">Carregando...</p>;
     }
 
@@ -74,6 +90,7 @@ export default function SquadForm() {
     return (
         <SquadFormComponent
             initial={squad ?? {}}
+            existingSquads={existingSquads}
             saving={saveMutation.isPending}
             onSave={(payload) => saveMutation.mutate(payload)}
             onCancel={goBack}

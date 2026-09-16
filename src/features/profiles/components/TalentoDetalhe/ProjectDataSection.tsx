@@ -65,12 +65,12 @@ export function ProjectDataSection({ form, updateField }: Props) {
                     onChange={(e) => updateField("projectEntryDate", e.target.value)}
                 />
                 <YesNoRadio
-                    label="Recurso Billable?"
+                    label="Recurso Billable? *"
                     value={form.billable}
                     onChange={(v) => updateField("billable", v)}
                 />
                 <YesNoRadio
-                    label="Onboarding Porto?"
+                    label="Onboarding Porto? *"
                     value={form.portoOnboarding}
                     onChange={(v) => updateField("portoOnboarding", v)}
                 />

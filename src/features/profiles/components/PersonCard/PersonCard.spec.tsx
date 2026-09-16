@@ -62,6 +62,20 @@ describe('Componente PersonCard', () => {
         expect(screen.getByText('Matrícula Pendente')).toBeInTheDocument();
     });
 
+    it('deve exibir o status do recurso (AVAILABLE/WAITING/ALLOCATED)', () => {
+        render(
+            <MemoryRouter>
+                <PersonCard
+                    id={mockProfile.id}
+                    name={mockProfile.name!}
+                    resourceStatus="WAITING"
+                />
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('Aguardando')).toBeInTheDocument();
+    });
+
     it('deve limitar a exibição a no máximo 4 skills e mostrar o contador restante', () => {
         render(
             <MemoryRouter>

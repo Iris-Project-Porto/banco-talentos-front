@@ -152,6 +152,8 @@ export function useTalentoDetalhe(id: string | undefined) {
         onSuccess: (updated, variables) => {
             setProfile(updated);
             queryClient.invalidateQueries({ queryKey: ["talento", variables.id] });
+            queryClient.invalidateQueries({ queryKey: ["profiles-catalog"] });
+            queryClient.invalidateQueries({ queryKey: ["profiles-pendentes"] });
             toast.success("Dados salvos com sucesso.");
 
             if (variables.activate) {
@@ -167,6 +169,9 @@ export function useTalentoDetalhe(id: string | undefined) {
         if (!id) return;
 
         const registrationRequired = form.registrationStatus !== "NOT_REQUIRED";
+        // Mesma regra de visibilidade da aba + seções em TalentoDetalheCorporativaTab
+        const projectSectionsVisible =
+            profile?.registrationStatus !== "NOT_REQUIRED" && registrationRequired;
 
         if (registrationRequired) {
             if (!form.registrationNumber?.trim()) {
@@ -179,6 +184,57 @@ export function useTalentoDetalhe(id: string | undefined) {
             }
             if (!form.registrationNotes?.trim()) {
                 toast.error("Informe as Observações da Matrícula.");
+                return;
+            }
+        }
+
+        if (projectSectionsVisible) {
+            if (!form.contractingArea?.trim()) {
+                toast.error("Informe a Área Contratante.");
+                return;
+            }
+            if (!form.costCenter?.trim()) {
+                toast.error("Informe o Centro de Custo.");
+                return;
+            }
+            if (!form.projectEntryDate?.trim()) {
+                toast.error("Informe a Data de Entrada no Projeto.");
+                return;
+            }
+            if (!form.projectManagerName?.trim()) {
+                toast.error("Informe o Gerente de Projeto.");
+                return;
+            }
+            if (form.billable == null) {
+                toast.error("Informe se o recurso é Billable.");
+                return;
+            }
+            if (form.portoOnboarding == null) {
+                toast.error("Informe se o Onboarding Porto foi realizado.");
+                return;
+            }
+            if (!form.allocationProjectId?.trim()) {
+                toast.error("Selecione o Projeto.");
+                return;
+            }
+            if (!form.allocationSquadId?.trim()) {
+                toast.error("Selecione a Squad.");
+                return;
+            }
+            if (!form.technicalProposalStatus?.trim()) {
+                toast.error("Selecione o Status da Proposta Técnica.");
+                return;
+            }
+            if (!form.technicalProposalNumber?.trim()) {
+                toast.error("Informe o Número da Proposta Técnica.");
+                return;
+            }
+            if (!form.technicalProposalSentAt?.trim()) {
+                toast.error("Informe a Data do Envio da Proposta Técnica.");
+                return;
+            }
+            if (!form.technicalProposalNotes?.trim()) {
+                toast.error("Informe as Observações da Proposta Técnica.");
                 return;
             }
         }
