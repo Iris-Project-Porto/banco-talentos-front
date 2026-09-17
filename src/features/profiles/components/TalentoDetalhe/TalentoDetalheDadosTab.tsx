@@ -46,7 +46,7 @@ export function TalentoDetalheDadosTab({
                         options={[{ value: "", label: "-" }, ...AREA_OPTIONS]}
                     />
                     <Select
-                        label="Anos de exp."
+                        label="Anos de experiência"
                         value={String(form.experienceYears)}
                         onChange={(e) => updateField("experienceYears", e.target.value)}
                         options={[{ value: "", label: "-" }, ...EXPERIENCE_OPTIONS]}

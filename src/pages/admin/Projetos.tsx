@@ -111,7 +111,7 @@ export default function Projetos() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <StatCard label="Total de projetos" value={counts?.total ?? 0} labelColor="#2563EB" />
-                <StatCard label="Ativos" value={counts?.active ?? 0} labelColor="#D97706" />
+                <StatCard label="Ativos" value={counts?.active ?? 0} labelColor="#16A34A" />
                 <StatCard label="Inativos" value={counts?.inactive ?? 0} labelColor="#DC2626" />
             </div>
 

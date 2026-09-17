@@ -18,6 +18,16 @@ const emptyEquipmentForm = {
     notes: "",
 };
 
+const EQUIPMENT_STATUS_BADGE: Record<EquipmentStatus, "pending" | "info" | "success" | "danger"> = {
+    REQUEST_IN_PROGRESS: "pending",
+    REQUESTED: "pending",
+    WITHDRAWN: "info",
+    SENT_TO_RESOURCE: "info",
+    IN_USE: "success",
+    RETURNED: "info",
+    INACTIVE: "danger",
+};
+
 interface Props {
     profileId: string;
     hasClientMachine: boolean;
@@ -118,7 +128,14 @@ export function ClientMachinesSection({ profileId, hasClientMachine, onHasClient
                             {
                                 header: "Status da Máquina",
                                 render: (row) => (
-                                    <Badge variant="success">
+                                    <Badge
+                                        variant={EQUIPMENT_STATUS_BADGE[row.status] ?? "info"}
+                                        className={
+                                            row.status === "RETURNED"
+                                                ? "!bg-slate-100 !text-slate-600"
+                                                : undefined
+                                        }
+                                    >
                                         {EQUIPMENT_STATUS_LABELS[row.status] ?? row.status}
                                     </Badge>
                                 ),

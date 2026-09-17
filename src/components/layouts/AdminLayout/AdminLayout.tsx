@@ -1,23 +1,34 @@
 import { useState, Suspense } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth";
+import { profilesApi } from "@/features/profiles";
 import { Menu, X, LogOut } from "lucide-react";
 
 const staticNavItems = [
   { to: "/admin/dashboard", label: "Dashboard" },
-  { to: "/admin/fila", label: "Fila de revisão" },
+  { to: "/admin/fila", label: "Fila de revisão", showPendingBadge: true },
   { to: "/admin/talentos", label: "Recursos" },
   { to: "/admin/usuarios", label: "Usuários" },
   { to: "/admin/skills", label: "Skills" },
   { to: "/admin/vagas", label: "Vagas" },
   { to: "/admin/projetos", label: "Projetos" },
-  { to: "/admin/squads", label: "Squads" }
+  { to: "/admin/squads", label: "Squads" },
 ];
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { data: pendingCount = 0 } = useQuery({
+    queryKey: ["profiles-pendentes", "count"],
+    queryFn: async () => {
+      const response = await profilesApi.getPendentes(0, 1);
+      return response?.totalElements ?? 0;
+    },
+    refetchInterval: 60_000,
+  });
 
   async function handleLogout() {
     await logout();
@@ -40,20 +51,25 @@ export default function AdminLayout() {
 
       <nav className="flex-1 py-4 overflow-y-auto">
         <p className="px-5 pt-2 pb-1 text-2xs font-semibold uppercase tracking-[0.08em] text-slate-500">Menu</p>
-        {staticNavItems.map(({ to, label }) => (
+        {staticNavItems.map(({ to, label, showPendingBadge }) => (
           <NavLink
             key={to}
             to={to}
             onClick={() => setIsMobileMenuOpen(false)}
             end={to === "/admin/talentos" || to === "/admin/dashboard"}
             className={({ isActive }) =>
-              `flex items-center px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
+              `flex items-center justify-between gap-2 px-5 py-[9px] text-sm transition-colors border-l-[3px] ${isActive
                 ? "border-l-pink bg-white/5 text-white font-medium"
                 : "border-l-transparent text-white/55 hover:text-white/80"
               }`
             }
           >
-            {label}
+            <span>{label}</span>
+            {showPendingBadge && pendingCount > 0 && (
+              <span className="shrink-0 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold leading-none text-slate-950">
+                {pendingCount} pendente{pendingCount !== 1 ? "s" : ""}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
