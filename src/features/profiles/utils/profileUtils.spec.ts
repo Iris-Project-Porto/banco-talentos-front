@@ -15,6 +15,26 @@ describe('profileUtils', () => {
     });
 
     describe('getRegistrationStatusLabel', () => {
+        it('deve retornar "Não Necessário" para status não necessário', () => {
+            expect(getRegistrationStatusLabel("NOT_REQUIRED")).toBe("Não Necessário");
+        });
+
+        it('deve retornar "Solicitado via chamado" para status solicitado via chamado', () => {
+            expect(getRegistrationStatusLabel("REQUESTED_VIA_TICKET")).toBe("Solicitado via chamado");
+        });
+
+        it('deve retornar "Chamado aguardando aprovação" para status chamado aguardando aprovação', () => {
+            expect(getRegistrationStatusLabel("TICKET_AWAITING_APPROVAL")).toBe("Chamado aguardando aprovação");
+        });
+
+        it('deve retornar "Chamado aguardando atendimento" para status chamado aguardando atendimento', () => {
+            expect(getRegistrationStatusLabel("TICKET_AWAITING_SERVICE")).toBe("Chamado aguardando atendimento");
+        });
+
+        it('deve retornar "Liberada" para status liberado', () => {
+            expect(getRegistrationStatusLabel("RELEASED")).toBe("Liberada");
+        });
+        
         it('deve retornar "Em andamento" para status pendentes', () => {
             expect(getRegistrationStatusLabel("REQUESTED")).toBe("Em andamento");
             expect(getRegistrationStatusLabel("AWAITING_APPROVAL")).toBe("Em andamento");
@@ -25,7 +45,7 @@ describe('profileUtils', () => {
             expect(getRegistrationStatusLabel("REJECTED")).toBe("Concluído");
         });
 
-        it('deve retornar "Não solicitado" para status não preenchido ou vazio', () => {
+        it('deve retornar "Não solicitado" para status não solicitado ou vazio', () => {
             expect(getRegistrationStatusLabel()).toBe("Não solicitado");
             expect(getRegistrationStatusLabel("NOT_REQUESTED")).toBe("Não solicitado");
         });

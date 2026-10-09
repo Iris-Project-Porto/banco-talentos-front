@@ -1,6 +1,6 @@
 import { Badge, Tag } from "@/components/ui";
 import { type JobPosting, type ExperienceLevel, type JobSkill } from "../../types/types";
-import { Pencil, Clock, Calendar, Trash2 } from "lucide-react";
+import { Pencil, Clock, Calendar, Ban } from "lucide-react";
 
 const SENIORIDADE_BADGE: Record<ExperienceLevel, "junior" | "pleno" | "senior" | "warning"> = {
     JUNIOR: "junior",
@@ -72,7 +72,7 @@ export function VagaCard({ vaga, onEdit, onCancel }: Props) {
                             className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-md transition-colors"
                             title="Cancelar Vaga"
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Ban className="w-4 h-4" />
                         </button>
                     )}
                 </div>
@@ -109,7 +109,7 @@ export function VagaCard({ vaga, onEdit, onCancel }: Props) {
                 </span>
                 <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
-                    {new Date(vaga.openingDate).toLocaleDateString("pt-BR")}
+                    {vaga.openingDate.slice(0, 10).split("-").reverse().join("/")}
                 </span>
             </div>
         </div>

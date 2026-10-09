@@ -12,13 +12,13 @@ import RecursoLayout from "@/components/layouts/RecursoLayout/RecursoLayout";
 
 // Páginas Públicas
 const Login = lazy(() => import("@/pages/public/Login"));
-const Register = lazy(() => import("@/pages/public/Register"));
 const VerifyEmail = lazy(() => import("@/pages/public/VerifyEmail"));
 const ForgotPassword = lazy(() => import("@/pages/public/ForgotPassWord"));
 const ResetPassword = lazy(() => import("@/pages/public/ResetPassword"));
 
 // Páginas Privadas (Recurso)
 const MeuPerfil = lazy(() => import("@/pages/user/MeuPerfil"));
+const MeuPerfilEditar = lazy(() => import("@/pages/user/MeuPerfilEditar"));
 const MeuHistorico = lazy(() => import("@/pages/user/MeuHistorico"));
 
 // Páginas Admin
@@ -32,9 +32,9 @@ const Vagas = lazy(() => import("@/pages/admin/Vagas"));
 const VagaForm = lazy(() => import("@/pages/admin/VagaForm"));
 const Forms = lazy(() => import("@/pages/admin/Forms"));
 const Squads = lazy(() => import("@/pages/admin/Squads"));
+const SquadForm = lazy(() => import("@/pages/admin/SquadForm"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
 const ProjetoForm = lazy(() => import("@/pages/admin/ProjetoForm"));
-const ConsultaRecursos = lazy(() => import("@/pages/admin/ConsultaRecursos"));
 
 // DEFINIÇÃO DAS ROTAS
 
@@ -43,7 +43,6 @@ export const router = createBrowserRouter([
     {
         element: <PublicRoute />,
         children: [
-            { path: "/register", element: <Register /> },
             { path: "/verify", element: <VerifyEmail /> },
         ]
     },
@@ -66,6 +65,7 @@ export const router = createBrowserRouter([
                 children: [
                     { index: true, element: <Navigate to="/meu-perfil" replace /> },
                     { path: "meu-perfil", element: <MeuPerfil /> },
+                    { path: "meu-perfil/editar", element: <MeuPerfilEditar /> },
                     { path: "meu-historico", element: <MeuHistorico /> },
                 ],
             },
@@ -92,10 +92,11 @@ export const router = createBrowserRouter([
                     { path: "vagas/:id/editar", element: <VagaForm /> },
                     { path: "forms", element: <Forms /> },
                     { path: "squads", element: <Squads /> },
+                    { path: "squads/novo", element: <SquadForm /> },
+                    { path: "squads/:id", element: <SquadForm /> },
                     { path: "projetos", element: <Projetos /> },
                     { path: "projetos/novo", element: <ProjetoForm /> },
                     { path: "projetos/:id/editar", element: <ProjetoForm /> },
-                    { path: "recursos", element: <ConsultaRecursos /> },
                 ],
             },
         ],

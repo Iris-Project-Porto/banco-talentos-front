@@ -25,4 +25,16 @@ describe('Input Component', () => {
         render(<Input labelRight={<span>Esqueceu a password?</span>} />);
         expect(screen.getByText('Esqueceu a password?')).toBeInTheDocument();
     });
+
+    it('deve limitar o ano a 4 dígitos em campos type="date"', () => {
+        const { container } = render(<Input type="date" aria-label="Data" />);
+        const input = container.querySelector('input[type="date"]');
+        expect(input).toHaveAttribute('max', '9999-12-31');
+    });
+
+    it('deve respeitar max customizado em campos type="date"', () => {
+        const { container } = render(<Input type="date" max="2030-12-31" aria-label="Data" />);
+        const input = container.querySelector('input[type="date"]');
+        expect(input).toHaveAttribute('max', '2030-12-31');
+    });
 });

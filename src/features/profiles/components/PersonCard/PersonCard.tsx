@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Avatar, Badge, Tag } from "@/components/ui";
+import { RESOURCE_STATUS_LABELS } from "../../profile";
 import type { ProfileSkill } from "../../types/profile";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   area?: string;
   nivel?: string;
   allocationStatus?: string;
+  resourceStatus?: string;
   skills?: ProfileSkill[];
   createdAt?: string;
   href?: string;
@@ -34,6 +36,12 @@ const ALOC_LABEL: Record<string, string> = {
   "Em Transição (saindo de projeto)": "Em Transição",
 };
 
+const RESOURCE_STATUS_TAG: Record<string, "status-success" | "status-info" | "status-warning"> = {
+  AVAILABLE: "status-success",
+  WAITING: "status-warning",
+  ALLOCATED: "status-info",
+};
+
 const REG_STATUS_TAG: Record<string, "status-success" | "status-info" | "status-warning" | "status-alert"> = {
   "APPROVED": "status-success",
   "REQUESTED": "status-info",
@@ -49,10 +57,30 @@ const REG_STATUS_LABEL: Record<string, string> = {
   "REJECTED": "Matrícula Recusada",
 };
 
-export function PersonCard({ id, name, email, photoUrl, area, nivel, allocationStatus, skills, createdAt, href, registrationStatus }: Props) {
+export function PersonCard({
+  id,
+  name,
+  email,
+  photoUrl,
+  area,
+  nivel,
+  allocationStatus,
+  resourceStatus,
+  skills,
+  createdAt,
+  href,
+  registrationStatus,
+}: Props) {
   const badgeVariant = nivel ? NIVEL_BADGE[nivel] : undefined;
-  const tagKind = allocationStatus ? ALOC_TAG[allocationStatus] : undefined;
-  const tagLabel = allocationStatus ? (ALOC_LABEL[allocationStatus] ?? allocationStatus.split(" ")[0]) : undefined;
+
+  const resourceLabel = resourceStatus ? RESOURCE_STATUS_LABELS[resourceStatus] : undefined;
+  const resourceTagKind = resourceStatus ? RESOURCE_STATUS_TAG[resourceStatus] : undefined;
+
+  const allocationTagKind = allocationStatus ? ALOC_TAG[allocationStatus] : undefined;
+  const allocationLabel = allocationStatus
+    ? (ALOC_LABEL[allocationStatus] ?? allocationStatus.split(" ")[0])
+    : undefined;
+
   const regLabel = registrationStatus ? REG_STATUS_LABEL[registrationStatus] : undefined;
   const regTagKind = registrationStatus ? REG_STATUS_TAG[registrationStatus] : undefined;
 
@@ -76,7 +104,11 @@ export function PersonCard({ id, name, email, photoUrl, area, nivel, allocationS
 
       <div className="flex flex-wrap gap-1">
         {area && <Tag kind="area">{area}</Tag>}
-        {tagKind && tagLabel && <Tag kind={tagKind}>{tagLabel}</Tag>}
+        {resourceLabel && resourceTagKind ? (
+          <Tag kind={resourceTagKind}>{resourceLabel}</Tag>
+        ) : allocationTagKind && allocationLabel ? (
+          <Tag kind={allocationTagKind}>{allocationLabel}</Tag>
+        ) : null}
         {regLabel && regTagKind ? (
           <Tag kind={regTagKind}>{regLabel}</Tag>
         ) : regLabel ? (

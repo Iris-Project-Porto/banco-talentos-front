@@ -1,27 +1,27 @@
-export type StatusRecurso = "DISPONIVEL" | "AGUARDANDO" | "ALOCADO";
+export type StatusRecurso = "AVAILABLE" | "WAITING" | "ALLOCATED";
 
 export type StatusMatricula =
-  | "NAO_NECESSARIO"
-  | "SOLICITADO_VIA_CHAMADO"
-  | "CHAMADO_AGUARDANDO_APROVACAO"
-  | "CHAMADO_AGUARDANDO_ATENDIMENTO"
-  | "LIBERADA";
+  | "NOT_REQUIRED"
+  | "REQUESTED_VIA_TICKET"
+  | "TICKET_AWAITING_APPROVAL"
+  | "TICKET_AWAITING_SERVICE"
+  | "RELEASED";
 
 export type StatusMaquina =
-  | "VAZIO"
-  | "EM_PROCESSO_DE_SOLICITACAO"
-  | "SOLICITADO"
-  | "RETIRADO"
-  | "ENVIO_PARA_O_RECURSO"
-  | "EM_USO"
-  | "DEVOLVIDO";
+  | "REQUEST_IN_PROGRESS"
+  | "REQUESTED"
+  | "WITHDRAWN"
+  | "SENT_TO_RESOURCE"
+  | "IN_USE"
+  | "RETURNED"
+  | "INACTIVE";
 
 export type StatusPropostaTecnica =
-  | "PENDENTE_DE_ENVIO"
-  | "ENVIADO_AO_COORDENADOR"
-  | "COBRAR_RETORNO"
-  | "ASSINADO"
-  | "ERRO_DE_ASSINATURA";
+  | "PENDING_SEND"
+  | "SENT_TO_COORDINATOR"
+  | "FOLLOW_UP_REQUIRED"
+  | "SIGNED"
+  | "SIGNATURE_ERROR";
 
 export interface Maquina {
   id: string;
@@ -51,18 +51,14 @@ export interface Recurso {
   jobTitle?: string;
   area?: string;
   status: string;
-  // Seção 1
   statusRecurso: StatusRecurso;
   statusMatricula: StatusMatricula;
   numeroMatricula?: string;
   dataSolicitacaoMatricula?: string;
   observacoesMatricula?: string;
-  // Seção 2
   possuiMaquinaCliente: boolean;
   maquinas: Maquina[];
-  // Seção 3
   statusPropostaTecnica?: StatusPropostaTecnica;
-  // Seção 4
   areaContratante?: string;
   centroCustoContratante?: string;
   dataEntradaProjeto?: string;
@@ -71,9 +67,6 @@ export interface Recurso {
   gerenteProjeto?: string;
   projetoAlocacao?: string;
   squadAlocacao?: string;
-  // Seção 5
-  contato?: string;
-  endereco?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -99,33 +92,33 @@ export interface RecursoFilterParams {
 }
 
 export const STATUS_RECURSO_LABELS: Record<StatusRecurso, string> = {
-  DISPONIVEL: "Disponível",
-  AGUARDANDO: "Aguardando",
-  ALOCADO: "Alocado",
+  AVAILABLE: "Disponível",
+  WAITING: "Aguardando",
+  ALLOCATED: "Alocado",
 };
 
 export const STATUS_MATRICULA_LABELS: Record<StatusMatricula, string> = {
-  NAO_NECESSARIO: "Não necessário",
-  SOLICITADO_VIA_CHAMADO: "Solicitado via chamado",
-  CHAMADO_AGUARDANDO_APROVACAO: "Aguardando aprovação",
-  CHAMADO_AGUARDANDO_ATENDIMENTO: "Aguardando atendimento",
-  LIBERADA: "Liberada",
+  NOT_REQUIRED: "Não Necessário",
+  REQUESTED_VIA_TICKET: "Solicitado via chamado",
+  TICKET_AWAITING_APPROVAL: "Aguardando aprovação",
+  TICKET_AWAITING_SERVICE: "Aguardando atendimento",
+  RELEASED: "Liberada",
 };
 
 export const STATUS_MAQUINA_LABELS: Record<StatusMaquina, string> = {
-  VAZIO: "—",
-  EM_PROCESSO_DE_SOLICITACAO: "Em processo",
-  SOLICITADO: "Solicitado",
-  RETIRADO: "Retirado",
-  ENVIO_PARA_O_RECURSO: "Enviado ao recurso",
-  EM_USO: "Em uso",
-  DEVOLVIDO: "Devolvido",
+  REQUEST_IN_PROGRESS: "Em processo de solicitação",
+  REQUESTED: "Solicitado",
+  WITHDRAWN: "Retirado",
+  SENT_TO_RESOURCE: "Envio para o recurso",
+  IN_USE: "Em Uso",
+  RETURNED: "Devolvido",
+  INACTIVE: "Inativo",
 };
 
 export const STATUS_PROPOSTA_LABELS: Record<StatusPropostaTecnica, string> = {
-  PENDENTE_DE_ENVIO: "Pendente de envio",
-  ENVIADO_AO_COORDENADOR: "Enviado ao Coordenador",
-  COBRAR_RETORNO: "Cobrar retorno",
-  ASSINADO: "Assinado",
-  ERRO_DE_ASSINATURA: "Erro de assinatura",
+  PENDING_SEND: "Pendente de envio",
+  SENT_TO_COORDINATOR: "Enviado ao Coordenador",
+  FOLLOW_UP_REQUIRED: "Cobrar retorno",
+  SIGNED: "Assinado",
+  SIGNATURE_ERROR: "Erro de assinatura",
 };

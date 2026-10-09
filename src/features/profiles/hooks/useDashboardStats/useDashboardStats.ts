@@ -16,8 +16,6 @@ export const ALOCACAO_COLORS: Record<string, string> = {
     "Alocado Integral (100%)": "#3B82F6",
     "Alocado Parcial": "#F59E0B",
     "Em Transição (saindo de projeto)": "#F97316",
-    "Férias / Licença": "#8B5CF6",
-    "Desligado": "#EF4444",
 };
 
 export function useDashboardStats() {

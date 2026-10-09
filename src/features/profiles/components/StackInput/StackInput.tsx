@@ -122,11 +122,6 @@ export function StackInput({ value, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="text-xs font-medium text-gray-600 block">
-        Stack tecnológica
-      </label>
-
-
       <div className="relative">
         <div className="flex gap-2">
           <div className="relative flex-1">

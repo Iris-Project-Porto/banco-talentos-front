@@ -39,6 +39,11 @@ describe('VagaCard Component', () => {
         expect(screen.getByText('Urgente')).toBeInTheDocument();
     });
 
+    it('deve exibir a data de abertura sem deslocar um dia', () => {
+        render(<VagaCard vaga={mockVaga} onEdit={vi.fn()} onCancel={vi.fn()} />);
+        expect(screen.getByText('01/05/2024')).toBeInTheDocument();
+    });
+
     it('deve chamar onEdit ao clicar no botão de editar', () => {
         const handleEdit = vi.fn();
         render(<VagaCard vaga={mockVaga} onEdit={handleEdit} onCancel={vi.fn()} />);

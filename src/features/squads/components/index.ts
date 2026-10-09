@@ -1,1 +1,1 @@
-export * from "./SquadFormModal";
+export * from "./SquadForm/SquadForm";

@@ -10,8 +10,8 @@ describe('Skills Validations', () => {
     };
 
     const existingSkills = [
-        { id: '1', name: 'React' },
-        { id: '2', name: 'Python' },
+        { id: '1', name: 'React', active: true },
+        { id: '2', name: 'Python', active: true },
     ];
     it('deve aprovar dados de skill válidos', () => {
         const result = skillSchema.safeParse(dadosBase);

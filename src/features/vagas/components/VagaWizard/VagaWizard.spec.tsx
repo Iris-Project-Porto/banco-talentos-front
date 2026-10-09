@@ -44,13 +44,13 @@ describe('Componente VagaWizard', () => {
 
     it('deve renderizar o cabeçalho de Nova Vaga quando não houver ID inicial', () => {
         renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
-        expect(screen.getByText('Nova vaga')).toBeInTheDocument();
+        expect(screen.getByText('Cadastrar Vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar e continuar' })).toBeInTheDocument();
     });
 
     it('deve renderizar o cabeçalho de Editar Vaga quando um ID inicial for fornecido', () => {
         renderWithClient(<VagaWizard initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
-        expect(screen.getByText('Editar vaga')).toBeInTheDocument();
+        expect(screen.getByText('Editar Vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
     });
 
@@ -65,7 +65,7 @@ describe('Componente VagaWizard', () => {
         );
 
         expect(screen.getByText(/Vagas com status/i)).toBeInTheDocument();
-        expect(screen.getByText('FILLED')).toBeInTheDocument();
+        expect(screen.getByText('Preenchida', { selector: 'b' })).toBeInTheDocument();
         expect(screen.getByText(/não podem ser editadas/i)).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Salvar alterações' })).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();

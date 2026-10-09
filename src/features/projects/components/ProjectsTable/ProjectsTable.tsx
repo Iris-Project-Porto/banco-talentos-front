@@ -19,10 +19,12 @@ export function ProjectsTable({ data, onView, onEdit }: Props) {
         {
             header: "Projeto",
             render: (project: Project) => (
-                <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate">{project.name}</p>
+                <div className="min-w-0 max-w-xs">
+                    <p className="font-bold text-slate-900 truncate" title={project.name}>
+                        {project.name}
+                    </p>
                     {project.description && (
-                        <p className="text-xs text-slate-500 truncate mt-0.5 max-w-xs">
+                        <p className="text-xs text-slate-500 truncate mt-0.5" title={project.description}>
                             {project.description}
                         </p>
                     )}

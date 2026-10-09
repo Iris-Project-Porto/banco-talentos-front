@@ -1,3 +1,5 @@
+import type { Recurso } from "@/features/recursos/types/recurso";
+
 export interface SquadMetrics {
     totalResources: number;
     allocatedResources: number;
@@ -23,6 +25,7 @@ export interface Squad {
     updatedBy?: string;
     metrics?: SquadMetrics;
     members?: number;
+    recursos?: Recurso[];
 }
 
 export interface SquadPayload {
@@ -30,6 +33,7 @@ export interface SquadPayload {
     description: string;
     portoCoordinator: string;
     projectManager: string;
+    recursoIds?: string[];
 }
 
 export interface PageableResponse<T> {

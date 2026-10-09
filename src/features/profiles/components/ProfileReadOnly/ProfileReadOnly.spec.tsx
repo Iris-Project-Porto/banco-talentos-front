@@ -8,7 +8,7 @@ describe('ProfileReadOnly Component', () => {
         id: '123',
         status: 'ACTIVE',
         nivel: 'Pleno',
-        registrationStatus: 'APPROVED',
+        registrationStatus: 'RELEASED',
         registrationNumber: 'MAT-999',
         area: 'Frontend',
         experienceYears: 4,
@@ -45,7 +45,7 @@ describe('ProfileReadOnly Component', () => {
     it('deve renderizar corretamente os campos básicos de informação (ReadField)', () => {
         render(<ProfileReadOnly profile={mockProfileBase} />);
 
-        expect(screen.getByText('Matrícula')).toBeInTheDocument();
+        expect(screen.getByText('Nº da Matrícula')).toBeInTheDocument();
         expect(screen.getByText('MAT-999')).toBeInTheDocument();
 
         expect(screen.getByText('Área')).toBeInTheDocument();

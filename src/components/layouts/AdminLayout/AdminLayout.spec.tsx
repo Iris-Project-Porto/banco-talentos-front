@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './AdminLayout';
 
 const mockNavigate = vi.fn();
@@ -21,23 +22,39 @@ vi.mock('@/features/auth', () => ({
     }),
 }));
 
-describe('AdminLayout Component', () => {
-    it('deve renderizar as informações do utilizador administrador na sidebar', () => {
-        render(
+vi.mock('@/features/profiles', () => ({
+    profilesApi: {
+        getPendentes: vi.fn().mockResolvedValue({ totalElements: 3, content: [] }),
+    },
+}));
+
+function renderLayout() {
+    const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+    });
+
+    return render(
+        <QueryClientProvider client={queryClient}>
             <MemoryRouter>
                 <AdminLayout />
             </MemoryRouter>
-        );
+        </QueryClientProvider>,
+    );
+}
+
+describe('AdminLayout Component', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('deve renderizar as informações do utilizador administrador na sidebar', () => {
+        renderLayout();
         expect(screen.getAllByText('Admin Silva').length).toBeGreaterThan(0);
         expect(screen.getAllByText('admin@vilt-group.com').length).toBeGreaterThan(0);
     });
 
     it('deve renderizar todos os links de navegação específicos de Admin', () => {
-        render(
-            <MemoryRouter>
-                <AdminLayout />
-            </MemoryRouter>
-        );
+        renderLayout();
 
         expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Fila de revisão').length).toBeGreaterThan(0);
@@ -48,12 +65,16 @@ describe('AdminLayout Component', () => {
         expect(screen.getAllByText('Skills').length).toBeGreaterThan(0);
     });
 
+    it('deve exibir o badge de pendentes na Fila de revisão', async () => {
+        renderLayout();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('3 pendentes').length).toBeGreaterThan(0);
+        });
+    });
+
     it('deve invocar o logout e reencaminhar para /login ao clicar no botão "Sair"', async () => {
-        render(
-            <MemoryRouter>
-                <AdminLayout />
-            </MemoryRouter>
-        );
+        renderLayout();
         const logoutButtons = screen.getAllByRole('button', { name: /Sair/i });
         fireEvent.click(logoutButtons[0]);
 
@@ -62,11 +83,7 @@ describe('AdminLayout Component', () => {
     });
 
     it('deve renderizar o Outlet (onde as rotas filhas são injetadas)', () => {
-        render(
-            <MemoryRouter>
-                <AdminLayout />
-            </MemoryRouter>
-        );
+        renderLayout();
         expect(screen.getByTestId('outlet')).toBeInTheDocument();
     });
 });

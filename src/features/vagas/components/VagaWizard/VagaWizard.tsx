@@ -17,6 +17,12 @@ const VAGA_WIZARD_STEPS: StepperStep[] = [
 
 type VagaWizardStep = 0 | 1;
 
+const STATUS_DICTIONARY = {
+    "FILLED": "Preenchida",
+    "CLOSED": "Encerrada",
+    "CANCELLED": "Cancelada",
+};
+
 interface Props {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
@@ -25,7 +31,7 @@ interface Props {
 }
 
 export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
-    const [step, setStep] = useState<VagaWizardStep>(1);
+    const [step, setStep] = useState<VagaWizardStep>(0);
     const [savedVagaId, setSavedVagaId] = useState(initial.id);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
@@ -71,7 +77,7 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
-                title={isEdit ? "Editar vaga" : "Nova vaga"}
+                title={isEdit ? "Editar Vaga" : "Cadastrar Vaga"}
                 subtitle="Preencha as informações da vaga"
                 onBack={onCancel}
                 backLabel="Voltar para vagas"
@@ -98,7 +104,7 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
 
             {!canEdit && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
-                    Vagas com status <b>{initial.status}</b> não podem ser editadas (Apenas Abertas, Em Triagem ou Em Alocação).
+                    Vagas com status <b>{STATUS_DICTIONARY[initial.status as keyof typeof STATUS_DICTIONARY]}</b> não podem ser editadas (Apenas Abertas, Em Triagem ou Em Alocação).
                 </div>
             )}
 

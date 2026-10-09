@@ -43,15 +43,18 @@ export const skillSchema = z
   });
 
 export function createSkillSchema(
-    existingSkills: { id: string; name: string }[],
+    existingSkills: { id: string; name: string; active: boolean }[],
     editingId?: string,
 ) {
     return skillSchema.superRefine((data, ctx) => {
         const normalized = normalizeSkillName(data.name);
-        const hasDuplicate = existingSkills.some(
-            (skill) => skill.id !== editingId && normalizeSkillName(skill.name) === normalized,
-        );
 
+        const hasDuplicate = existingSkills.some(
+            (skill) =>
+                skill.id !== editingId &&
+                skill.active &&
+                normalizeSkillName(skill.name) === normalized,
+        );
         if (hasDuplicate) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
