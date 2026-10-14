@@ -23,8 +23,6 @@ export default function TalentoDetalhe() {
         loading,
         setStacks,
         updateField,
-        handleAddSoftSkill,
-        handleRemoveSoftSkill,
         handleSave,
   } = useTalentoDetalhe(id);
 
@@ -91,9 +89,8 @@ export default function TalentoDetalhe() {
                     form={form}
                     stacks={stacks}
                     setStacks={setStacks}
+                    onSoftSkillsChange={(softSkills) => updateField("softSkills", softSkills)}
                     saving={saving}
-                    onAddSoftSkill={handleAddSoftSkill}
-                    onRemoveSoftSkill={handleRemoveSoftSkill}
                     onSave={() => handleSave(false)}
                 />
             )}
