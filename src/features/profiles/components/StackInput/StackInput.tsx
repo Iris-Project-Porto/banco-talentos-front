@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import type { Skill } from "@/features/skills";
 
 export interface StackItem {
   name: string;
@@ -8,9 +9,10 @@ export interface StackItem {
 interface Props {
   value: StackItem[];
   onChange: (stacks: StackItem[]) => void;
+  skills?: Skill[];
 }
 
-const STACK_SUGGESTIONS = [
+/*const STACK_SUGGESTIONS = [
   "JavaScript", "TypeScript", "React", "Next.js", "Vue.js", "Angular", "Svelte",
   "Node.js", "Express", "NestJS", "Java", "Spring Boot", "Kotlin", "Python",
   "Django", "FastAPI", "Flask", "Go", "Rust", "C#", ".NET", "PHP", "Laravel",
@@ -22,7 +24,8 @@ const STACK_SUGGESTIONS = [
   "Tailwind CSS", "Sass", "Figma", "Storybook",
   "Jest", "Cypress", "Playwright", "Vitest",
   "Linux", "Bash", "SQL", "Pandas", "Spark", "Airflow",
-];
+];*/
+
 
 function getLevelLabel(level: number): { label: string; color: string; bg: string } {
   if (level <= 3) return { label: "Em desenvolvimento", color: "#9333ea", bg: "#f3e8ff" };
@@ -44,7 +47,8 @@ function LevelBadge({ level }: { level: number }) {
   );
 }
 
-export function StackInput({ value, onChange }: Props) {
+export function StackInput({ skills, value, onChange }: Props) {
+  const STACK_SUGGESTIONS = (skills ?? []).map((s) => s.name);
   const [inputVal, setInputVal] = useState("");
   const [selectedStack, setSelectedStack] = useState<string | null>(null);
   const [pendingLevel, setPendingLevel] = useState<number>(5);
@@ -84,8 +88,9 @@ export function StackInput({ value, onChange }: Props) {
   }
 
   function confirmAdd() {
-    const name = (selectedStack || inputVal).trim();
-    if (!name) return;
+    if (!selectedStack || !STACK_SUGGESTIONS.includes(selectedStack)) return;
+
+    const name = selectedStack;
     const alreadyExists = value.find((v) => v.name.toLowerCase() === name.toLowerCase());
     if (alreadyExists) return;
 
@@ -110,7 +115,8 @@ export function StackInput({ value, onChange }: Props) {
     onChange(updated);
   }
 
-  const hasInput = inputVal.trim().length > 0;
+  const hasSelectedSuggestion =
+    selectedStack !== null && STACK_SUGGESTIONS.includes(selectedStack);
   const { label: levelLabel } = getLevelLabel(pendingLevel);
 
   const LEGEND = [
@@ -167,11 +173,11 @@ export function StackInput({ value, onChange }: Props) {
           </div>
         </div>
 
-        {hasInput && (
+        {hasSelectedSuggestion && (
           <div className="mt-3 bg-gray-50 rounded-xl border border-gray-100 p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-gray-600">
-                Nível de conhecimento em <span className="text-pink-600 font-semibold">{inputVal}</span>
+                Nível de conhecimento em <span className="text-pink-600 font-semibold">{selectedStack}</span>
               </span>
               <LevelBadge level={pendingLevel} />
             </div>
@@ -192,7 +198,12 @@ export function StackInput({ value, onChange }: Props) {
             <button
               type="button"
               onClick={confirmAdd}
-              disabled={!inputVal.trim() || !!value.find((v) => v.name.toLowerCase() === inputVal.trim().toLowerCase())}
+              disabled={
+                !hasSelectedSuggestion ||
+                !!value.find(
+                  (v) => v.name.toLowerCase() === selectedStack?.toLowerCase(),
+                )
+              }
               className="self-end mt-1 px-4 py-1.5 rounded-lg bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               + Adicionar

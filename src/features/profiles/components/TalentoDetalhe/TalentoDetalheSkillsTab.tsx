@@ -1,5 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button, Select, Section } from "@/components/ui";
+import { skillsApi } from "@/features/skills";
 import { StackInput, type StackItem } from "../StackInput/StackInput";
 import { SOFTSKILLS_LIST } from "../../profile";
 import type { ProfileFormState } from "../../types/profile";
@@ -26,6 +28,17 @@ export function TalentoDetalheSkillsTab({
     const [selectedSoftSkill, setSelectedSoftSkill] = useState("");
     const [selectedSoftLevel, setSelectedSoftLevel] = useState<number | "">("");
 
+    const {
+        data: hardSkillsPage,
+        isError: hardSkillsError,
+    } = useQuery({
+        queryKey: ["skills", "active", "HARD"],
+        queryFn: () => skillsApi.getActiveSkills(0, 500),
+    });
+    const hardSkills = (hardSkillsPage?.content ?? []).filter(
+        (skill) => skill.type === "HARD",
+    );
+
     const availableSoftSkills = SOFTSKILLS_LIST.filter(
         (skill) => !form.softSkills.some((s) => s.name === skill),
     );
@@ -38,8 +51,17 @@ export function TalentoDetalheSkillsTab({
 
     return (
         <div className="flex max-w-3xl flex-col gap-4">
-            <Section title="Stack tecnológica">
-                <StackInput value={stacks} onChange={setStacks} />
+            <Section title="Avaliação de Hard Skills (Admin)">
+                {hardSkillsError && (
+                    <p className="mb-2 text-sm text-red-600">
+                        Não foi possível carregar as hard skills.
+                    </p>
+                )}
+                <StackInput
+                    value={stacks}
+                    onChange={setStacks}
+                    skills={hardSkills}
+                />
             </Section>
             <Section title="Avaliação de Soft Skills (Admin)">
                 <div className="mb-5 rounded-lg border border-slate-100 bg-slate-50 p-4">
