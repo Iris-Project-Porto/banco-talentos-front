@@ -125,21 +125,6 @@ export function useTalentoDetalhe(id: string | undefined) {
         setForm((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleAddSoftSkill = (name: string, level: number) => {
-        if (!name || !level) return;
-        setForm((prev) => ({
-            ...prev,
-            softSkills: [...prev.softSkills, { name, level }],
-        }));
-    };
-
-    const handleRemoveSoftSkill = (skillName: string) => {
-        setForm((prev) => ({
-            ...prev,
-            softSkills: prev.softSkills.filter((s) => s.name !== skillName),
-        }));
-    };
-
     const saveMutation = useMutation({
         mutationFn: async ({
             id,
@@ -273,8 +258,6 @@ export function useTalentoDetalhe(id: string | undefined) {
         loading,
         setStacks,
         updateField,
-        handleAddSoftSkill,
-        handleRemoveSoftSkill,
         handleSave,
     };
 }
