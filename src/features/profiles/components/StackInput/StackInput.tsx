@@ -12,21 +12,6 @@ interface Props {
   skills?: Skill[];
 }
 
-/*const STACK_SUGGESTIONS = [
-  "JavaScript", "TypeScript", "React", "Next.js", "Vue.js", "Angular", "Svelte",
-  "Node.js", "Express", "NestJS", "Java", "Spring Boot", "Kotlin", "Python",
-  "Django", "FastAPI", "Flask", "Go", "Rust", "C#", ".NET", "PHP", "Laravel",
-  "Ruby", "Rails", "Swift", "Dart", "Flutter", "React Native",
-  "PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "SQLite",
-  "Docker", "Kubernetes", "AWS", "Azure", "GCP", "Terraform", "Ansible",
-  "GraphQL", "REST API", "gRPC", "Kafka", "RabbitMQ",
-  "Git", "GitHub Actions", "GitLab CI", "Jenkins", "CircleCI",
-  "Tailwind CSS", "Sass", "Figma", "Storybook",
-  "Jest", "Cypress", "Playwright", "Vitest",
-  "Linux", "Bash", "SQL", "Pandas", "Spark", "Airflow",
-];*/
-
-
 function getLevelLabel(level: number): { label: string; color: string; bg: string } {
   if (level <= 3) return { label: "Em desenvolvimento", color: "#9333ea", bg: "#f3e8ff" };
   if (level <= 6) return { label: "Pratico com regularidade", color: "#2563eb", bg: "#dbeafe" };
