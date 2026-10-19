@@ -62,7 +62,8 @@ export function useMeuPerfilEditar() {
     const queryClient = useQueryClient();
     const { user, markProfileCreated } = useAuth();
     const [form, setForm] = useState<MeuPerfilEditForm>(EMPTY_FORM);
-    const [stacks, setStacks] = useState<StackItem[]>([]);
+    const [hardSkills, setHardSkills] = useState<StackItem[]>([]);
+    const [softSkills, setSoftSkills] = useState<StackItem[]>([]);
 
     const {
         data: profile,
@@ -85,14 +86,21 @@ export function useMeuPerfilEditar() {
     useEffect(() => {
         if (!profile) return;
         setForm(mapProfileToForm(profile));
-        const hardSkills = (profile.skills ?? []).filter(
-            (ps: ProfileSkill) => ps.skill?.type !== "SOFT" && ps.type !== "SOFT",
+        const skills = (profile.skills ?? []).map((ps: ProfileSkill) => ({
+            name: ps.skill?.name ?? ps.name ?? "",
+            level: Number(ps.proficiencyLevel ?? ps.level ?? 5),
+            type: ps.skill?.type ?? ps.type,
+        })).filter((skill) => skill.name);
+
+        setHardSkills(
+            skills
+                .filter((skill) => skill.type !== "SOFT")
+                .map(({ name, level }) => ({ name, level })),
         );
-        setStacks(
-            hardSkills.map((ps: ProfileSkill) => ({
-                name: ps.skill?.name ?? ps.name ?? "",
-                level: Number(ps.proficiencyLevel ?? ps.level ?? 5),
-            })),
+        setSoftSkills(
+            skills
+                .filter((skill) => skill.type === "SOFT")
+                .map(({ name, level }) => ({ name, level })),
         );
     }, [profile]);
 
@@ -131,15 +139,18 @@ export function useMeuPerfilEditar() {
         saveMutation.mutate({
             ...form,
             experienceYears: form.experienceYears ? Number(form.experienceYears) : null,
-            skills: stacks.map((s) => ({ name: s.name, type: "HARD", proficiencyLevel: s.level })),
+            skills: hardSkills.map((s) => ({ name: s.name, type: "HARD", proficiencyLevel: s.level })),
+            softSkills: softSkills.map((s) => ({ name: s.name, type: "SOFT", proficiencyLevel: s.level })),
         });
     }
 
     return {
         profile: profile ?? null,
         form,
-        stacks,
-        setStacks,
+        hardSkills,
+        setHardSkills,
+        softSkills,
+        setSoftSkills,
         updateField,
         handleSave,
         loading: user?.hasProfile === true && isLoading,
