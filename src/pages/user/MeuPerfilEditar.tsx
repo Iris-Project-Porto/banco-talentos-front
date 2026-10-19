@@ -37,7 +37,7 @@ export default function MeuPerfilEditar() {
         isError: skillsError,
     } = useQuery({
         queryKey: ["skills", "active", "assessment"],
-        queryFn: () => skillsApi.getActiveSkillsPublic(0, 500),
+        queryFn: () => skillsApi.getActiveSkillsPublic(),
     });
     const activeSkills = activeSkillsPage?.content ?? [];
     const hardSkillsList = activeSkills.filter(

@@ -31,7 +31,7 @@ export const skillsApi = {
     getActiveSkills: (page = 0, size = 20) =>
         http.get<SkillsPaginatedResponse>(`/v1/admin/skills/active?page=${page}&size=${size}`).then((r) => r.data),
     
-    getActiveSkillsPublic: (page = 0, size = 20) =>
+    getActiveSkillsPublic: () =>
         http.get<SkillsPaginatedResponse>(`/v1/skills`).then((r) => r.data),
 
     getInactiveSkills: (page = 0, size = 20) =>
