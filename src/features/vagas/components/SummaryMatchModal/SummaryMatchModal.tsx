@@ -1,18 +1,11 @@
 import { ProgressRing } from "@/components/ui";
 import { Sparkles } from "lucide-react";
+import type { Match } from "../../types/types";
 
 interface Props {
+    match?: Match | null;
     onClose: () => void;
 }
-
-const MOCK_SUMMARY = {
-    matchScore: 95,
-    resourceName: "João Silva",
-    requiredSkillsMatched: 1,
-    requiredSkillsTotal: 4,
-    desirableSkillsMatched: 2,
-    desirableSkillsTotal: 3,
-} as const;
 
 function SkillProgress({
     label,
@@ -46,11 +39,24 @@ function SkillProgress({
     );
 }
 
-export function SummaryMatchModal({ onClose }: Props) {
+export function SummaryMatchModal({ match, onClose }: Props) {
+    if (!match) return null;
+
+    const summary = match.summary ?? {
+        requiredSkillsMatched: 0,
+        requiredSkillsTotal: 0,
+        desirableSkillsMatched: 0,
+        desirableSkillsTotal: 0,
+    };
+
     const requiredPercent =
-        (MOCK_SUMMARY.requiredSkillsMatched / MOCK_SUMMARY.requiredSkillsTotal) * 100;
+        summary.requiredSkillsTotal > 0
+            ? (summary.requiredSkillsMatched / summary.requiredSkillsTotal) * 100
+            : 0;
     const desirablePercent =
-        (MOCK_SUMMARY.desirableSkillsMatched / MOCK_SUMMARY.desirableSkillsTotal) * 100;
+        summary.desirableSkillsTotal > 0
+            ? (summary.desirableSkillsMatched / summary.desirableSkillsTotal) * 100
+            : 0;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -75,27 +81,32 @@ export function SummaryMatchModal({ onClose }: Props) {
                 <div className="flex flex-col gap-6 px-7 py-6">
                     <div className="flex items-center gap-5">
                         <ProgressRing
-                            value={MOCK_SUMMARY.matchScore}
+                            value={match.matchScore}
                             size={72}
                             strokeWidth={5}
                         />
-                        <div>
-                            <p className="text-sm text-slate-500">Melhor match</p>
-                            <p className="text-lg font-bold text-slate-900">
-                                {MOCK_SUMMARY.resourceName}
+                        <div className="min-w-0">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                Candidato #{match.rankingScore}
                             </p>
+                            <p className="truncate text-lg font-bold text-slate-900">
+                                {match.name}
+                            </p>
+                            {match.description && (
+                                <p className="truncate text-xs text-slate-500">{match.description}</p>
+                            )}
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-5">
                         <SkillProgress
-                            label="Skills atendidas"
-                            detail={`${MOCK_SUMMARY.requiredSkillsMatched} de ${MOCK_SUMMARY.requiredSkillsTotal} obrigatórias`}
+                            label="Skills obrigatórias atendidas"
+                            detail={`${summary.requiredSkillsMatched} de ${summary.requiredSkillsTotal} obrigatórias`}
                             percent={requiredPercent}
                         />
                         <SkillProgress
                             label="Skills desejáveis atendidas"
-                            detail={`${MOCK_SUMMARY.desirableSkillsMatched} de ${MOCK_SUMMARY.desirableSkillsTotal}`}
+                            detail={`${summary.desirableSkillsMatched} de ${summary.desirableSkillsTotal} desejáveis`}
                             percent={desirablePercent}
                         />
                     </div>

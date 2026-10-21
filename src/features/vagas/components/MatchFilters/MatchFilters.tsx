@@ -1,17 +1,23 @@
 import { Search } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
-import {
-    MOCK_AVAILABILITY_OPTIONS,
-    MOCK_SQUAD_OPTIONS,
-} from "../../utils/matchList";
 import type { MatchAvailabilityFilter, MatchSquadFilter } from "../../types/types";
 
 const filterLabelCls = "block text-[11px] font-semibold tracking-wide text-slate-500 mb-1.5";
+
+const DEFAULT_SQUAD_OPTIONS = [{ value: "all", label: "Todas" }];
+
+const AVAILABILITY_OPTIONS = [
+    { value: "all", label: "Todas" },
+    { value: "available", label: "Disponível" },
+    { value: "allocated", label: "Em projeto" },
+    { value: "waiting", label: "Aguardando" },
+];
 
 interface Props {
     search: string;
     squad: MatchSquadFilter;
     availability: MatchAvailabilityFilter;
+    squadOptions?: { value: string; label: string }[];
     onSearchChange: (value: string) => void;
     onSquadChange: (value: MatchSquadFilter) => void;
     onAvailabilityChange: (value: MatchAvailabilityFilter) => void;
@@ -22,11 +28,14 @@ export function MatchFilters({
     search,
     squad,
     availability,
+    squadOptions,
     onSearchChange,
     onSquadChange,
     onAvailabilityChange,
     onClear,
 }: Props) {
+    const finalSquadOptions = squadOptions && squadOptions.length > 0 ? squadOptions : DEFAULT_SQUAD_OPTIONS;
+
     return (
         <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -46,7 +55,7 @@ export function MatchFilters({
                 <div className="min-w-0 lg:col-span-3">
                     <label className={filterLabelCls}>SQUAD</label>
                     <Select
-                        options={[...MOCK_SQUAD_OPTIONS]}
+                        options={[...finalSquadOptions]}
                         value={squad}
                         onChange={(e) => onSquadChange(e.target.value)}
                     />
@@ -55,7 +64,7 @@ export function MatchFilters({
                 <div className="min-w-0 lg:col-span-3">
                     <label className={filterLabelCls}>DISPONIBILIDADE</label>
                     <Select
-                        options={[...MOCK_AVAILABILITY_OPTIONS]}
+                        options={AVAILABILITY_OPTIONS}
                         value={availability}
                         onChange={(e) => onAvailabilityChange(e.target.value as MatchAvailabilityFilter)}
                     />

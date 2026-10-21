@@ -414,6 +414,7 @@ Base path: `/v1/admin/resources`
 | `GET` | `/v1/admin/job-postings/active` | Lista as vagas ativas (paginado) |
 | `GET` | `/v1/admin/job-postings/inactive` | Lista as vagas inativas (paginado) |
 | `GET` | `/v1/admin/job-postings/:id` | Busca detalhes de uma vaga específica |
+| `GET` | `/v1/admin/job-postings/:id/matches` | Ranking de candidatos compatíveis com a vaga (score, skills e resumo) |
 | `POST` | `/v1/admin/job-postings` | Cria uma nova vaga |
 | `PUT` | `/v1/admin/job-postings/:id` | Atualiza os dados de uma vaga |
 | `PATCH`| `/v1/admin/job-postings/:id/activate` | Ativa uma vaga |

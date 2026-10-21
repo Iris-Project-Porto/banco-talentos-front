@@ -38,16 +38,23 @@ export function MatchTable({ data, onView }: Props) {
         {
             header: "Squad",
             render: (match: Match) => (
-                <p className="whitespace-nowrap text-slate-600">{match.squadName}</p>
+                <p className="whitespace-nowrap text-slate-600">{match.squadName || "—"}</p>
             ),
         },
         {
             header: "Disponibilidade",
-            render: (match: Match) => (
-                <Badge variant={match.avaiability === "available" ? "success" : "warning"}>
-                    {match.avaiability === "available" ? "Disponível" : "Em projeto"}
-                </Badge>
-            ),
+            render: (match: Match) => {
+                const avail = (match.availability || "").toLowerCase();
+                const isAvailable = avail === "available";
+                const isWaiting = avail === "waiting";
+                const label = isAvailable ? "Disponível" : isWaiting ? "Aguardando" : "Em projeto";
+                const variant = isAvailable ? "success" : isWaiting ? "info" : "warning";
+                return (
+                    <Badge variant={variant}>
+                        {label}
+                    </Badge>
+                );
+            },
         },
         {
             header: "Match",
@@ -60,11 +67,14 @@ export function MatchTable({ data, onView }: Props) {
             header: "Skills que mais contribuíram",
             render: (match: Match) => (
                 <div className="flex flex-wrap gap-1.5">
-                    {match.mainSkills.map((skill) => (
+                    {(match.mainSkills || []).map((skill) => (
                         <Tag key={skill.name} kind="skill">
                             {skill.name} ({skill.contributionPercent}%)
                         </Tag>
                     ))}
+                    {(!match.mainSkills || match.mainSkills.length === 0) && (
+                        <span className="text-xs text-slate-400">—</span>
+                    )}
                 </div>
             ),
         },
