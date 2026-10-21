@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { authApi } from "@/features/auth";
+import { authApi, useAuth } from "@/features/auth";
 import { Button, Input, PasswordRequirements } from "@/components/ui";
 import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { resetPasswordSchema, type ResetPasswordFormData } from "@/features/auth/validations/validations";
@@ -10,6 +10,7 @@ import { getApiError } from "@/lib/axios";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [params] = useSearchParams();
 
   const email = params.get("email") ?? "";
@@ -39,7 +40,8 @@ export default function ResetPassword() {
   const resetMutation = useMutation({
     mutationFn: (data: ResetPasswordFormData) =>
       authApi.resetPassword(data.email, data.token, data.password),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logout();
       navigate("/login?reset=1");
     },
   });

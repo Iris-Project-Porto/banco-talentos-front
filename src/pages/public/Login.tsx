@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input } from "@/components/ui";
-import { useAuth, UserRole } from "@/features/auth";
+import { authApi, useAuth, UserRole } from "@/features/auth";
 import { loginSchema, type LoginFormData } from "@/features/auth/validations/validations";
 import AuthLayout from "@/components/layouts/AuthLayout/AuthLayout";
 import { getApiError } from "@/lib/axios";
@@ -29,7 +29,15 @@ export default function Login() {
     try {
       await login(data.email, data.password);
       const stored = localStorage.getItem("user");
-      const role = stored ? JSON.parse(stored).role : null;
+      const loggedInUser = stored ? JSON.parse(stored) : null;
+      if (loggedInUser?.mustChangePassword) {
+        const resetUrl = await authApi.generateFirstPasswordReset();
+        const resetLocation = new URL(resetUrl);
+        navigate(`${resetLocation.pathname}${resetLocation.search}`, { replace: true });
+        return;
+      }
+
+      const role = loggedInUser?.role ?? null;
       navigate(role === UserRole.ADMIN ? "/admin/dashboard" : "/meu-perfil", { replace: true });
     } catch (err) {
       setError(getApiError(err, "E-mail ou senha incorretos."));
