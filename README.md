@@ -304,9 +304,10 @@ Base path: `/v1/auth` (prefixo `/api` é adicionado pelo Axios em produção ou 
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `POST` | `/v1/auth/login` | Autentica e retorna os tokens e dados do usuário (`name`, `email`, `role`, `hasProfile`) |
+| `POST` | `/v1/auth/login` | Autentica e retorna os tokens e dados do usuário (`name`, `email`, `role`, `hasProfile`, `mustChangePassword`) |
 | `POST` | `/v1/auth/refresh` | Renova a sessão e rotaciona os tokens |
 | `POST` | `/v1/auth/logout` | Invalida o refresh token e encerra a sessão |
+| `POST` | `/v1/auth/first-password-reset` | Gera um link de redefinição para o usuário autenticado com senha provisória |
 | `POST` | `/v1/auth/register` | Cria conta de **Administrador** (nome, e-mail, senha, role `ADMIN` e grupo). Recurso não é aceito neste endpoint |
 | `POST` | `/v1/auth/verify` | Valida o código OTP de ativação de e-mail |
 | `POST` | `/v1/auth/resend-verification-code` | Reenvia o código OTP de ativação de e-mail |
@@ -321,6 +322,8 @@ O front persiste `token`, `refreshToken` e `user` no `localStorage`. O intercept
 2. O front chama `GET /v1/auth/validate-reset-token` ao carregar a página.
 3. Se o token estiver expirado ou inválido, exibe mensagem e orienta a solicitar novo link em `/forgot-password`.
 4. Se válido, exibe o formulário; ao salvar, chama `POST /v1/auth/reset-password` (validação repetida no backend).
+
+No primeiro acesso com senha provisória, `POST /v1/auth/login` retorna `mustChangePassword: true`; o front chama `POST /v1/auth/first-password-reset` com o JWT recém-recebido e redireciona para a URL de reset retornada.
 
 ### 👤 Perfil do Recurso
 
