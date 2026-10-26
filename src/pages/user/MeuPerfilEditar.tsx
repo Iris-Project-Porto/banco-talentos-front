@@ -10,6 +10,8 @@ import {
     ContactAddressFields,
     ProfileTabButton,
 } from "@/features/profiles";
+import { useQuery } from "@tanstack/react-query";
+import { skillsApi } from "@/features/skills";
 
 type Tab = "identificacao" | "skills" | "contato" | "links";
 
@@ -17,8 +19,10 @@ export default function MeuPerfilEditar() {
     const navigate = useNavigate();
     const {
         form,
-        stacks,
-        setStacks,
+        hardSkills,
+        setHardSkills,
+        softSkills,
+        setSoftSkills,
         updateField,
         handleSave,
         loading,
@@ -27,6 +31,21 @@ export default function MeuPerfilEditar() {
         saving,
     } = useMeuPerfilEditar();
     const [tab, setTab] = useState<Tab>("identificacao");
+
+    const {
+        data: activeSkillsPage,
+        isError: skillsError,
+    } = useQuery({
+        queryKey: ["skills", "active", "assessment"],
+        queryFn: () => skillsApi.getActiveSkillsPublic(),
+    });
+    const activeSkills = activeSkillsPage?.content ?? [];
+    const hardSkillsList = activeSkills.filter(
+        (skill) => skill.type === "HARD",
+    );
+    const softSkillsList = activeSkills.filter(
+        (skill) => skill.type === "SOFT",
+    );
 
     if (loading) {
         return <p className="text-sm text-slate-400">Carregando...</p>;
@@ -129,8 +148,16 @@ export default function MeuPerfilEditar() {
 
             {tab === "skills" && (
                 <div className="flex max-w-3xl flex-col gap-4">
-                    <Section title="Stack tecnológica">
-                        <StackInput value={stacks} onChange={setStacks} />
+                    {skillsError && (
+                        <p className="text-sm text-red-600">
+                            Não foi possível carregar as skills.
+                        </p>
+                    )}
+                    <Section title="Avaliação de Hard Skills">
+                        <StackInput value={hardSkills} onChange={setHardSkills} skills={hardSkillsList} />
+                    </Section>
+                    <Section title="Avaliação de Soft Skills">
+                        <StackInput value={softSkills} onChange={setSoftSkills} skills={softSkillsList} />
                     </Section>
                 </div>
             )}
