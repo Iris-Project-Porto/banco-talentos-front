@@ -8,6 +8,7 @@ interface AuthUser {
     email: string;
     role: UserRole;
     hasProfile: boolean;
+    mustChangePassword: boolean;
 }
 
 export interface AuthContextType {
@@ -47,7 +48,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     function markProfileCreated() {
         setUser((current) => {
             if (!current) return current;
-            persistUser({ name: current.name, email: current.email, role: current.role, hasProfile: true });
+            persistUser({
+                name: current.name,
+                email: current.email,
+                role: current.role,
+                hasProfile: true,
+                mustChangePassword: current.mustChangePassword,
+            });
             return { ...current, hasProfile: true };
         });
     }
@@ -63,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 email: parsed.email,
                 role: parsed.role,
                 hasProfile: parsed.hasProfile === true,
+                mustChangePassword: parsed.mustChangePassword === true,
             });
         }
         setLoading(false);
@@ -82,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: data.email,
             role: data.role,
             hasProfile: data.hasProfile === true,
+            mustChangePassword: data.mustChangePassword === true,
         });
         setUser({
             token: data.token,
@@ -89,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: data.email,
             role: data.role,
             hasProfile: data.hasProfile === true,
+            mustChangePassword: data.mustChangePassword === true,
         });
     }
 
