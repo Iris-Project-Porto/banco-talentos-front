@@ -42,7 +42,6 @@ describe("Componente ResourceCreateModal", () => {
         expect(screen.getByText("Cadastrar Recurso")).toBeInTheDocument();
         expect(screen.getByText("Nome completo *")).toBeInTheDocument();
         expect(screen.getByText("E-mail corporativo *")).toBeInTheDocument();
-        expect(screen.getByText("CPF *")).toBeInTheDocument();
         expect(screen.getByText("Grupo *")).toBeInTheDocument();
         expect(await screen.findByRole("option", { name: "Delivery" })).toBeInTheDocument();
     });
@@ -70,7 +69,6 @@ describe("Componente ResourceCreateModal", () => {
 
         expect(await screen.findByText("Nome é obrigatório")).toBeInTheDocument();
         expect(screen.getByText("E-mail é obrigatório")).toBeInTheDocument();
-        expect(screen.getByText("CPF inválido")).toBeInTheDocument();
         expect(screen.getAllByText("Selecione o grupo").length).toBeGreaterThanOrEqual(1);
     });
 
@@ -90,7 +88,6 @@ describe("Componente ResourceCreateModal", () => {
         expect(onSave.mock.calls[0][0]).toEqual({
             name: "João Silva",
             email: "joao@vilt-group.com",
-            cpf: "12345678901",
             groupId: "group-1",
         });
     });

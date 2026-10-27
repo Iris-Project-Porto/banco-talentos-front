@@ -32,7 +32,6 @@ describe('recursosApi', () => {
             const payload = {
                 name: 'João Silva',
                 email: 'joao@vilt-group.com',
-                cpf: '12345678901',
                 groupId: 'group-1',
             };
             vi.mocked(http.post).mockResolvedValueOnce({ data: { profileId: 'p1', userId: 'u1', ...payload } });

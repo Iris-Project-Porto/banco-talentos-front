@@ -40,7 +40,6 @@ export interface UserProfile {
     levelScore?: number;
     levelJustification?: string;
     photoUrl?: string;
-    cpf?: string;
     area?: string;
     about?: string;
     allocationStatus?: string;

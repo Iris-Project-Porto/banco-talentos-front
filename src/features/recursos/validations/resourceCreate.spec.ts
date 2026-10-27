@@ -5,18 +5,16 @@ describe("resourceCreateSchema", () => {
     const dadosValidos = {
         name: "João Silva",
         email: "joao@vilt-group.com",
-        cpf: "123.456.789-01",
         groupId: "group-1",
     };
 
-    it("deve aprovar dados válidos e normalizar o CPF", () => {
+    it("deve aprovar dados válidos", () => {
         const result = resourceCreateSchema.safeParse(dadosValidos);
         expect(result.success).toBe(true);
         if (result.success) {
             expect(result.data).toEqual({
                 name: "João Silva",
                 email: "joao@vilt-group.com",
-                cpf: "12345678901",
                 groupId: "group-1",
             });
         }
@@ -35,14 +33,6 @@ describe("resourceCreateSchema", () => {
         expect(result.success).toBe(false);
         if (!result.success) {
             expect(result.error.issues[0].message).toBe("E-mail inválido");
-        }
-    });
-
-    it("deve rejeitar CPF com menos de 11 dígitos", () => {
-        const result = resourceCreateSchema.safeParse({ ...dadosValidos, cpf: "123.456" });
-        expect(result.success).toBe(false);
-        if (!result.success) {
-            expect(result.error.issues[0].message).toBe("CPF inválido");
         }
     });
 
