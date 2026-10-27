@@ -30,7 +30,7 @@ Aplicação web central da **VILT** para gerenciamento de talentos e recursos hu
 ## ✨ Funcionalidades
 
 **Gestão de Recursos**
-Listagem e filtros de recursos em `/admin/talentos`, com cadastro exclusivo pelo admin (nome, e-mail, CPF e grupo). O recurso recebe e-mail com senha provisória e completa o perfil em **Meu Perfil**. Hard e Soft Skills com níveis de proficiência de 1 a 10.
+Listagem e filtros de recursos em `/admin/talentos`, com cadastro exclusivo pelo admin (nome, e-mail, e grupo). O recurso recebe e-mail com senha provisória e completa o perfil em **Meu Perfil**. Hard e Soft Skills com níveis de proficiência de 1 a 10.
 
 **Gestão de Vagas**
 Módulo completo (CRUD) para controle de postos de trabalho (Aberta, Em triagem, Em alocação, Preenchida, Fechada, Cancelada) e filtragem por código, título, projeto, recrutador ou senioridade. Cadastro e edição em páginas dedicadas, com wizard de duas etapas: dados da vaga (projeto, squad, modalidade, skills obrigatórias/desejáveis com nível e peso) e ranking de match de recursos. Edição permitida apenas nos status Aberta, Em triagem e Em alocação; cancelamento com modal de confirmação.
@@ -157,7 +157,7 @@ src/
 │   ├── recursos/              # Cadastro e listagem de recursos (admin)
 │   │   ├── api/               # POST/GET/PATCH /v1/admin/resources
 │   │   ├── components/
-│   │   │   ├── ResourceCreateModal/  # Modal de cadastro (nome, e-mail, CPF, grupo)
+│   │   │   ├── ResourceCreateModal/  # Modal de cadastro (nome, e-mail, grupo)
 │   │   │   ├── RecursosFilters/      # Filtros da listagem
 │   │   │   └── RecursosList/         # Tabela/listagem de recursos
 │   │   ├── hooks/             # useRecursosList
@@ -385,7 +385,7 @@ Base path: `/v1/admin/resources`
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
-| `POST` | `/v1/admin/resources` | Cadastra recurso (nome, e-mail, CPF, grupo) e dispara e-mail com senha provisória |
+| `POST` | `/v1/admin/resources` | Cadastra recurso (nome, e-mail, grupo) e dispara e-mail com senha provisória |
 | `GET` | `/v1/admin/resources` | Lista recursos com filtros e paginação |
 | `GET` | `/v1/admin/resources/:id` | Busca um recurso por ID |
 | `PATCH` | `/v1/admin/resources/:id` | Atualiza dados operacionais do recurso |

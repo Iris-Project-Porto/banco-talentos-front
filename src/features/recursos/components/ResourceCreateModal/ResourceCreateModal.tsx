@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select } from "@/components/ui";
 import { authApi } from "@/features/auth/api/auth.api";
-import { formatCpf, formatEmail } from "@/utils/masks";
+import { formatEmail } from "@/utils/masks";
 import {
     resourceCreateSchema,
     type ResourceCreateFormData,
@@ -37,11 +37,10 @@ export function ResourceCreateModal({ saving, onSave, onClose }: Props) {
         formState: { errors },
     } = useForm<ResourceCreateFormData>({
         resolver: zodResolver(resourceCreateSchema),
-        defaultValues: { name: "", email: "", cpf: "", groupId: "" },
+        defaultValues: { name: "", email: "",  groupId: "" },
     });
 
     const emailRegister = register("email");
-    const cpfRegister = register("cpf");
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -85,20 +84,6 @@ export function ResourceCreateModal({ saving, onSave, onClose }: Props) {
                                 setValue("email", formatted, { shouldValidate: true });
                             }}
                             error={errors.email?.message}
-                        />
-                        <Input
-                            label="CPF *"
-                            placeholder="000.000.000-00"
-                            inputMode="numeric"
-                            maxLength={14}
-                            {...cpfRegister}
-                            onChange={(e) => {
-                                const formatted = formatCpf(e.target.value);
-                                e.target.value = formatted;
-                                cpfRegister.onChange(e);
-                                setValue("cpf", formatted, { shouldValidate: true });
-                            }}
-                            error={errors.cpf?.message}
                         />
                         <Select
                             label="Grupo *"
