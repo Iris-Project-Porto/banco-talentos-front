@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { vagasApi, VagaCard, type JobPosting, type JobPostingPayload } from "@/features/vagas";
+import { vagasApi, VagaCard, type JobPosting } from "@/features/vagas";
 import { PageHeader, Button, ConfirmModal, Input, Pagination } from "@/components/ui";
 
 export default function Vagas() {
@@ -28,8 +28,8 @@ export default function Vagas() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: async (data: JobPostingPayload & { id: string }) =>
-      vagasApi.update(data.id, data),
+    mutationFn: async ({ id }: { id: string }) =>
+      vagasApi.updateStatus(id, "CANCELLED"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vagas'] });
       setVagaToCancel(null);
@@ -61,12 +61,14 @@ export default function Vagas() {
   function openEdit(v: JobPosting) { navigate(`/admin/vagas/${v.id}/editar`); }
 
   function handleCancelJob(vaga: JobPosting) {
-    setVagaToCancel(vaga);
+    if (!["CANCELLED", "FILLED"].includes(vaga.status)) {
+      setVagaToCancel(vaga);
+    }
   }
 
   function confirmCancelJob() {
     if (vagaToCancel) {
-      cancelMutation.mutate({ ...vagaToCancel, status: "CANCELLED" });
+      cancelMutation.mutate({ id: vagaToCancel.id });
     }
   }
 
