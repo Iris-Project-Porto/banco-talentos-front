@@ -1,27 +1,29 @@
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
 import { STATUS_ONLY_STATUSES, type JobPostingPayload, type JobStatus } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
-import { GeneralFields } from "../GeneralFields/GeneralFields";
-import { SkillsSection } from "../SkillsSection/SkillsSection";
-import { AdditionalInfoFields } from "../AdditionalInfoFields/AdditionalInfoFields";
+import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
+import { MatchResources } from "../ResourceMatch/ResourceMatch";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
 
-const VAGA_FORM_STEPS: StepperStep[] = [
+const VAGA_WIZARD_STEPS: StepperStep[] = [
     { label: "Dados da Vaga", description: "Informações gerais" },
     { label: "Match de Recursos", description: "Ranking automático" },
 ];
+
+type VagaWizardStep = 0 | 1;
 
 const STATUS_DICTIONARY = {
     "FILLED": "Preenchida",
     "CLOSED": "Encerrada",
     "CANCELLED": "Cancelada",
-}
+};
 
-interface VagaFormProps {
+interface Props {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
     onSave: (v: JobPostingPayload & { id?: string }) => void;
@@ -54,15 +56,23 @@ export function VagaForm({ initial, saving, onSave, onStatusChange, onCancel }: 
 
     const vagaDependencies = useVagaDependencies(selectedProjectId, selectedSquadId, methods.setValue);
 
-    const onSubmit = (data: VagaFormData) => {
-        onSave({
+    async function onSubmit(data: VagaFormData) {
+        const payload = {
             ...data,
             description: data.description || "", requirements: data.requirements || "", notes: data.notes || "",
             openingDate: new Date(data.openingDate).toISOString(),
             closingDate: data.closingDate ? new Date(data.closingDate).toISOString() : undefined,
-            id: initial.id
-        });
-    };
+            id: savedVagaId ?? initial.id,
+        };
+
+        try {
+            const saved = await onSave(payload);
+            setSavedVagaId(saved.id);
+            setStep(1);
+        } catch {
+            // Erro tratado no pai (toast). Permanece no step 0.
+        }
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -86,22 +96,11 @@ export function VagaForm({ initial, saving, onSave, onStatusChange, onCancel }: 
                                 {isEdit ? "Salvar alterações" : "Salvar"}
                             </Button>
                         )}
-                        {canChangeOnlyStatus && (
-                            <Button
-                                type="button"
-                                variant="primary"
-                                loading={saving}
-                                disabled={!onStatusChange || saving}
-                                onClick={() => onStatusChange?.(methods.getValues("status"))}
-                            >
-                                Salvar status
-                            </Button>
-                        )}
                     </>
                 }
             />
 
-            <Stepper steps={VAGA_FORM_STEPS} currentStep={0} />
+            <Stepper steps={VAGA_WIZARD_STEPS} currentStep={step} />
 
             {!canEdit && !canChangeOnlyStatus && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
@@ -127,11 +126,9 @@ export function VagaForm({ initial, saving, onSave, onStatusChange, onCancel }: 
                         />
                     </div>
 
-                    <SkillsSection canEdit={canEdit} />
-
-                    <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
-                        <AdditionalInfoFields canEdit={canEdit} />
-                    </div>
+                    {step === 1 && (
+                        <MatchResources vagaId={savedVagaId} />
+                    )}
                 </form>
             </FormProvider>
         </div>

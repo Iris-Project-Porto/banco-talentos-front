@@ -28,7 +28,6 @@ export default function VagaForm() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["vagas"] });
             toast.success("Vaga salva com sucesso!");
-            navigate("/admin/vagas");
         },
         onError: (error) => {
             toast.error(
@@ -78,7 +77,7 @@ export default function VagaForm() {
     }
 
     return (
-        <VagaFormComponent
+        <VagaWizard
             initial={vaga ?? {}}
             saving={saveMutation.isPending || statusMutation.isPending}
             onSave={(payload) => saveMutation.mutate(payload)}
