@@ -1,5 +1,11 @@
 import { http } from "@/lib/axios";
-import type { JobPosting, JobPostingPayload, JobStatus } from "../types/types";
+import type {
+  CandidateFiltersParams,
+  JobPosting,
+  JobPostingPayload,
+  JobStatus,
+  MatchCandidatesResponse,
+} from "../types/types";
 
 export const vagasApi = {
   getActive: (page = 0, size = 20) =>

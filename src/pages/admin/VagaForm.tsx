@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { STATUS_ONLY_STATUSES, vagasApi, VagaForm as VagaFormComponent, type JobPostingPayload, type JobStatus } from "@/features/vagas";
+import { STATUS_ONLY_STATUSES, vagasApi, VagaWizard as VagaWizardComponent, type JobPostingPayload, type JobStatus } from "@/features/vagas";
 import { getApiError } from "@/lib/axios";
 
 type SavePayload = JobPostingPayload & { id?: string };
@@ -77,10 +77,10 @@ export default function VagaForm() {
     }
 
     return (
-        <VagaWizard
+        <VagaWizardComponent
             initial={vaga ?? {}}
             saving={saveMutation.isPending || statusMutation.isPending}
-            onSave={(payload) => saveMutation.mutate(payload)}
+            onSave={(payload) => saveMutation.mutateAsync(payload)}
             onStatusChange={(status) => statusMutation.mutate(status)}
             onCancel={goBack}
         />
