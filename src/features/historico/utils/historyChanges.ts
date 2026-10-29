@@ -11,8 +11,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isEmptyValue(value: unknown): boolean {
+  return value === null || value === undefined || value === "";
+}
+
 function areValuesEqual(left: unknown, right: unknown): boolean {
   if (Object.is(left, right)) return true;
+  if (isEmptyValue(left) && isEmptyValue(right)) return true;
   if (typeof left !== "object" || left === null || typeof right !== "object" || right === null) {
     return false;
   }
