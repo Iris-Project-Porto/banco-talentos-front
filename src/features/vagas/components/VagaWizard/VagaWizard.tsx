@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
-import { type JobPosting, type JobPostingPayload } from "../../types/types";
+import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
 import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
@@ -27,14 +27,16 @@ interface Props {
     initial: Partial<JobPostingPayload> & { id?: string };
     saving: boolean;
     onSave: (v: JobPostingPayload & { id?: string }) => Promise<JobPosting>;
+    onStatusChange?: (status: JobStatus) => void;
     onCancel: () => void;
 }
 
-export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
+export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }: Props) {
     const [step, setStep] = useState<VagaWizardStep>(0);
     const [savedVagaId, setSavedVagaId] = useState(initial.id);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
+    const canChangeOnlyStatus = isEdit && STATUS_ONLY_STATUSES.includes(initial.status as JobStatus);
 
     const methods = useForm<VagaFormData>({
         resolver: zodResolver(vagaSchema),
@@ -96,15 +98,31 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
                                 {isEdit ? "Salvar alterações" : "Salvar e continuar"}
                             </Button>
                         )}
+                        {canChangeOnlyStatus && (
+                            <Button
+                                type="button"
+                                variant="primary"
+                                loading={saving}
+                                disabled={!onStatusChange || saving}
+                                onClick={() => onStatusChange?.(methods.getValues("status"))}
+                            >
+                                Salvar status
+                            </Button>
+                        )}
                     </>
                 }
             />
 
             <Stepper steps={VAGA_WIZARD_STEPS} currentStep={step} />
 
-            {!canEdit && (
+            {!canEdit && !canChangeOnlyStatus && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
                     Vagas com status <b>{STATUS_DICTIONARY[initial.status as keyof typeof STATUS_DICTIONARY]}</b> não podem ser editadas (Apenas Abertas, Em Triagem ou Em Alocação).
+                </div>
+            )}
+            {canChangeOnlyStatus && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
+                    Esta vaga está somente para leitura. Apenas o status pode ser alterado.
                 </div>
             )}
 
@@ -114,7 +132,11 @@ export function VagaWizard({ initial, saving, onSave, onCancel }: Props) {
                     className="flex flex-col gap-5"
                 >
                     {step === 0 && (
-                        <VagaDataForm canEdit={canEdit} dependencies={vagaDependencies} />
+                        <VagaDataForm
+                            canEdit={canEdit}
+                            canEditStatus={canEdit || canChangeOnlyStatus}
+                            dependencies={vagaDependencies}
+                        />
                     )}
 
                     {step === 1 && (

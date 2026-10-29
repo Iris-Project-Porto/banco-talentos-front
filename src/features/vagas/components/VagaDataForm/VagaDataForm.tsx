@@ -5,14 +5,15 @@ import { useVagaDependencies } from "../VagaWizard/hooks/useVagaDependencies/use
 
 interface Props {
     canEdit: boolean;
+    canEditStatus?: boolean;
     dependencies: ReturnType<typeof useVagaDependencies>;
 }
 
-export function VagaDataForm({ canEdit, dependencies }: Props) {
+export function VagaDataForm({ canEdit, canEditStatus = canEdit, dependencies }: Props) {
     return (
         <>
             <div className="rounded-xl border border-slate-200 bg-white shadow-card px-7 py-6">
-                <GeneralFields canEdit={canEdit} dependencies={dependencies} />
+                <GeneralFields canEdit={canEdit} canEditStatus={canEditStatus} dependencies={dependencies} />
             </div>
 
             <SkillsSection canEdit={canEdit} />
