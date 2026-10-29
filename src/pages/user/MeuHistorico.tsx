@@ -1,33 +1,22 @@
 import HistoryItem from "@/features/historico/components/HistoryItem/HistoryItem";
+import { useHistorico } from "@/features/historico/hooks/useHistorico";
+import type { AuditOperation } from "@/features/historico/types/historico";
+import type { HistoryOperation } from "@/features/historico/utils/historyChanges";
 
-const historyItems = [
-  {
-    id: "history-1",
-    operation: "Atualização" as const,
-    entityType: "Perfil",
-    date: "2025-03-14T10:30:00-03:00",
-    oldValue: { area: "Fullstack" },
-    newValue: { area: "Frontend" },
-  },
-  {
-    id: "history-2",
-    operation: "Atualização" as const,
-    entityType: "Perfil",
-    date: "2025-02-27T15:45:00-03:00",
-    oldValue: { level: "JUNIOR", phone: "(32) 98487-9196" },
-    newValue: { level: "PLENO", phone: "(32) 98486-9196" },
-  },
-  {
-    id: "history-3",
-    operation: "Criação" as const,
-    entityType: "Equipamento",
-    date: "2025-01-08T09:15:00-03:00",
-    oldValue: {},
-    newValue: { equipment: { name: "Notebook", model: "Dell Latitude 5440" } },
-  },
-];
+const operationLabels: Record<AuditOperation, HistoryOperation> = {
+  CREATE: "Criação",
+  UPDATE: "Atualização",
+  DELETE: "Remoção",
+};
+
+const entityLabels: Record<string, string> = {
+  PROFILE: "Perfil",
+  RESOURCE_EQUIPMENT: "Equipamento",
+};
 
 export default function MeuHistorico() {
+  const { historico, isLoading, isError } = useHistorico();
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -48,13 +37,34 @@ export default function MeuHistorico() {
               </tr>
             </thead>
             <tbody>
-              {historyItems.map((item) => (
+              {isLoading && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                    Carregando histórico...
+                  </td>
+                </tr>
+              )}
+              {isError && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-red-600">
+                    Não foi possível carregar o histórico.
+                  </td>
+                </tr>
+              )}
+              {!isLoading && !isError && historico.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                    Nenhum registro de histórico encontrado.
+                  </td>
+                </tr>
+              )}
+              {!isLoading && !isError && historico.map((item) => (
                 <HistoryItem
                   key={item.id}
                   id={item.id}
-                  operation={item.operation}
-                  entityType={item.entityType}
-                  date={item.date}
+                  operation={operationLabels[item.operation]}
+                  entityType={entityLabels[item.entityType] ?? item.entityType}
+                  date={item.createdAt}
                   oldValue={item.oldValue}
                   newValue={item.newValue}
                 />

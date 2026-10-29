@@ -1,5 +1,5 @@
 export type JsonObject = Record<string, unknown>;
-export type HistoryOperation = "Criação" | "Atualização" | "Exclusão";
+export type HistoryOperation = "Criação" | "Atualização" | "Remoção";
 
 export interface Change {
   label: string;

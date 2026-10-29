@@ -2,7 +2,6 @@ import HistoryChangeRow from "../HistoryChangeRow/HistoryChangeRow";
 import {
   getHistoryChanges,
   type HistoryOperation,
-  type JsonObject,
 } from "../../utils/historyChanges";
 
 interface HistoryItemProps {
@@ -10,8 +9,8 @@ interface HistoryItemProps {
   operation: HistoryOperation;
   entityType: string;
   date: string;
-  oldValue: JsonObject;
-  newValue: JsonObject;
+  oldValue: unknown;
+  newValue: unknown;
 }
 
 export default function HistoryItem({ id, operation, entityType, date, oldValue, newValue }: HistoryItemProps) {
