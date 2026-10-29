@@ -1,28 +1,38 @@
-import { Button } from "@/components/ui";
+import HistoryChangeRow from "../HistoryChangeRow/HistoryChangeRow";
+import {
+  getHistoryChanges,
+  type HistoryOperation,
+  type JsonObject,
+} from "../../utils/historyChanges";
 
-interface Props {
-  description: string;
+interface HistoryItemProps {
+  id: string;
+  operation: HistoryOperation;
+  entityType: string;
   date: string;
-  onViewChanges: () => void;
+  oldValue: JsonObject;
+  newValue: JsonObject;
 }
 
-export default function HistoryItem({ description, date, onViewChanges }: Props) {
+export default function HistoryItem({ id, operation, entityType, date, oldValue, newValue }: HistoryItemProps) {
   const formattedDate = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
   }).format(new Date(date));
+  const changes = getHistoryChanges(oldValue, newValue);
 
   return (
-    <tr className="border-b border-gray-100 transition-colors hover:bg-gray-50">
-      <td className="px-4 py-4 text-sm font-medium text-gray-800">{description}</td>
-      <td className="px-4 py-4 text-sm text-gray-500">
-        <time dateTime={date}>{formattedDate}</time>
-      </td>
-      <td className="px-4 py-4 text-right">
-        <Button type="button" variant="secondary" size="sm" onClick={onViewChanges}>
-          Ver alterações
-        </Button>
-      </td>
-    </tr>
+    <>
+      {changes.map((change, index) => (
+        <HistoryChangeRow
+          key={`${id}-${change.label}-${index}`}
+          change={change}
+          operation={operation}
+          entityType={entityType}
+          formattedDate={formattedDate}
+          date={date}
+        />
+      ))}
+    </>
   );
 }
