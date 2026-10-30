@@ -7,8 +7,36 @@ export interface Change {
   newValue: unknown;
 }
 
+export interface HistorySkill {
+  name: string;
+  level: string | number | null;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getFirstValue(record: Record<string, unknown>, keys: string[]): unknown {
+  return keys.map((key) => record[key]).find((value) => value !== null && value !== undefined);
+}
+
+export function getHistorySkill(value: unknown): HistorySkill | null {
+  if (!isRecord(value)) return null;
+
+  const name = getFirstValue(value, ["Skill", "name"]);
+  if (typeof name !== "string") return null;
+
+  const level = getFirstValue(value, [
+    "Nível de proficiência",
+    "proficiencyLevel",
+    "Nível mínimo",
+    "minLevel",
+    "level",
+  ]);
+  return {
+    name,
+    level: typeof level === "string" || typeof level === "number" ? level : null,
+  };
 }
 
 function isEmptyValue(value: unknown): boolean {
@@ -37,18 +65,6 @@ function areValuesEqual(left: unknown, right: unknown): boolean {
   );
 }
 
-function formatLabel(key: string) {
-  const labels: Record<string, string> = {
-    area: "Área",
-    level: "Nível",
-    phone: "Telefone",
-    skills: "Competências",
-    proficiencyLevel: "Nível de proficiência",
-  };
-
-  return labels[key] ?? key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_-]/g, " ");
-}
-
 function getIdentity(value: unknown): string | null {
   if (!isRecord(value)) return null;
 
@@ -67,6 +83,57 @@ function getItemLabel(value: unknown, index: number): string {
   return `Item ${index + 1}`;
 }
 
+function isSkillsPath(path: string[]): boolean {
+  const key = path[path.length - 1];
+  return key === "Skills";
+}
+
+function getSkillIdentity(skill: unknown, index: number): string {
+  if (isRecord(skill)) {
+    const skillId = skill["ID da skill"] ?? skill.skillId;
+    if (typeof skillId === "string" || typeof skillId === "number") {
+      return `skill:${skillId}`;
+    }
+
+    const name = getHistorySkill(skill)?.name;
+    if (name) return `name:${name.toLocaleLowerCase()}`;
+
+    const id = skill.ID ?? skill.id;
+    if (typeof id === "string" || typeof id === "number") return `id:${id}`;
+  }
+  return `index:${index}`;
+}
+
+function getSkillChanges(
+  oldValue: unknown,
+  newValue: unknown,
+  path: string[],
+): Change[] {
+  const oldSkills = Array.isArray(oldValue) ? oldValue : [];
+  const newSkills = Array.isArray(newValue) ? newValue : [];
+  const oldItems = new Map(oldSkills.map((skill, index) => [getSkillIdentity(skill, index), skill]));
+  const newItems = new Map(newSkills.map((skill, index) => [getSkillIdentity(skill, index), skill]));
+  const identities = new Set([...oldItems.keys(), ...newItems.keys()]);
+
+  return [...identities].flatMap((identity) => {
+    const oldSkill = oldItems.get(identity);
+    const newSkill = newItems.get(identity);
+    const oldDisplay = getHistorySkill(oldSkill);
+    const newDisplay = getHistorySkill(newSkill);
+    if (
+      oldDisplay?.name === newDisplay?.name &&
+      oldDisplay?.level === newDisplay?.level
+    ) {
+      return [];
+    }
+    return [{
+      label: path.join(" / "),
+      oldValue: oldSkill,
+      newValue: newSkill,
+    }];
+  });
+}
+
 export function getHistoryChanges(
   oldValue: unknown,
   newValue: unknown,
@@ -82,10 +149,16 @@ export function getHistoryChanges(
     const oldRecord = isRecord(oldValue) ? oldValue : {};
     const newRecord = isRecord(newValue) ? newValue : {};
     const keys = new Set([...Object.keys(oldRecord), ...Object.keys(newRecord)]);
-    return [...keys].flatMap((key) =>
-      getHistoryChanges(oldRecord[key], newRecord[key], [...path, formatLabel(key)]),
-    );
+    return [...keys].flatMap((key) => {
+      const nextPath = [...path, key];
+      if (isSkillsPath(nextPath)) {
+        return getSkillChanges(oldRecord[key], newRecord[key], nextPath);
+      }
+      return getHistoryChanges(oldRecord[key], newRecord[key], nextPath);
+    });
   }
+
+  if (isSkillsPath(path)) return getSkillChanges(oldValue, newValue, path);
 
   if (Array.isArray(oldValue) && Array.isArray(newValue)) {
     const oldIdentities = oldValue.map(getIdentity);

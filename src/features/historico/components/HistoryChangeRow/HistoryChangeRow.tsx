@@ -1,3 +1,4 @@
+import HistorySkillCard from "../HistorySkillCard/HistorySkillCard";
 import {
   formatHistoryValue,
   type Change,
@@ -30,10 +31,14 @@ export default function HistoryChangeRow({
       </td>
       <td className="px-4 py-4 text-sm font-medium text-gray-700">{change.label}</td>
       <td className="max-w-sm whitespace-pre-wrap break-words px-4 py-4 text-sm text-gray-600">
-        {formatHistoryValue(change.oldValue)}
+        {change.label.endsWith("Skills") && change.oldValue !== null
+          ? <HistorySkillCard value={change.oldValue} />
+          : formatHistoryValue(change.oldValue)}
       </td>
       <td className="max-w-sm whitespace-pre-wrap break-words px-4 py-4 text-sm font-medium text-gray-800">
-        {formatHistoryValue(change.newValue)}
+        {change.label.endsWith("Skills") && change.newValue !== null
+          ? <HistorySkillCard value={change.newValue} />
+          : formatHistoryValue(change.newValue)}
       </td>
     </tr>
   );
