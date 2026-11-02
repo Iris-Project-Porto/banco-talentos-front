@@ -84,3 +84,53 @@ describe('SkillsSection Component', () => {
         expect(screen.getByRole('group')).toBeDisabled();
     });
 });
+
+describe('Máscara e total dos pesos', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(skillsApi.getActiveSkills).mockResolvedValue({ content: mockSkills } as any);
+    });
+
+    it('permite limpar o peso e aceita apenas inteiros de 1 a 100', () => {
+        renderSection();
+        fireEvent.click(screen.getByRole('button', { name: 'Selecionar Skill' }));
+        const input = screen.getByRole('textbox', { name: 'Peso da skill 1' });
+        expect(input).toHaveValue('1');
+        fireEvent.change(input, { target: { value: '' } });
+        expect(input).toHaveValue('');
+        for (const value of ['0', '101', '-1', '1.5', '1,5', '1e2', 'abc']) {
+            fireEvent.change(input, { target: { value } });
+            expect(input).toHaveValue('');
+        }
+        for (const value of ['1', '50', '100']) {
+            fireEvent.change(input, { target: { value } });
+            expect(input).toHaveValue(value);
+        }
+    });
+
+    it('limita a soma a 100% e libera espaço ao reduzir ou remover uma skill', () => {
+        renderSection({ defaultValues: { skills: [
+            { name: 'React', importanceWeight: 50, type: 'MANDATORY', minLevel: 'BASIC' },
+            { name: 'Node', importanceWeight: 50, type: 'DESIRABLE', minLevel: 'BASIC' },
+        ] } });
+        const weight = screen.getByRole('textbox', { name: 'Peso da skill 2' });
+        const selectSkill = screen.getByRole('button', { name: 'Selecionar Skill' });
+        expect(selectSkill).toBeDisabled();
+        expect(screen.getByRole('button', { name: '+ Adicionar Skill' })).toBeDisabled();
+        fireEvent.change(weight, { target: { value: '51' } });
+        expect(weight).toHaveValue('50');
+        fireEvent.change(weight, { target: { value: '40' } });
+        expect(weight).toHaveValue('40');
+        expect(selectSkill).toBeEnabled();
+        fireEvent.click(selectSkill);
+        const thirdWeight = screen.getByRole('textbox', { name: 'Peso da skill 3' });
+        fireEvent.change(thirdWeight, { target: { value: '50' } });
+        expect(thirdWeight).toHaveValue('1');
+        fireEvent.change(thirdWeight, { target: { value: '10' } });
+        expect(thirdWeight).toHaveValue('10');
+        expect(selectSkill).toBeDisabled();
+        fireEvent.click(screen.getAllByTitle('Excluir')[0]);
+        expect(selectSkill).toBeEnabled();
+        expect(screen.getByText(/Total dos pesos: 50%/)).toBeInTheDocument();
+    });
+});

@@ -27,6 +27,8 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
 
     const watchedSkills = useWatch({ control, name: "skills" }) || [];
+    const totalWeight = watchedSkills.reduce((total, skill) =>
+        total + (Number.isFinite(skill.importanceWeight) ? skill.importanceWeight : 0), 0);
 
     const skillOptions = useMemo(() => [
         {value: "", label: isLoading ? "Carregando..." : "Selecione uma skill"},
@@ -121,14 +123,34 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
 
                             <div className="col-span-1">
                                 <div className="flex items-center  gap-1">
-                                    <Input
-                                        type="number"
-                                        min={0}
-                                        step={1}
-                                        max={100}
-                                        placeholder="0"
-                                        className={`w-16 text-center ${skillErr?.importanceWeight ? 'border-red-400' : ''}`}
-                                        {...register(`skills.${index}.importanceWeight` as const, { valueAsNumber: true })}
+                                    <Controller
+                                        name={`skills.${index}.importanceWeight`}
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Input
+                                                {...field}
+                                                value={Number.isNaN(field.value) ? '' : field.value}
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={3}
+                                                placeholder="1 a 100"
+                                                aria-label={`Peso da skill ${index + 1}`}
+                                                aria-invalid={!!skillErr?.importanceWeight}
+                                                className={`w-16 text-center ${skillErr?.importanceWeight ? 'border-red-400' : ''}`}
+                                                onChange={(event) => {
+                                                    const value = event.target.value;
+                                                    if (value === '') {
+                                                        field.onChange(NaN);
+                                                    } else if (/^[1-9]\d{0,2}$/.test(value) && Number(value) <= 100) {
+                                                        const otherWeights = watchedSkills.reduce((total, skill, skillIndex) =>
+                                                            total + (skillIndex !== index && Number.isFinite(skill.importanceWeight) ? skill.importanceWeight : 0), 0);
+                                                        if (otherWeights + Number(value) <= 100) {
+                                                            field.onChange(Number(value));
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        )}
                                     />
                                     <span className="text-sm font-medium text-slate-600">%</span>
                                 </div>
@@ -166,12 +188,16 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
+                <p className="text-xs text-slate-600" aria-live="polite">
+                    Total dos pesos: {totalWeight}%. A soma dos pesos das skills não pode ultrapassar 100%.
+                </p>
                 <div className="flex flex-wrap items-center gap-3">
                     <Button
                         type="button"
                         variant="secondary"
                         size="sm"
-                        onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 0, description: "" })}
+                        onClick={() => append({ name: "", type: "MANDATORY", minLevel: "BASIC", importanceWeight: 1, description: "" })}
+                        disabled={totalWeight >= 100}
                         className="text-blue-600 border-blue-600 hover:bg-blue-50"
                     >
                         Selecionar Skill
@@ -181,6 +207,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         variant="secondary"
                         size="sm"
                         onClick={() => setIsSkillModalOpen(true)}
+                        disabled={totalWeight >= 100}
                         className="text-blue-600 border-blue-600 hover:bg-blue-50"
                     >
                         + Adicionar Skill
