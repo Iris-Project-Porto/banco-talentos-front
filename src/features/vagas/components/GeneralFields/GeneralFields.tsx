@@ -28,15 +28,17 @@ const STATUS_OPTIONS = [
 
 interface Props {
     canEdit: boolean;
+    canEditStatus?: boolean;
     dependencies: ReturnType<typeof useVagaDependencies>;
 }
 
-export function GeneralFields({ canEdit, dependencies }: Props) {
+export function GeneralFields({ canEdit, canEditStatus = canEdit, dependencies }: Props) {
     const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
     const { projects, filteredSquads, loadingProjects, loadingSquads } = dependencies;
 
     return (
-        <fieldset disabled={!canEdit} className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5">
+            <fieldset disabled={!canEdit} className="flex flex-col gap-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                     label="Código da Vaga *"
@@ -110,27 +112,32 @@ export function GeneralFields({ canEdit, dependencies }: Props) {
                 />
             </div>
 
+            </fieldset>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Select
                     label="Status da Vaga *"
                     options={STATUS_OPTIONS}
                     error={errors.status?.message}
+                    disabled={!canEditStatus}
                     {...register("status")}
                 />
-                <Input
-                    label="Data de Abertura *"
-                    type="date"
-                    error={errors.openingDate?.message}
-                    {...register("openingDate")}
-                />
-                <Input
-                    label="Data de Encerramento (Opcional)"
-                    type="date"
-                    {...register("closingDate")}
-                />
+                <fieldset disabled={!canEdit} className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                        label="Data de Abertura *"
+                        type="date"
+                        error={errors.openingDate?.message}
+                        {...register("openingDate")}
+                    />
+                    <Input
+                        label="Data de Encerramento (Opcional)"
+                        type="date"
+                        {...register("closingDate")}
+                    />
+                </fieldset>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <fieldset disabled={!canEdit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Input
                     label="Recrutador *"
                     placeholder="Nome do recrutador"
@@ -149,7 +156,7 @@ export function GeneralFields({ canEdit, dependencies }: Props) {
                         Vaga Urgente
                     </label>
                 </div>
-            </div>
-        </fieldset>
+            </fieldset>
+        </div>
     );
 }

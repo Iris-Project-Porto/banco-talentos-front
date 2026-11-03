@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { vagasApi, VagaWizard, type JobPostingPayload } from "@/features/vagas";
+import { STATUS_ONLY_STATUSES, vagasApi, VagaWizard as VagaWizardComponent, type JobPostingPayload, type JobStatus } from "@/features/vagas";
 import { getApiError } from "@/lib/axios";
 
 type SavePayload = JobPostingPayload & { id?: string };
@@ -19,8 +19,12 @@ export default function VagaForm() {
     });
 
     const saveMutation = useMutation({
-        mutationFn: async ({ id: vagaId, ...body }: SavePayload) =>
-            vagaId ? vagasApi.update(vagaId, body) : vagasApi.create(body),
+        mutationFn: async ({ id: vagaId, ...body }: SavePayload) => {
+            if (vaga && STATUS_ONLY_STATUSES.includes(vaga.status)) {
+                throw new Error("Vagas canceladas ou preenchidas permitem somente alteração do status.");
+            }
+            return vagaId ? vagasApi.update(vagaId, body) : vagasApi.create(body);
+        },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["vagas"] });
             toast.success("Vaga salva com sucesso!");
@@ -35,9 +39,30 @@ export default function VagaForm() {
         },
     });
 
-    function handleSave(payload: SavePayload) {
-        return saveMutation.mutateAsync(payload);
-    }
+    const statusMutation = useMutation({
+        mutationFn: async (status: JobStatus) => {
+            if (!id || !vaga || !STATUS_ONLY_STATUSES.includes(vaga.status)) {
+                throw new Error("A alteração isolada de status está disponível apenas para vagas canceladas ou preenchidas.");
+            }
+            return vagasApi.updateStatus(id, status);
+        },
+        onSuccess: async (_result, status) => {
+            queryClient.setQueryData(["vagas", "detail", id], (current: typeof vaga) =>
+                current ? { ...current, status } : current,
+            );
+            await queryClient.invalidateQueries({ queryKey: ["vagas"] });
+            toast.success("Status da vaga atualizado com sucesso!");
+            navigate("/admin/vagas");
+        },
+        onError: (error) => {
+            toast.error(
+                getApiError(
+                    error,
+                    "Não foi possível atualizar o status da vaga. Tente novamente.",
+                ),
+            );
+        },
+    });
 
     function goBack() {
         navigate("/admin/vagas");
@@ -52,10 +77,11 @@ export default function VagaForm() {
     }
 
     return (
-        <VagaWizard
+        <VagaWizardComponent
             initial={vaga ?? {}}
-            saving={saveMutation.isPending}
-            onSave={handleSave}
+            saving={saveMutation.isPending || statusMutation.isPending}
+            onSave={(payload) => saveMutation.mutateAsync(payload)}
+            onStatusChange={(status) => statusMutation.mutate(status)}
             onCancel={goBack}
         />
     );
