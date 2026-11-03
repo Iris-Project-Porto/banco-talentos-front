@@ -64,10 +64,10 @@ describe('Componente VagaWizard', () => {
             />
         );
 
-        expect(screen.getByText(/Vagas com status/i)).toBeInTheDocument();
-        expect(screen.getByText('Preenchida', { selector: 'b' })).toBeInTheDocument();
-        expect(screen.getByText(/não podem ser editadas/i)).toBeInTheDocument();
+        expect(screen.getByText(/somente para leitura/i)).toBeInTheDocument();
+        expect(screen.getByText(/Apenas o status pode ser alterado/i)).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Salvar alterações' })).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Salvar status' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
     });
 

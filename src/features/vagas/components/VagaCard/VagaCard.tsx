@@ -46,6 +46,7 @@ export function VagaCard({ vaga, onEdit, onCancel }: Props) {
     const displayStatus = STATUS_LABEL[normalizedStatus] || vaga.status;
     const tagKind = STATUS_COLOR[normalizedStatus] || "status-info";
     const isCancelled = normalizedStatus === "CANCELLED";
+    const canCancel = !["CANCELLED", "FILLED"].includes(normalizedStatus);
 
     return (
         <div className={`bg-white border border-slate-200 rounded-xl shadow-card p-5 flex flex-col transition-all hover:shadow-card-hover hover:-translate-y-px ${isCancelled && 'opacity-60 grayscale-[0.5]'}`}>
@@ -66,7 +67,7 @@ export function VagaCard({ vaga, onEdit, onCancel }: Props) {
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
-                    {!isCancelled && (
+                    {canCancel && (
                         <button
                             onClick={() => onCancel(vaga)}
                             className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-md transition-colors"
