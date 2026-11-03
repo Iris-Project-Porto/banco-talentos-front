@@ -116,10 +116,10 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
                 <FormProvider {...methods}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col">
                         <div className={activeTab === "general" ? "block" : "hidden"}>
-                            <GeneralDataTab isEdit={isEdit} />
+                            <GeneralDataTab isEdit={isEdit} onNext={() => setActiveTab("resources")} />
                         </div>
                         <div className={activeTab === "resources" ? "block" : "hidden"}>
-                            <SquadResourcesTab />
+                            <SquadResourcesTab onBack={() => setActiveTab("general")} />
                         </div>
                     </form>
                 </FormProvider>
