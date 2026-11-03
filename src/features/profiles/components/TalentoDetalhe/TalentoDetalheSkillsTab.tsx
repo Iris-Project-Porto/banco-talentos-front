@@ -49,6 +49,7 @@ export function TalentoDetalheSkillsTab({
                     value={stacks}
                     onChange={setStacks}
                     skills={hardSkills}
+                    placeholder="Ex: React, Python, Docker..."
                 />
             </Section>
             <Section title="Avaliação de Soft Skills (Admin)">
@@ -61,6 +62,7 @@ export function TalentoDetalheSkillsTab({
                     value={form.softSkills}
                     onChange={onSoftSkillsChange}
                     skills={softSkills}
+                    placeholder="Ex: Comunicação Assertiva, Trabalho em equipe e colaboração..."
                 />
             </Section>
             <div className="flex flex-wrap items-center gap-3 pt-2">
