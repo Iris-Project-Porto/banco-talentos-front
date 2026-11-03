@@ -80,7 +80,6 @@ describe("Componente ResourceCreateModal", () => {
 
         await userEvent.type(screen.getByPlaceholderText("Digite o nome completo"), "João Silva");
         await userEvent.type(screen.getByPlaceholderText("usuario@empresa.com"), "joao@vilt-group.com");
-        await userEvent.type(screen.getByPlaceholderText("000.000.000-00"), "12345678901");
         await userEvent.selectOptions(screen.getByRole("combobox"), "group-1");
         await userEvent.click(screen.getByRole("button", { name: "Salvar" }));
 
