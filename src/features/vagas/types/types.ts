@@ -2,6 +2,8 @@ export type ExperienceLevel = "JUNIOR" | "PLENO" | "SENIOR" | "ESPECIALISTA";
 
 export type JobStatus = "OPEN" | "SCREENING" | "ALLOCATING" | "FILLED" | "CLOSED" | "CANCELLED";
 
+export const STATUS_ONLY_STATUSES: JobStatus[] = ["CANCELLED", "FILLED"];
+
 export type SkillRequirementType = "MANDATORY" | "DESIRABLE";
 
 export type SkillLevel = "BASIC" | "INTERMEDIATE" | "ADVANCED" | "SPECIALIST";
