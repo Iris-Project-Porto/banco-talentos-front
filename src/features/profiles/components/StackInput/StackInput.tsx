@@ -9,6 +9,7 @@ export interface StackItem {
 interface Props {
   value: StackItem[];
   onChange: (stacks: StackItem[]) => void;
+  placeholder: string;
   skills?: Skill[];
 }
 
@@ -32,7 +33,7 @@ function LevelBadge({ level }: { level: number }) {
   );
 }
 
-export function StackInput({ skills, value, onChange }: Props) {
+export function StackInput({ skills, value, onChange, placeholder }: Props) {
   const STACK_SUGGESTIONS = (skills ?? []).map((s) => s.name);
   const [inputVal, setInputVal] = useState("");
   const [selectedStack, setSelectedStack] = useState<string | null>(null);
@@ -134,7 +135,7 @@ export function StackInput({ skills, value, onChange }: Props) {
                   }
                 }
               }}
-              placeholder="Ex: React, Python, Docker..."
+              placeholder={placeholder}
               className="w-full rounded-lg px-3 py-2 text-sm outline-none bg-white border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
             />
 

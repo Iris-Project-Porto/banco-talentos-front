@@ -26,18 +26,21 @@ const softSkills: Skill[] = [
     },
 ];
 
+const hardSkillsPlaceholder = 'Ex: React, Python, Docker...';
+const softSkillsPlaceholder = 'Ex: Comunicação Assertiva, Trabalho em equipe e colaboração...';
+
 describe('Componente StackInput', () => {
     it('deve renderizar o input vazio e a legenda descritiva de escala', () => {
-        render(<StackInput value={[]} onChange={vi.fn()} />);
+        render(<StackInput value={[]} onChange={vi.fn()} placeholder={hardSkillsPlaceholder} />);
 
-        expect(screen.getByPlaceholderText('Ex: React, Python, Docker...')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(hardSkillsPlaceholder)).toBeInTheDocument();
         expect(screen.getByText('Escala de nível')).toBeInTheDocument();
     });
 
     it('deve mostrar a lista de sugestões filtradas ao digitar um valor correspondente', () => {
-        render(<StackInput value={[]} onChange={vi.fn()} skills={hardSkills} />);
+        render(<StackInput value={[]} onChange={vi.fn()} skills={hardSkills} placeholder={hardSkillsPlaceholder} />);
 
-        const input = screen.getByPlaceholderText('Ex: React, Python, Docker...');
+        const input = screen.getByPlaceholderText(hardSkillsPlaceholder);
         fireEvent.change(input, { target: { value: 'Rea' } });
 
         expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument();
@@ -46,9 +49,9 @@ describe('Componente StackInput', () => {
 
     it('deve exibir o nível e permitir adicionar somente após selecionar uma sugestão', () => {
         const handleChange = vi.fn();
-        render(<StackInput value={[]} onChange={handleChange} skills={hardSkills} />);
+        render(<StackInput value={[]} onChange={handleChange} skills={hardSkills} placeholder={hardSkillsPlaceholder} />);
 
-        const input = screen.getByPlaceholderText('Ex: React, Python, Docker...');
+        const input = screen.getByPlaceholderText(hardSkillsPlaceholder);
         fireEvent.change(input, { target: { value: 'Skill inexistente' } });
 
         expect(screen.queryByRole('slider')).not.toBeInTheDocument();
@@ -69,9 +72,9 @@ describe('Componente StackInput', () => {
 
     it('deve permitir avaliar soft skills recebidas como sugestões', () => {
         const handleChange = vi.fn();
-        render(<StackInput value={[]} onChange={handleChange} skills={softSkills} />);
+        render(<StackInput value={[]} onChange={handleChange} skills={softSkills} placeholder={softSkillsPlaceholder} />);
 
-        const input = screen.getByPlaceholderText('Ex: React, Python, Docker...');
+        const input = screen.getByPlaceholderText(softSkillsPlaceholder);
         fireEvent.change(input, { target: { value: 'Com' } });
         fireEvent.mouseDown(screen.getByRole('button', { name: 'Comunicação' }));
         fireEvent.click(screen.getByRole('button', { name: '+ Adicionar' }));
@@ -83,7 +86,7 @@ describe('Componente StackInput', () => {
         const handleChange = vi.fn();
         const existingStacks = [{ name: 'Vue.js', level: 6 }];
 
-        render(<StackInput value={existingStacks} onChange={handleChange} />);
+        render(<StackInput value={existingStacks} onChange={handleChange} placeholder={hardSkillsPlaceholder} />);
 
         expect(screen.getByText('Vue.js')).toBeInTheDocument();
         expect(screen.getByText('6')).toBeInTheDocument();
