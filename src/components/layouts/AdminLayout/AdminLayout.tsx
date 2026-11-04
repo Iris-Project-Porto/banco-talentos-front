@@ -14,6 +14,7 @@ const staticNavItems = [
   { to: "/admin/vagas", label: "Vagas" },
   { to: "/admin/projetos", label: "Projetos" },
   { to: "/admin/squads", label: "Squads" },
+  { to: "/admin/historico", label: "Histórico" },
 ];
 
 export default function AdminLayout() {
