@@ -8,13 +8,22 @@ export type AuditJsonValue =
   | AuditJsonValue[]
   | { [key: string]: AuditJsonValue };
 
-export interface AuditLog {
+// A lista mostra apenas informações resumidas, os snapshots aparecem somente nos detalhes
+export interface AuditSummary {
   id: string;
   userId: string | null;
+  userAffectedId: string | null;
   operation: AuditOperation;
   entityType: string;
   entityId: string;
+  createdAt: string;
+}
+//esta interface é usada para exibir os registros que são detalhes no historico
+export interface AuditDetail extends AuditSummary {
   oldValue: AuditJsonValue | null;
   newValue: AuditJsonValue | null;
-  createdAt: string;
+}
+export interface AuditLog extends AuditSummary {
+  oldValue?: AuditJsonValue | null;
+  newValue?: AuditJsonValue | null;
 }
