@@ -47,14 +47,17 @@ describe('GeneralFields Component', () => {
         expect(screen.getByRole('option', { name: 'Squad A' })).toBeInTheDocument();
     });
 
-    it('deve bloquear a fieldset quando canEdit for false', () => {
+    it('deve bloquear as fieldsets quando canEdit for false', () => {
         render(
             <FormWrapper>
                 <GeneralFields canEdit={false} dependencies={mockDependencies} />
             </FormWrapper>
         );
 
-        const fieldset = screen.getByRole('group');
-        expect(fieldset).toBeDisabled();
+        const fieldsets = screen.getAllByRole('group');
+        expect(fieldsets.length).toBeGreaterThan(0);
+        fieldsets.forEach((fieldset) => {
+            expect(fieldset).toBeDisabled();
+        });
     });
 });
