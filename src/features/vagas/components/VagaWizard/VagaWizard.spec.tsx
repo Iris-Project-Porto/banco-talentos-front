@@ -126,6 +126,32 @@ describe('Componente VagaWizard', () => {
         });
     });
 
+    it('deve exibir erro ao tentar salvar com soma dos pesos das skills diferente de 100%', async () => {
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 50 },
+                    ],
+                }}
+                saving={false}
+                onSave={vi.fn()}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
+        });
+
+        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText('A soma dos pesos das skills deve ser exatamente 100%')).toBeInTheDocument();
+        });
+    });
+
     it('deve invocar onSave com o payload correto e tratado após preenchimento válido', async () => {
         const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-nova' });
         const { container } = renderWithClient(

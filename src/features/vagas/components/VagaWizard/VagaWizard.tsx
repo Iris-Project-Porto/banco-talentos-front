@@ -76,6 +76,15 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
         }
     }
 
+    function onInvalid() {
+        setTimeout(() => {
+            const firstErrorEl = document.querySelector(
+                ".text-red-500, [aria-invalid='true'], .border-red-400, #skills-error"
+            );
+            firstErrorEl?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+        }, 50);
+    }
+
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
@@ -93,7 +102,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
                                 type="button"
                                 variant="primary"
                                 loading={saving}
-                                onClick={methods.handleSubmit(onSubmit)}
+                                onClick={methods.handleSubmit(onSubmit, onInvalid)}
                             >
                                 {isEdit ? "Salvar alterações" : "Salvar e continuar"}
                             </Button>
@@ -128,7 +137,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
 
             <FormProvider {...methods}>
                 <form
-                    onSubmit={methods.handleSubmit(onSubmit)}
+                    onSubmit={methods.handleSubmit(onSubmit, onInvalid)}
                     className="flex flex-col gap-5"
                 >
                     {step === 0 && (

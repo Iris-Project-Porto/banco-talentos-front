@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useFormContext, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { Trash2, FileText, HelpCircle } from "lucide-react";
 import { Button, Input, Select } from "@/components/ui";
@@ -20,7 +20,7 @@ const MIN_LEVEL_OPTIONS = [
 ];
 
 export function SkillsSection({ canEdit }: { canEdit: boolean }) {
-    const { register, control, formState: { errors } } = useFormContext<VagaFormData>();
+    const { register, control, formState: { errors, submitCount } } = useFormContext<VagaFormData>();
     const { fields, append, remove } = useFieldArray({ control, name: "skills" });
 
     const { skills: skillCatalog, createMutation, isLoading } = useSkillsCatalog();
@@ -29,6 +29,15 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
     const watchedSkills = useWatch({ control, name: "skills" }) || [];
     const totalWeight = watchedSkills.reduce((total, skill) =>
         total + (Number.isFinite(skill.importanceWeight) ? skill.importanceWeight : 0), 0);
+
+    const skillsErrorMsg = errors.skills?.root?.message || errors.skills?.message;
+    const skillsErrorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (submitCount > 0 && skillsErrorMsg) {
+            skillsErrorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+        }
+    }, [submitCount, skillsErrorMsg]);
 
     const skillOptions = useMemo(() => [
         {value: "", label: isLoading ? "Carregando..." : "Selecione uma skill"},
@@ -187,9 +196,9 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                 })}
             </div>
 
-            <div className="flex flex-col gap-2 mt-2">
+            <div id="skills-error" ref={skillsErrorRef} className="flex flex-col gap-2 mt-2">
                 <p className="text-xs text-slate-600" aria-live="polite">
-                    Total dos pesos: {totalWeight}%. A soma dos pesos das skills não pode ultrapassar 100%.
+                    Total dos pesos: {totalWeight}%. A soma dos pesos das skills deve ser exatamente 100%.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                     <Button
@@ -213,7 +222,7 @@ export function SkillsSection({ canEdit }: { canEdit: boolean }) {
                         + Adicionar Skill
                     </Button>
                 </div>
-                <ErrorMsg msg={errors.skills?.root?.message || errors.skills?.message} />
+                <ErrorMsg msg={skillsErrorMsg} />
             </div>
         </fieldset>
 

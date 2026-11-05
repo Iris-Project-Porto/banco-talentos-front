@@ -21,7 +21,9 @@ describe('Peso da skill', () => {
     it.each([
         { weights: [50, 50], valid: true },
         { weights: [30, 30, 40], valid: true },
-        { weights: [20, 30], valid: true },
+        { weights: [100], valid: true },
+        { weights: [20, 30], valid: false },
+        { weights: [99], valid: false },
         { weights: [50, 50, 50], valid: false },
         { weights: [50, 51], valid: false },
     ])('valida o total dos pesos $weights', ({ weights, valid }) => {
@@ -36,7 +38,7 @@ describe('Peso da skill', () => {
         expect(result.success).toBe(valid);
         if (!result.success) {
             expect(result.error.issues).toContainEqual(expect.objectContaining({
-                path: ['skills'], message: 'A soma dos pesos das skills não pode ultrapassar 100%',
+                path: ['skills'], message: 'A soma dos pesos das skills deve ser exatamente 100%',
             }));
         }
     });

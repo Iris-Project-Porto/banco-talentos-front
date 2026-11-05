@@ -37,8 +37,8 @@ export const vagaSchema = z.object({
     closingDate: z.string().optional(),
     isUrgent: z.boolean().default(false),
     skills: z.array(jobSkillSchema).min(1, "O campo skills é obrigatório")
-        .refine((skills) => skills.reduce((total, skill) => total + skill.importanceWeight, 0) <= 100, {
-            message: "A soma dos pesos das skills não pode ultrapassar 100%",
+        .refine((skills) => skills.reduce((total, skill) => total + (Number.isFinite(skill.importanceWeight) ? skill.importanceWeight : 0), 0) === 100, {
+            message: "A soma dos pesos das skills deve ser exatamente 100%",
         }),
 }).refine((data) => {
     if (!data.skills?.length) return true;
