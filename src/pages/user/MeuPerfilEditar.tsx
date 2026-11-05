@@ -154,10 +154,20 @@ export default function MeuPerfilEditar() {
                         </p>
                     )}
                     <Section title="Avaliação de Hard Skills">
-                        <StackInput value={hardSkills} onChange={setHardSkills} skills={hardSkillsList} />
+                        <StackInput
+                            value={hardSkills}
+                            onChange={setHardSkills}
+                            skills={hardSkillsList}
+                            placeholder="Ex: React, Python, Docker..."
+                        />
                     </Section>
                     <Section title="Avaliação de Soft Skills">
-                        <StackInput value={softSkills} onChange={setSoftSkills} skills={softSkillsList} />
+                        <StackInput
+                            value={softSkills}
+                            onChange={setSoftSkills}
+                            skills={softSkillsList}
+                            placeholder="Ex: Comunicação Assertiva, Trabalho em equipe e colaboração..."
+                        />
                     </Section>
                 </div>
             )}
