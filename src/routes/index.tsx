@@ -35,6 +35,7 @@ const Squads = lazy(() => import("@/pages/admin/Squads"));
 const SquadForm = lazy(() => import("@/pages/admin/SquadForm"));
 const Projetos = lazy(() => import("@/pages/admin/Projetos"));
 const ProjetoForm = lazy(() => import("@/pages/admin/ProjetoForm"));
+const Historico = lazy(() => import("@/pages/admin/Historico"));
 
 // DEFINIÇÃO DAS ROTAS
 
@@ -97,6 +98,7 @@ export const router = createBrowserRouter([
                     { path: "projetos", element: <Projetos /> },
                     { path: "projetos/novo", element: <ProjetoForm /> },
                     { path: "projetos/:id/editar", element: <ProjetoForm /> },
+                    { path: "historico", element: <Historico /> },
                 ],
             },
         ],

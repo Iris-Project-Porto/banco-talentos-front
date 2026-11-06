@@ -63,6 +63,7 @@ describe('AdminLayout Component', () => {
 
         expect(screen.getAllByText('Vagas').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Skills').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Histórico').length).toBeGreaterThan(0);
     });
 
     it('deve exibir o badge de pendentes na Fila de revisão', async () => {
