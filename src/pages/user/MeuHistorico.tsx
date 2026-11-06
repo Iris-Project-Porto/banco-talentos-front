@@ -5,7 +5,7 @@ import { useHistorico } from "@/features/historico/hooks/useHistorico";
 import type { AuditOperation } from "@/features/historico/types/historico";
 import type { HistoryOperation } from "@/features/historico/utils/historyChanges";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const operationLabels: Record<AuditOperation, HistoryOperation> = {
   CREATE: "Criação",
