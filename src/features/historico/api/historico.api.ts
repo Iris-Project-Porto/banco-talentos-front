@@ -12,6 +12,8 @@ export const historicoApi = {
   getAuditDetail: (auditId: string): Promise<AuditDetail> =>
     http.get(`/v1/audit/${auditId}`).then((response) => response.data),
 
-  getHistorico: (): Promise<AuditLog[]> =>
-    http.get("/v1/audit").then((response) => response.data),
+  getHistorico: async (): Promise<AuditLog[]> => {
+    const audits = await historicoApi.getAuditList();
+    return Promise.all(audits.map(({ id }) => historicoApi.getAuditDetail(id)));
+  },
 };
