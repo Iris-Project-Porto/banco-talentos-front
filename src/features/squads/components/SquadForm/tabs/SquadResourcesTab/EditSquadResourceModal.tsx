@@ -11,8 +11,8 @@ interface Props {
 export function EditSquadResourceModal({ recurso, onClose, onSave }: Props) {
     const [jobTitle, setJobTitle] = useState(recurso.jobTitle || "");
 
-    function handleSave(e: React.FormEvent) {
-        e.preventDefault();
+    function handleSave(e?: React.SyntheticEvent) {
+        e?.preventDefault?.();
         onSave(recurso, jobTitle.trim());
         onClose();
     }
@@ -37,7 +37,14 @@ export function EditSquadResourceModal({ recurso, onClose, onSave }: Props) {
                     </button>
                 </div>
 
-                <form onSubmit={handleSave}>
+                <div
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleSave(e);
+                        }
+                    }}
+                >
                     <div className="p-6 flex flex-col gap-4">
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-slate-700">Recurso</label>
@@ -59,11 +66,11 @@ export function EditSquadResourceModal({ recurso, onClose, onSave }: Props) {
                         <Button type="button" variant="secondary" onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button type="submit" variant="primary">
+                        <Button type="button" variant="primary" onClick={handleSave}>
                             Salvar Alteração
                         </Button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
@@ -42,6 +42,19 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
         },
     });
 
+    useEffect(() => {
+        if (initial && initial.id) {
+            methods.reset({
+                name: initial.name || "",
+                description: initial.description || "",
+                portoCoordinator: initial.portoCoordinator || "",
+                projectManager: initial.projectManager || "",
+                status: initial.active === false ? "INACTIVE" : "ACTIVE",
+                recursos: initial.recursos || [],
+            });
+        }
+    }, [initial.id]);
+
     const { handleSubmit, watch } = methods;
     const [name, description, portoCoordinator, projectManager] = watch([
         "name",
@@ -61,6 +74,10 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
             portoCoordinator: data.portoCoordinator.trim(),
             projectManager: data.projectManager.trim(),
             recursoIds: (data.recursos || []).map((r) => r.id),
+            recursos: (data.recursos || []).map((r) => ({
+                id: r.id,
+                jobTitle: r.jobTitle || "",
+            })),
         };
 
         if (isEdit) {
@@ -102,7 +119,10 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
                         type="button"
                         variant="primary"
                         loading={saving}
-                        onClick={handleSubmit(onSubmit)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleSubmit(onSubmit)(e);
+                        }}
                         disabled={!canSave || saving}
                     >
                         {isEdit ? "Salvar alterações" : "Salvar"}
@@ -114,7 +134,13 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
                 <SquadFormTabs active={activeTab} onChange={setActiveTab} />
 
                 <FormProvider {...methods}>
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col">
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmit(onSubmit)(e);
+                        }}
+                        className="flex-1 flex flex-col"
+                    >
                         <div className={activeTab === "general" ? "block" : "hidden"}>
                             <GeneralDataTab isEdit={isEdit} onNext={() => setActiveTab("resources")} />
                         </div>

@@ -29,8 +29,8 @@ export function SelectResourcesModal({
 
     const { data, isLoading } = useQuery({
         queryKey: ["profiles", "active", "modal-selection"],
-        queryFn: () => profilesApi.getAtivos(0, 1000),
-        staleTime: 60_000,
+        queryFn: () => profilesApi.getAtivos(0, 200),
+        staleTime: 5 * 60_000,
     });
 
     const allRecursos = useMemo<Recurso[]>(() => {
