@@ -1,19 +1,27 @@
-import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button, ConfirmModal } from "@/components/ui";
 import { SquadResourcesTable } from "./SquadResourcesTable";
 import { SelectResourcesModal } from "./SelectResourcesModal";
+import { EditSquadResourceModal } from "./EditSquadResourceModal";
 import type { SquadFormData } from "../../../../validations/validations";
 import type { Recurso } from "@/features/recursos/types/recurso";
 
-export function SquadResourcesTab() {
-    const { watch, setValue } = useFormContext<SquadFormData>();
-    const recursos = watch("recursos") || [];
+interface Props {
+    onBack?: () => void;
+}
+
+export function SquadResourcesTab({ onBack }: Props) {
+    const { control, setValue } = useFormContext<SquadFormData>();
+    const recursos = useWatch({ control, name: "recursos" }) ?? [];
 
     const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
     const [recursoToRemove, setRecursoToRemove] = useState<Recurso | null>(null);
+    const [editingRecurso, setEditingRecurso] = useState<Recurso | null>(null);
+
+    const existingIds = useMemo(() => recursos.map((r) => r.id), [recursos]);
 
     function handleAddRecursos(selected: Recurso[]) {
         const newRecursos = [...recursos];
@@ -26,6 +34,7 @@ export function SquadResourcesTab() {
                 newRecursos.push({
                     id: recurso.id,
                     name: recurso.name,
+                    email: recurso.email,
                     jobTitle: recurso.jobTitle,
                 });
                 addedCount++;
@@ -39,9 +48,17 @@ export function SquadResourcesTab() {
         }
 
         if (duplicateCount > 0) {
-            toast.error(`${duplicateCount} recurso(s) já pertencem à squad e não foram adicionados novamente.`);
+            toast.error(
+                duplicateCount === 1
+                    ? "O recurso selecionado já está vinculado à squad."
+                    : `${duplicateCount} recursos já estão vinculados à squad.`,
+            );
         } else if (addedCount > 0) {
-            toast.success(`${addedCount} recurso(s) adicionado(s) com sucesso.`);
+            toast.success(
+                addedCount === 1
+                    ? "Recurso adicionado com sucesso."
+                    : `${addedCount} recursos adicionados com sucesso.`,
+            );
         }
     }
 
@@ -56,6 +73,15 @@ export function SquadResourcesTab() {
         setValue("recursos", newRecursos, { shouldDirty: true });
         setRecursoToRemove(null);
         toast.success("Recurso removido da squad.");
+    }
+
+    function handleSaveEditedResource(recurso: Recurso, newJobTitle: string) {
+        const updated = recursos.map((r) =>
+            r.id === recurso.id ? { ...r, jobTitle: newJobTitle } : r,
+        );
+        setValue("recursos", updated, { shouldDirty: true });
+        setEditingRecurso(null);
+        toast.success("Cargo do recurso atualizado com sucesso.");
     }
 
     return (
@@ -81,20 +107,38 @@ export function SquadResourcesTab() {
                 </Button>
             </div>
 
-            <div className="p-6 flex-1 bg-slate-50/50">
+            <div className="p-6 flex-1 bg-slate-50/50 flex flex-col justify-between gap-6">
                 <div className="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm">
                     <SquadResourcesTable
                         data={recursos as Recurso[]}
                         emptyMessage="Nenhum recurso vinculado a esta squad."
+                        onEdit={(recurso) => setEditingRecurso(recurso)}
                         onRemove={confirmRemove}
                     />
                 </div>
+
+                {onBack && (
+                    <div className="flex justify-start pt-2">
+                        <Button type="button" variant="secondary" onClick={onBack}>
+                            Voltar: Dados Gerais
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {isSelectModalOpen && (
                 <SelectResourcesModal
                     onClose={() => setIsSelectModalOpen(false)}
                     onConfirm={handleAddRecursos}
+                    existingIds={existingIds}
+                />
+            )}
+
+            {!!editingRecurso && (
+                <EditSquadResourceModal
+                    recurso={editingRecurso}
+                    onClose={() => setEditingRecurso(null)}
+                    onSave={handleSaveEditedResource}
                 />
             )}
 

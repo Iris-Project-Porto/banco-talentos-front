@@ -56,4 +56,16 @@ describe("historicoApi", () => {
 
     expect(http.get).toHaveBeenCalledWith("/v1/audit/audit-123");
   });
+
+  it("carrega os detalhes dos registros listados para o histórico", async () => {
+    const audit = { id: "audit-123" };
+    const auditDetail = { ...audit, oldValue: { Cargo: "Dev" }, newValue: { Cargo: "Tech Lead" } };
+    vi.mocked(http.get)
+      .mockResolvedValueOnce({ data: [audit] })
+      .mockResolvedValueOnce({ data: auditDetail });
+
+    await expect(historicoApi.getHistorico()).resolves.toEqual([auditDetail]);
+    expect(http.get).toHaveBeenNthCalledWith(1, "/v1/audit", { params: undefined });
+    expect(http.get).toHaveBeenNthCalledWith(2, "/v1/audit/audit-123");
+  });
 });

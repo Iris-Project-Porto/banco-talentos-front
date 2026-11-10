@@ -4,7 +4,11 @@ export const jobSkillSchema = z.object({
     name: z.string().min(1, "O nome da skill é obrigatório"),
     type: z.enum(["MANDATORY", "DESIRABLE"]),
     minLevel: z.enum(["BASIC", "INTERMEDIATE", "ADVANCED", "SPECIALIST"]),
-    importanceWeight: z.coerce.number().int('O peso da skill deve ser um número inteiro').min(1, 'O peso da skill deve ser maior que 0').max(100, 'O peso da skill deve ser menor que 100'),
+    importanceWeight: z.coerce.number({
+        invalid_type_error: 'Informe um peso inteiro de 1 a 100',
+    }).int('Informe um peso inteiro de 1 a 100')
+        .min(1, 'Informe um peso inteiro de 1 a 100')
+        .max(100, 'Informe um peso inteiro de 1 a 100'),
     description: z.string().max(255, "A descrição da skill deve ter no máximo 255 caracteres").optional(),
 });
 
@@ -32,7 +36,10 @@ export const vagaSchema = z.object({
     openingDate: z.string({ required_error: "A data de abertura é obrigatória" }).min(1, "A data de abertura é obrigatória"),
     closingDate: z.string().optional(),
     isUrgent: z.boolean().default(false),
-    skills: z.array(jobSkillSchema).min(1, "O campo skills é obrigatório"),
+    skills: z.array(jobSkillSchema).min(1, "O campo skills é obrigatório")
+        .refine((skills) => skills.reduce((total, skill) => total + (Number.isFinite(skill.importanceWeight) ? skill.importanceWeight : 0), 0) === 100, {
+            message: "A soma dos pesos das skills deve ser exatamente 100%",
+        }),
 }).refine((data) => {
     if (!data.skills?.length) return true;
     const names = data.skills.map((s) => s.name).filter(Boolean);

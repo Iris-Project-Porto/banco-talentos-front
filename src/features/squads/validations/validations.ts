@@ -27,6 +27,7 @@ const squadBaseSchema = z.object({
             z.object({
                 id: z.string(),
                 name: z.string(),
+                email: z.string().optional(),
                 jobTitle: z.string().optional(),
             }),
         )

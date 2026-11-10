@@ -1,7 +1,11 @@
+import { useState } from "react";
+import { Pagination } from "@/components/ui";
 import HistoryItem from "@/features/historico/components/HistoryItem/HistoryItem";
 import { useHistorico } from "@/features/historico/hooks/useHistorico";
 import type { AuditOperation } from "@/features/historico/types/historico";
 import type { HistoryOperation } from "@/features/historico/utils/historyChanges";
+
+const PAGE_SIZE = 7;
 
 const operationLabels: Record<AuditOperation, HistoryOperation> = {
   CREATE: "Criação",
@@ -15,7 +19,11 @@ const entityLabels: Record<string, string> = {
 };
 
 export default function MeuHistorico() {
+  const [page, setPage] = useState(0);
   const { historico, isLoading, isError } = useHistorico();
+  const totalPages = Math.ceil(historico.length / PAGE_SIZE);
+  const currentPage = Math.min(page, Math.max(totalPages - 1, 0));
+  const pageItems = historico.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,7 +66,7 @@ export default function MeuHistorico() {
                   </td>
                 </tr>
               )}
-              {!isLoading && !isError && historico.map((item) => (
+              {!isLoading && !isError && pageItems.map((item) => (
                 <HistoryItem
                   key={item.id}
                   id={item.id}
@@ -72,8 +80,15 @@ export default function MeuHistorico() {
             </tbody>
           </table>
         </div>
+        {!isLoading && !isError && (
+          <Pagination
+            className="mt-0 border-t-0 px-4 pb-4"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        )}
       </div>
-
     </div>
   );
 }

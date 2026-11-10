@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import {Input, Select} from "@/components/ui";
+import { Button, Input, Select } from "@/components/ui";
 import type { SquadFormData } from "../../../../validations/validations";
 
 const STATUS_OPTIONS = [
@@ -9,9 +9,10 @@ const STATUS_OPTIONS = [
 
 interface Props {
     isEdit: boolean;
+    onNext?: () => void;
 }
 
-export function GeneralDataTab({ isEdit }: Props) {
+export function GeneralDataTab({ isEdit, onNext }: Props) {
     const {
         register,
         formState: { errors },
@@ -62,6 +63,14 @@ export function GeneralDataTab({ isEdit }: Props) {
                         error={errors.projectManager?.message}
                     />
                 </div>
+
+                {onNext && (
+                    <div className="flex justify-end pt-4 border-t border-slate-100">
+                        <Button type="button" variant="primary" onClick={onNext}>
+                            Próximo: Recursos da Squad
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );
