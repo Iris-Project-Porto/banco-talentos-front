@@ -1,4 +1,4 @@
-import { Pagination } from "@/components/ui";
+import { Button, Pagination } from "@/components/ui";
 import { Loader2, UsersRoundIcon } from "lucide-react";
 import { MatchTable } from "../MatchTable/MatchTable";
 import { useEffect, useMemo, useState } from "react";
@@ -12,9 +12,17 @@ const MATCH_PAGE_SIZE = 5;
 
 interface Props {
     vagaId?: string;
+    selectedMatches?: Match[];
+    onSelectedMatchesChange?: (matches: Match[]) => void;
+    onProceedToAllocation?: () => void;
 }
 
-export function MatchResources({ vagaId }: Props) {
+export function MatchResources({
+    vagaId,
+    selectedMatches = [],
+    onSelectedMatchesChange,
+    onProceedToAllocation,
+}: Props) {
     const [page, setPage] = useState(0);
     const [search, setSearch] = useState("");
     const [squad, setSquad] = useState<MatchSquadFilter>("all");
@@ -66,6 +74,35 @@ export function MatchResources({ vagaId }: Props) {
 
     const totalPages = candidatesData?.totalPages ?? 1;
 
+    const selectedIds = useMemo(() => (selectedMatches || []).map((m) => m.id), [selectedMatches]);
+
+    function handleToggleSelect(match: Match) {
+        if (!onSelectedMatchesChange) return;
+        const exists = selectedIds.includes(match.id);
+        if (exists) {
+            onSelectedMatchesChange(selectedMatches.filter((m) => m.id !== match.id));
+        } else {
+            onSelectedMatchesChange([...selectedMatches, match]);
+        }
+    }
+
+    function handleSelectAll(visible: Match[]) {
+        if (!onSelectedMatchesChange) return;
+        const allSelected = visible.length > 0 && visible.every((m) => selectedIds.includes(m.id));
+        if (allSelected) {
+            const visibleIds = new Set(visible.map((m) => m.id));
+            onSelectedMatchesChange(selectedMatches.filter((m) => !visibleIds.has(m.id)));
+        } else {
+            const current = [...selectedMatches];
+            visible.forEach((m) => {
+                if (!current.some((c) => c.id === m.id)) {
+                    current.push(m);
+                }
+            });
+            onSelectedMatchesChange(current);
+        }
+    }
+
     function handleClearFilters() {
         setSearch("");
         setSquad("all");
@@ -116,14 +153,44 @@ export function MatchResources({ vagaId }: Props) {
                     Ocorreu um erro ao carregar os candidatos compatíveis. Verifique se o backend está ativo e tente novamente.
                 </div>
             ) : (
-                <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-                    <MatchTable data={candidates} onView={handleView} />
-                    <Pagination
-                        className="mt-0 py-4 px-4 border-t-0"
-                        currentPage={page}
-                        totalPages={totalPages}
-                        onPageChange={setPage}
-                    />
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+                        <MatchTable
+                            data={candidates}
+                            selectedIds={selectedIds}
+                            onToggleSelect={onSelectedMatchesChange ? handleToggleSelect : undefined}
+                            onSelectAll={onSelectedMatchesChange ? handleSelectAll : undefined}
+                            onView={handleView}
+                        />
+                        <Pagination
+                            className="mt-0 py-4 px-4 border-t-0"
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
+
+                    {onProceedToAllocation && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-card">
+                            <div className="text-sm text-slate-600">
+                                {selectedMatches.length === 0 ? (
+                                    <span>Nenhum recurso selecionado para alocação</span>
+                                ) : (
+                                    <span className="font-semibold text-slate-800">
+                                        {selectedMatches.length} {selectedMatches.length === 1 ? "recurso selecionado" : "recursos selecionados"} para alocação
+                                    </span>
+                                )}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="primary"
+                                disabled={selectedMatches.length === 0}
+                                onClick={onProceedToAllocation}
+                            >
+                                Avançar para Alocação {selectedMatches.length > 0 ? `(${selectedMatches.length})` : ""}
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
 

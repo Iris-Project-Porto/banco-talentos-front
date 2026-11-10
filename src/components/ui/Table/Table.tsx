@@ -13,6 +13,8 @@ export interface TableSelection<T> {
     selectedKeys: RowKey[];
     onToggleRow: (row: T) => void;
     onToggleAll: (checked: boolean) => void;
+    selectAllAriaLabel?: string;
+    getRowAriaLabel?: (row: T) => string;
 }
 
 interface Props<T> {
@@ -66,9 +68,10 @@ interface TableRowProps<T> {
     selectable: boolean;
     isSelected: boolean;
     onToggle?: (row: T) => void;
+    rowAriaLabel?: string;
 }
 
-function TableRowInner<T>({ row, rowKey, columns, selectable, isSelected, onToggle }: TableRowProps<T>) {
+function TableRowInner<T>({ row, rowKey, columns, selectable, isSelected, onToggle, rowAriaLabel }: TableRowProps<T>) {
     return (
         <tr
             onClick={selectable && onToggle ? () => onToggle(row) : undefined}
@@ -86,7 +89,7 @@ function TableRowInner<T>({ row, rowKey, columns, selectable, isSelected, onTogg
                     <TableCheckbox
                         checked={isSelected}
                         onChange={() => onToggle?.(row)}
-                        aria-label={`Selecionar linha ${rowKey}`}
+                        aria-label={rowAriaLabel || `Selecionar linha ${rowKey}`}
                     />
                 </td>
             )}
@@ -133,7 +136,7 @@ export function Table<T>({
                                     checked={allSelected}
                                     indeterminate={someSelected}
                                     onChange={selection.onToggleAll}
-                                    aria-label="Selecionar todos"
+                                    aria-label={selection.selectAllAriaLabel || "Selecionar todos"}
                                 />
                             </th>
                         )}
@@ -172,6 +175,7 @@ export function Table<T>({
                                         selectable={Boolean(selection)}
                                         isSelected={selectedSet.has(key)}
                                         onToggle={selection?.onToggleRow}
+                                        rowAriaLabel={selection?.getRowAriaLabel ? selection.getRowAriaLabel(row) : undefined}
                                     />
                                 );
                             })}

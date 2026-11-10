@@ -5,10 +5,27 @@ import type { Match } from "../../types/types";
 
 interface Props {
     data: Match[];
+    selectedIds?: string[];
+    onToggleSelect?: (match: Match) => void;
+    onSelectAll?: (matches: Match[]) => void;
     onView?: (match: Match) => void;
 }
 
-export function MatchTable({ data, onView }: Props) {
+export function MatchTable({ data, selectedIds = [], onToggleSelect, onSelectAll, onView }: Props) {
+    const selection = onToggleSelect
+        ? {
+              selectedKeys: selectedIds,
+              onToggleRow: (match: Match) => onToggleSelect(match),
+              onToggleAll: (checked: boolean) => {
+                  if (onSelectAll) {
+                      onSelectAll(checked ? data : []);
+                  }
+              },
+              selectAllAriaLabel: "Selecionar todos os recursos",
+              getRowAriaLabel: (match: Match) => `Selecionar ${match.name}`,
+          }
+        : undefined;
+
     const columns = [
         {
             header: "Ranking",
@@ -100,6 +117,7 @@ export function MatchTable({ data, onView }: Props) {
         <Table
             columns={columns}
             data={data}
+            selection={selection}
             keyExtractor={(match) => match.id}
             emptyMessage="Nenhum recurso encontrado"
         />

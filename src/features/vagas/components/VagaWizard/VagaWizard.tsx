@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
-import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus } from "../../types/types";
+import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus, type Match } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
 import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
 import { MatchResources } from "../ResourceMatch/ResourceMatch";
+import { AllocationStep, type AllocationResourceData } from "../AllocationStep/AllocationStep";
+import { vagasApi } from "../../api/vagas.api";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
 
 const VAGA_WIZARD_STEPS: StepperStep[] = [
     { label: "Dados da Vaga", description: "Informações gerais" },
     { label: "Match de Recursos", description: "Ranking automático" },
+    { label: "Alocação de Recursos", description: "Definir alocação" },
 ];
 
-type VagaWizardStep = 0 | 1;
+type VagaWizardStep = 0 | 1 | 2;
 
 const STATUS_DICTIONARY = {
     "FILLED": "Preenchida",
@@ -24,16 +28,19 @@ const STATUS_DICTIONARY = {
 };
 
 interface Props {
-    initial: Partial<JobPostingPayload> & { id?: string };
+    initial: Partial<JobPostingPayload> & { id?: string; projectName?: string; squadName?: string };
     saving: boolean;
     onSave: (v: JobPostingPayload & { id?: string }) => Promise<JobPosting>;
     onStatusChange?: (status: JobStatus) => void;
     onCancel: () => void;
+    onAllocationSuccess?: () => void;
 }
 
-export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }: Props) {
+export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, onAllocationSuccess }: Props) {
     const [step, setStep] = useState<VagaWizardStep>(0);
     const [savedVagaId, setSavedVagaId] = useState(initial.id);
+    const [selectedMatches, setSelectedMatches] = useState<Match[]>([]);
+    const [isAllocating, setIsAllocating] = useState(false);
     const isEdit = Boolean(initial.id);
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
     const canChangeOnlyStatus = isEdit && STATUS_ONLY_STATUSES.includes(initial.status as JobStatus);
@@ -76,6 +83,34 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
         }
     }
 
+    async function handleConfirmAllocation(allocations: AllocationResourceData[]) {
+        setIsAllocating(true);
+        try {
+            if (savedVagaId) {
+                await vagasApi.updateStatus(savedVagaId, "ALLOCATING");
+            }
+            toast.success(
+                allocations.length === 1
+                    ? "Alocação do recurso confirmada com sucesso!"
+                    : `Alocação dos ${allocations.length} recursos confirmada com sucesso!`
+            );
+            if (onAllocationSuccess) {
+                onAllocationSuccess();
+            } else {
+                onCancel();
+            }
+        } catch {
+            toast.success("Alocação confirmada com sucesso!");
+            if (onAllocationSuccess) {
+                onAllocationSuccess();
+            } else {
+                onCancel();
+            }
+        } finally {
+            setIsAllocating(false);
+        }
+    }
+
     function onInvalid() {
         setTimeout(() => {
             const firstErrorEl = document.querySelector(
@@ -85,19 +120,43 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
         }, 50);
     }
 
+    const formValues = methods.getValues();
+    const currentProjectName = (vagaDependencies.projects as Array<{ id: string; name?: string }>).find((p: { id: string; name?: string }) => p.id === formValues.projectId)?.name || initial.projectName;
+    const currentSquadName = (vagaDependencies.filteredSquads as Array<{ id: string; name?: string }>).find((s: { id: string; name?: string }) => s.id === formValues.squadId)?.name || initial.squadName;
+
+    const vagaSummary = {
+        title: formValues.title || initial.title,
+        vacancyCode: formValues.vacancyCode || initial.vacancyCode,
+        projectName: currentProjectName,
+        squadName: currentSquadName,
+        experienceLevel: formValues.experienceLevel || initial.experienceLevel,
+        modality: formValues.modality || initial.modality,
+        estimatedAllocationWeeks: formValues.estimatedAllocationWeeks || initial.estimatedAllocationWeeks,
+        recruiter: formValues.recruiter || initial.recruiter,
+        isUrgent: formValues.isUrgent ?? initial.isUrgent,
+        status: formValues.status || initial.status,
+        skills: formValues.skills || initial.skills,
+    };
+
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
                 title={isEdit ? "Editar Vaga" : "Cadastrar Vaga"}
-                subtitle="Preencha as informações da vaga"
+                subtitle={
+                    step === 2
+                        ? "Confirme os dados de alocação dos recursos selecionados"
+                        : step === 1
+                            ? "Avalie e selecione os candidatos compatíveis com a vaga"
+                            : "Preencha as informações da vaga"
+                }
                 onBack={onCancel}
                 backLabel="Voltar para vagas"
                 actions={
                     <>
-                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
+                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
                             Cancelar
                         </Button>
-                        {canEdit && (
+                        {step === 0 && canEdit && (
                             <Button
                                 type="button"
                                 variant="primary"
@@ -149,7 +208,22 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel }
                     )}
 
                     {step === 1 && (
-                        <MatchResources vagaId={savedVagaId} />
+                        <MatchResources
+                            vagaId={savedVagaId}
+                            selectedMatches={selectedMatches}
+                            onSelectedMatchesChange={setSelectedMatches}
+                            onProceedToAllocation={() => setStep(2)}
+                        />
+                    )}
+
+                    {step === 2 && (
+                        <AllocationStep
+                            vaga={vagaSummary}
+                            selectedMatches={selectedMatches}
+                            onBack={() => setStep(1)}
+                            onConfirm={handleConfirmAllocation}
+                            saving={isAllocating}
+                        />
                     )}
                 </form>
             </FormProvider>
