@@ -28,12 +28,18 @@ export interface Squad {
     recursos?: Recurso[];
 }
 
+export interface SquadResourcePayload {
+    id: string;
+    jobTitle?: string;
+}
+
 export interface SquadPayload {
     name: string;
     description: string;
     portoCoordinator: string;
     projectManager: string;
     recursoIds?: string[];
+    recursos?: SquadResourcePayload[];
 }
 
 export interface PageableResponse<T> {

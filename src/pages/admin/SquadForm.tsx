@@ -1,9 +1,7 @@
-import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { squadsApi, SquadForm as SquadFormComponent, type SquadPayload } from "@/features/squads";
-import { profilesApi, type UserProfile } from "@/features/profiles";
 import { getApiError } from "@/lib/axios";
 
 type SavePayload = SquadPayload & {
@@ -13,6 +11,7 @@ type SavePayload = SquadPayload & {
 };
 
 const CATALOG_PAGE_SIZE = 500;
+const EMPTY_SQUAD = {};
 
 export default function SquadForm() {
     const { id } = useParams<{ id: string }>();
@@ -26,14 +25,7 @@ export default function SquadForm() {
         enabled: isEdit,
     });
 
-    const { data: profilesData } = useQuery({
-        queryKey: ["profiles", "active", "catalog"],
-        queryFn: () => profilesApi.getAtivos(0, 1000),
-        enabled: isEdit,
-        staleTime: 60_000,
-    });
-
-    const { data: existingSquads = [], isLoading: loadingCatalog } = useQuery({
+    const { data: existingSquads = [] } = useQuery({
         queryKey: ["squads", "catalog"],
         queryFn: async () => {
             const [active, inactive] = await Promise.all([
@@ -84,29 +76,11 @@ export default function SquadForm() {
         },
     });
 
-    const initialSquad = useMemo(() => {
-        if (!squad) return {};
-        const squadRecursos = squad.recursos && squad.recursos.length > 0
-            ? squad.recursos
-            : (profilesData?.content || [])
-                .filter((p: UserProfile) => p.allocationSquadId === id)
-                .map((p: UserProfile) => ({
-                    id: p.id,
-                    name: p.name || "",
-                    email: p.email || "",
-                    jobTitle: p.jobTitle || "",
-                }));
-        return {
-            ...squad,
-            recursos: squadRecursos,
-        };
-    }, [squad, profilesData, id]);
-
     function goBack() {
         navigate("/admin/squads");
     }
 
-    if (loadingSquad || loadingCatalog) {
+    if (isEdit && loadingSquad) {
         return <p className="text-sm text-slate-400">Carregando...</p>;
     }
 
@@ -116,7 +90,7 @@ export default function SquadForm() {
 
     return (
         <SquadFormComponent
-            initial={initialSquad}
+            initial={squad || EMPTY_SQUAD}
             existingSquads={existingSquads}
             saving={saveMutation.isPending}
             onSave={(payload) => saveMutation.mutate(payload)}
