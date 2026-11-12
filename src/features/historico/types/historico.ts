@@ -12,16 +12,20 @@ export type AuditJsonValue =
 export interface AuditSummary {
   id: string;
   userId: string | null;
+  userName: string | null;
   userAffectedId: string | null;
+  userAffectedName: string | null;
   operation: AuditOperation;
   entityType: string;
+  entityName?: string | null;
+  description?: string | null;
   entityId: string;
   createdAt: string;
 }
 //esta interface é usada para exibir os registros que são detalhes no historico
 export interface AuditDetail extends AuditSummary {
-  oldValue: AuditJsonValue | null;
-  newValue: AuditJsonValue | null;
+  oldValue?: AuditJsonValue | null;
+  newValue?: AuditJsonValue | null;
 }
 export interface AuditLog extends AuditSummary {
   oldValue?: AuditJsonValue | null;
