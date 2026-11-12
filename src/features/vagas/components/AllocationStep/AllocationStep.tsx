@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
-import { Avatar, Button, Input, Select } from "@/components/ui";
+import { Avatar, Button, Input } from "@/components/ui";
 import type { Match } from "../../types/types";
 
 export interface AllocationResourceData {
     resourceId: string;
     resourceName: string;
     startDate: string;
-    dedication: string;
     role: string;
 }
 
@@ -22,13 +21,6 @@ const MODALITY_MAP: Record<string, string> = {
     HIBRIDO: "Híbrido",
     PRESENCIAL: "Presencial",
 };
-
-const DEDICATION_OPTIONS = [
-    { value: "100%", label: "100%" },
-    { value: "75%", label: "75%" },
-    { value: "50%", label: "50%" },
-    { value: "25%", label: "25%" },
-];
 
 const ROLE_SUGGESTIONS = [
     "Tech Lead Frontend",
@@ -58,7 +50,7 @@ export interface AllocationStepProps {
     };
     selectedMatches: Match[];
     onBack: () => void;
-    onConfirm: (allocations: AllocationResourceData[]) => void;
+    onConfirm: (allocation: AllocationResourceData) => void;
     saving?: boolean;
 }
 
@@ -79,40 +71,78 @@ export function AllocationStep({
         });
     }, [selectedMatches]);
 
-    const [allocations, setAllocations] = useState<Record<string, { startDate: string; dedication: string; role: string }>>(() => {
-        const initialMap: Record<string, { startDate: string; dedication: string; role: string }> = {};
+    const [selectedResourceId, setSelectedResourceId] = useState<string | null>(() =>
+        sortedMatches.length === 1 ? sortedMatches[0].id : null
+    );
+
+    const effectiveSelectedId = useMemo(() => {
+        if (selectedResourceId && sortedMatches.some((m) => m.id === selectedResourceId)) {
+            return selectedResourceId;
+        }
+        return sortedMatches.length === 1 ? sortedMatches[0].id : null;
+    }, [selectedResourceId, sortedMatches]);
+
+    const selectedMatch = useMemo(
+        () => sortedMatches.find((m) => m.id === effectiveSelectedId) || null,
+        [sortedMatches, effectiveSelectedId]
+    );
+
+    function getDefaultAllocation(match: Match) {
+        return {
+            startDate: today,
+            role: match.description || vaga.title || "Desenvolvedor",
+        };
+    }
+
+    const [allocations, setAllocations] = useState<Record<string, { startDate: string; role: string }>>(() => {
+        const initialMap: Record<string, { startDate: string; role: string }> = {};
         selectedMatches.forEach((m) => {
-            initialMap[m.id] = {
-                startDate: today,
-                dedication: "100%",
-                role: m.description || vaga.title || "Desenvolvedor",
-            };
+            initialMap[m.id] = getDefaultAllocation(m);
         });
         return initialMap;
     });
 
-    function updateField(matchId: string, field: "startDate" | "dedication" | "role", value: string) {
+    const [fieldErrors, setFieldErrors] = useState<{ startDate?: string; role?: string }>({});
+
+    function selectCandidate(matchId: string) {
+        setSelectedResourceId(matchId);
+        setFieldErrors({});
+    }
+
+    function updateField(match: Match, field: "startDate" | "role", value: string) {
         setAllocations((prev) => ({
             ...prev,
-            [matchId]: {
-                ...(prev[matchId] || { startDate: today, dedication: "100%", role: "" }),
+            [match.id]: {
+                ...(prev[match.id] || getDefaultAllocation(match)),
                 [field]: value,
             },
         }));
+        if (effectiveSelectedId === match.id) {
+            setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+        }
     }
 
     function handleConfirm() {
-        const data: AllocationResourceData[] = sortedMatches.map((m) => {
-            const current = allocations[m.id] || { startDate: today, dedication: "100%", role: "" };
-            return {
-                resourceId: m.id,
-                resourceName: m.name,
-                startDate: current.startDate,
-                dedication: current.dedication,
-                role: current.role,
-            };
+        if (!selectedMatch) return;
+        const current = allocations[selectedMatch.id] || getDefaultAllocation(selectedMatch);
+        const errors: { startDate?: string; role?: string } = {};
+        if (!current.startDate) {
+            errors.startDate = "Informe a data de início";
+        }
+        if (!current.role.trim()) {
+            errors.role = "Informe o papel";
+        }
+        if (errors.startDate || errors.role) {
+            setFieldErrors(errors);
+            return;
+        }
+        setFieldErrors({});
+        onConfirm({
+            resourceId: selectedMatch.id,
+            resourceName: selectedMatch.name,
+            startDate: current.startDate,
+            role: current.role.trim(),
         });
-        onConfirm(data);
     }
 
     const mandatorySkills = (vaga.skills || [])
@@ -194,72 +224,116 @@ export function AllocationStep({
                 </div>
             </div>
 
-            {/* Grid de Cards dos Recursos Selecionados */}
+            {/* Grid de Cards dos Recursos Finalistas */}
             {count === 0 ? (
                 <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500 shadow-card">
                     Nenhum recurso selecionado para alocação. Volte ao Match para selecionar candidatos.
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {sortedMatches.map((match, index) => {
-                        const item = allocations[match.id] || { startDate: today, dedication: "100%", role: "" };
-                        return (
-                            <div
-                                key={match.id}
-                                className="rounded-xl border border-slate-200 bg-white p-5 shadow-card flex flex-col justify-between"
-                            >
-                                <div>
-                                    <span className="text-xs font-bold text-slate-400">{index + 1}</span>
-                                    <div className="mt-1 flex items-center justify-between gap-3">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <Avatar name={match.name} photoUrl={match.photoUrl} size={42} />
-                                            <div className="min-w-0">
-                                                <h4 className="text-base font-bold text-slate-900 truncate">{match.name}</h4>
-                                                <p className="text-xs text-slate-500 truncate">
-                                                    {match.description || match.squadName || "Colaborador"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-sm font-bold text-emerald-600 shrink-0">
-                                            {match.matchScore}% Match
-                                        </span>
-                                    </div>
-                                </div>
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                        <p className="text-sm font-semibold text-slate-700">
+                            {count === 1
+                                ? "Candidato selecionado para preencher a vaga"
+                                : `Finalistas (${count}) — selecione 1 candidato para preencher a vaga`}
+                        </p>
+                        {count > 1 && !selectedMatch && (
+                            <span className="text-xs font-medium text-amber-600">
+                                Escolha um candidato abaixo para confirmar a alocação
+                            </span>
+                        )}
+                    </div>
 
-                                <div className="mt-4 border-t border-slate-100 pt-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                        <Input
-                                            aria-label="Data Início"
-                                            label="Data Início"
-                                            type="date"
-                                            value={item.startDate}
-                                            onChange={(e) => updateField(match.id, "startDate", e.target.value)}
-                                        />
-                                        <Select
-                                            aria-label="Dedicação"
-                                            label="Dedicação"
-                                            options={DEDICATION_OPTIONS}
-                                            value={item.dedication}
-                                            onChange={(e) => updateField(match.id, "dedication", e.target.value)}
-                                        />
-                                        <Input
-                                            aria-label="Papel"
-                                            label="Papel"
-                                            list="role-suggestions"
-                                            placeholder="Ex: Tech Lead Frontend"
-                                            value={item.role}
-                                            onChange={(e) => updateField(match.id, "role", e.target.value)}
-                                        />
-                                        <datalist id="role-suggestions">
-                                            {ROLE_SUGGESTIONS.map((role) => (
-                                                <option key={role} value={role} />
-                                            ))}
-                                        </datalist>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {sortedMatches.map((match, index) => {
+                            const item = allocations[match.id] || getDefaultAllocation(match);
+                            const isSelected = effectiveSelectedId === match.id;
+                            return (
+                                <div
+                                    key={match.id}
+                                    onClick={() => selectCandidate(match.id)}
+                                    className={`rounded-xl border bg-white p-5 shadow-card flex flex-col justify-between cursor-pointer transition-all ${
+                                        isSelected
+                                            ? "border-pink ring-2 ring-pink/15"
+                                            : "border-slate-200 hover:border-slate-300"
+                                    }`}
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="text-xs font-bold text-slate-400">{index + 1}</span>
+                                            <label
+                                                className="inline-flex items-center gap-2 cursor-pointer"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="allocation-candidate"
+                                                    value={match.id}
+                                                    checked={isSelected}
+                                                    onChange={() => selectCandidate(match.id)}
+                                                    aria-label={`Selecionar ${match.name}`}
+                                                    className="size-4 accent-pink cursor-pointer"
+                                                />
+                                                <span
+                                                    className={`text-xs font-semibold ${
+                                                        isSelected ? "text-pink" : "text-slate-500"
+                                                    }`}
+                                                >
+                                                    {isSelected ? "Selecionado" : "Selecionar"}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        <div className="mt-2 flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <Avatar name={match.name} photoUrl={match.photoUrl} size={42} />
+                                                <div className="min-w-0">
+                                                    <h4 className="text-base font-bold text-slate-900 truncate">{match.name}</h4>
+                                                    <p className="text-xs text-slate-500 truncate">
+                                                        {match.description || match.squadName || "Colaborador"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="text-sm font-bold text-emerald-600 shrink-0">
+                                                {match.matchScore}% Match
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className="mt-4 border-t border-slate-100 pt-4 cursor-default"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <Input
+                                                aria-label="Data Início"
+                                                label="Data Início"
+                                                type="date"
+                                                value={item.startDate}
+                                                error={isSelected ? fieldErrors.startDate : undefined}
+                                                onChange={(e) => updateField(match, "startDate", e.target.value)}
+                                            />
+                                            <Input
+                                                aria-label="Papel"
+                                                label="Papel"
+                                                list="role-suggestions"
+                                                placeholder="Ex: Tech Lead Frontend"
+                                                value={item.role}
+                                                error={isSelected ? fieldErrors.role : undefined}
+                                                onChange={(e) => updateField(match, "role", e.target.value)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
+
+                    <datalist id="role-suggestions">
+                        {ROLE_SUGGESTIONS.map((role) => (
+                            <option key={role} value={role} />
+                        ))}
+                    </datalist>
                 </div>
             )}
 
@@ -271,11 +345,13 @@ export function AllocationStep({
                 <Button
                     type="button"
                     variant="primary"
-                    disabled={count === 0}
+                    disabled={!selectedMatch}
                     loading={saving}
                     onClick={handleConfirm}
                 >
-                    Confirmar Alocação {count === 1 ? "do Recurso" : `dos ${count} Recursos`}
+                    {selectedMatch
+                        ? `Confirmar Alocação de ${selectedMatch.name.split(" ")[0]}`
+                        : "Confirmar Alocação do Recurso"}
                 </Button>
             </div>
         </div>

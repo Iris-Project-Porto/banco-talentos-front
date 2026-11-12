@@ -111,11 +111,10 @@ describe("AllocationStep Component", () => {
         const dateInputs = screen.getAllByLabelText(/Data Início/i);
         expect(dateInputs).toHaveLength(2);
 
-        const dedicationSelects = screen.getAllByLabelText(/Dedicação/i);
-        expect(dedicationSelects).toHaveLength(2);
-
         const roleInputs = screen.getAllByLabelText(/Papel/i);
         expect(roleInputs).toHaveLength(2);
+
+        expect(screen.queryByLabelText(/Dedicação/i)).not.toBeInTheDocument();
     });
 
     it("deve disparar onBack ao clicar em Voltar ao Match", async () => {
@@ -137,7 +136,7 @@ describe("AllocationStep Component", () => {
         expect(handleBack).toHaveBeenCalledTimes(1);
     });
 
-    it("deve atualizar os campos e disparar onConfirm com os dados preenchidos", async () => {
+    it("deve exigir a seleção de 1 candidato entre múltiplos finalistas e disparar onConfirm apenas com ele", async () => {
         const handleConfirm = vi.fn();
         const user = userEvent.setup();
 
@@ -150,29 +149,58 @@ describe("AllocationStep Component", () => {
             />
         );
 
+        const initialConfirmBtn = screen.getByRole("button", { name: "Confirmar Alocação do Recurso" });
+        expect(initialConfirmBtn).toBeDisabled();
+
         const roleInputs = screen.getAllByLabelText(/Papel/i);
-        await user.clear(roleInputs[0]);
-        await user.type(roleInputs[0], "Tech Lead Frontend");
+        await user.clear(roleInputs[1]);
+        await user.type(roleInputs[1], "Dev Fullstack Lead");
 
-        const dedicationSelects = screen.getAllByLabelText(/Dedicação/i);
-        fireEvent.change(dedicationSelects[1], { target: { value: "50%" } });
+        const dateInputs = screen.getAllByLabelText(/Data Início/i);
+        fireEvent.change(dateInputs[1], { target: { value: "2026-12-01" } });
 
-        const confirmBtn = screen.getByRole("button", { name: "Confirmar Alocação dos 2 Recursos" });
+        const radioMariana = screen.getByRole("radio", { name: "Selecionar Mariana Costa" });
+        await user.click(radioMariana);
+
+        const confirmBtn = screen.getByRole("button", { name: "Confirmar Alocação de Mariana" });
+        expect(confirmBtn).toBeEnabled();
         await user.click(confirmBtn);
 
         expect(handleConfirm).toHaveBeenCalledTimes(1);
         const result = handleConfirm.mock.calls[0][0];
-        expect(result).toHaveLength(2);
-        expect(result[0]).toMatchObject({
-            resourceId: "mat-1",
-            resourceName: "Lucas Silveira",
-            dedication: "100%",
-            role: "Tech Lead Frontend",
-        });
-        expect(result[1]).toMatchObject({
+        expect(result).toMatchObject({
             resourceId: "mat-2",
             resourceName: "Mariana Costa",
-            dedication: "50%",
+            startDate: "2026-12-01",
+            role: "Dev Fullstack Lead",
+        });
+    });
+
+    it("deve pré-selecionar automaticamente quando houver apenas 1 candidato selecionado", async () => {
+        const handleConfirm = vi.fn();
+        const user = userEvent.setup();
+
+        render(
+            <AllocationStep
+                vaga={mockVaga}
+                selectedMatches={[mockMatches[0]]}
+                onBack={vi.fn()}
+                onConfirm={handleConfirm}
+            />
+        );
+
+        const radioLucas = screen.getByRole("radio", { name: "Selecionar Lucas Silveira" });
+        expect(radioLucas).toBeChecked();
+
+        const confirmBtn = screen.getByRole("button", { name: "Confirmar Alocação de Lucas" });
+        expect(confirmBtn).toBeEnabled();
+        await user.click(confirmBtn);
+
+        expect(handleConfirm).toHaveBeenCalledTimes(1);
+        expect(handleConfirm.mock.calls[0][0]).toMatchObject({
+            resourceId: "mat-1",
+            resourceName: "Lucas Silveira",
+            role: "Senior Frontend",
         });
     });
 
@@ -181,20 +209,26 @@ describe("AllocationStep Component", () => {
             {
                 id: "caique",
                 name: "Caique Lima",
+                description: "Backend Developer",
                 matchScore: 25,
                 rankingScore: 3,
+                mainSkills: [],
             },
             {
                 id: "diogo",
                 name: "Diogo Carrasco",
+                description: "Frontend",
                 matchScore: 50,
                 rankingScore: 2,
+                mainSkills: [],
             },
             {
                 id: "caio",
                 name: "Caio do Prado Gaspar",
+                description: "Java Consultant",
                 matchScore: 68,
                 rankingScore: 1,
+                mainSkills: [],
             },
         ];
 
@@ -213,6 +247,32 @@ describe("AllocationStep Component", () => {
             "Diogo Carrasco",
             "Caique Lima",
         ]);
+    });
+
+    it("deve exibir erro e impedir confirmação quando papel ou data estiverem vazios", async () => {
+        const handleConfirm = vi.fn();
+        const user = userEvent.setup();
+
+        render(
+            <AllocationStep
+                vaga={mockVaga}
+                selectedMatches={[mockMatches[0]]}
+                onBack={vi.fn()}
+                onConfirm={handleConfirm}
+            />
+        );
+
+        const roleInput = screen.getByLabelText(/Papel/i);
+        await user.clear(roleInput);
+
+        const dateInput = screen.getByLabelText(/Data Início/i);
+        fireEvent.change(dateInput, { target: { value: "" } });
+
+        await user.click(screen.getByRole("button", { name: "Confirmar Alocação de Lucas" }));
+
+        expect(screen.getByText("Informe a data de início")).toBeInTheDocument();
+        expect(screen.getByText("Informe o papel")).toBeInTheDocument();
+        expect(handleConfirm).not.toHaveBeenCalled();
     });
 });
 

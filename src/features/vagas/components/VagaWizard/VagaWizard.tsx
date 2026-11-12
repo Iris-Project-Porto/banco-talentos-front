@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
+import { getApiError } from "@/lib/axios";
 import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus, type Match } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
 import { useVagaDependencies } from "./hooks/useVagaDependencies/useVagaDependencies";
 import { VagaDataForm } from "../VagaDataForm/VagaDataForm";
 import { MatchResources } from "../ResourceMatch/ResourceMatch";
 import { AllocationStep, type AllocationResourceData } from "../AllocationStep/AllocationStep";
+import { FilledAllocationInfo } from "../FilledAllocationInfo/FilledAllocationInfo";
 import { vagasApi } from "../../api/vagas.api";
 
 const EDITABLE_STATUSES = ["OPEN", "SCREENING", "ALLOCATING"];
@@ -42,8 +45,19 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
     const [selectedMatches, setSelectedMatches] = useState<Match[]>([]);
     const [isAllocating, setIsAllocating] = useState(false);
     const isEdit = Boolean(initial.id);
+    const isFilled = isEdit && initial.status === "FILLED";
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
     const canChangeOnlyStatus = isEdit && STATUS_ONLY_STATUSES.includes(initial.status as JobStatus);
+
+    const {
+        data: filledAllocations = [],
+        isLoading: loadingFilledAllocations,
+        isError: filledAllocationsError,
+    } = useQuery({
+        queryKey: ["vagas", initial.id, "allocations"],
+        queryFn: () => vagasApi.getAllocations(initial.id!),
+        enabled: Boolean(isFilled && initial.id),
+    });
 
     const methods = useForm<VagaFormData>({
         resolver: zodResolver(vagaSchema),
@@ -83,29 +97,31 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
         }
     }
 
-    async function handleConfirmAllocation(allocations: AllocationResourceData[]) {
+    async function handleConfirmAllocation(allocation: AllocationResourceData) {
+        if (!savedVagaId) {
+            toast.error("Salve a vaga antes de confirmar a alocação.");
+            return;
+        }
         setIsAllocating(true);
         try {
-            if (savedVagaId) {
-                await vagasApi.updateStatus(savedVagaId, "ALLOCATING");
+            await vagasApi.allocate(savedVagaId, {
+                resourceId: allocation.resourceId,
+                startDate: allocation.startDate,
+                role: allocation.role.trim(),
+            });
+            toast.success(`Alocação de ${allocation.resourceName} confirmada! Vaga preenchida.`);
+            if (onAllocationSuccess) {
+                onAllocationSuccess();
+            } else {
+                onCancel();
             }
-            toast.success(
-                allocations.length === 1
-                    ? "Alocação do recurso confirmada com sucesso!"
-                    : `Alocação dos ${allocations.length} recursos confirmada com sucesso!`
+        } catch (error) {
+            toast.error(
+                getApiError(
+                    error,
+                    "Não foi possível confirmar a alocação da vaga. Tente novamente.",
+                ),
             );
-            if (onAllocationSuccess) {
-                onAllocationSuccess();
-            } else {
-                onCancel();
-            }
-        } catch {
-            toast.success("Alocação confirmada com sucesso!");
-            if (onAllocationSuccess) {
-                onAllocationSuccess();
-            } else {
-                onCancel();
-            }
         } finally {
             setIsAllocating(false);
         }
@@ -144,7 +160,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 title={isEdit ? "Editar Vaga" : "Cadastrar Vaga"}
                 subtitle={
                     step === 2
-                        ? "Confirme os dados de alocação dos recursos selecionados"
+                        ? "Escolha o candidato que preencherá a vaga e confirme os dados de alocação"
                         : step === 1
                             ? "Avalie e selecione os candidatos compatíveis com a vaga"
                             : "Preencha as informações da vaga"
@@ -192,6 +208,13 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
                     Esta vaga está somente para leitura. Apenas o status pode ser alterado.
                 </div>
+            )}
+            {isFilled && (
+                <FilledAllocationInfo
+                    allocations={filledAllocations}
+                    loading={loadingFilledAllocations}
+                    error={filledAllocationsError}
+                />
             )}
 
             <FormProvider {...methods}>

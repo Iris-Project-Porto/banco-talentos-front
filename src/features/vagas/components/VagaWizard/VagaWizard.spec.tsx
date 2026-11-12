@@ -8,6 +8,9 @@ vi.mock('../../api/vagas.api', () => ({
     vagasApi: {
         getProjects: vi.fn(),
         getSquads: vi.fn(),
+        getMatches: vi.fn(),
+        allocate: vi.fn(),
+        getAllocations: vi.fn(),
     }
 }));
 
@@ -40,6 +43,15 @@ describe('Componente VagaWizard', () => {
         vi.clearAllMocks();
         vi.mocked(vagasApi.getProjects).mockResolvedValue({ content: mockProjects } as any);
         vi.mocked(vagasApi.getSquads).mockResolvedValue({ content: mockSquads } as any);
+        vi.mocked(vagasApi.getMatches).mockResolvedValue({
+            content: [],
+            totalElements: 0,
+            totalPages: 1,
+            size: 5,
+            number: 0,
+        });
+        vi.mocked(vagasApi.allocate).mockResolvedValue({} as any);
+        vi.mocked(vagasApi.getAllocations).mockResolvedValue([]);
     });
 
     it('deve renderizar o cabeçalho de Nova Vaga quando não houver ID inicial', () => {
@@ -275,6 +287,118 @@ describe('Componente VagaWizard', () => {
 
         await waitFor(() => {
             expect(squadSelect.value).toBe('');
+        });
+    });
+
+    it('deve chamar vagasApi.allocate ao confirmar a alocação na etapa 3 e invocar onAllocationSuccess', async () => {
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-123' });
+        const handleAllocationSuccess = vi.fn();
+
+        vi.mocked(vagasApi.getMatches).mockResolvedValue({
+            content: [
+                {
+                    id: 'rec-1',
+                    name: 'Lucas Silveira',
+                    description: 'Senior Frontend',
+                    squadName: 'Squad A1',
+                    availability: 'available',
+                    matchScore: 96,
+                    rankingScore: 1,
+                    mainSkills: [],
+                },
+            ],
+            totalElements: 1,
+            totalPages: 1,
+            size: 5,
+            number: 0,
+        });
+
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-123',
+                    vacancyCode: 'VAG-123',
+                    title: 'Frontend Developer',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'SENIOR',
+                    modality: 'REMOTO',
+                    recruiter: 'Paula RH',
+                    estimatedAllocationWeeks: 12,
+                    status: 'OPEN',
+                    openingDate: '2026-07-01',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onCancel={vi.fn()}
+                onAllocationSuccess={handleAllocationSuccess}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+
+        await waitFor(() => {
+            expect(screen.getByRole('checkbox', { name: 'Selecionar Lucas Silveira' })).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Selecionar Lucas Silveira' }));
+        fireEvent.click(screen.getByRole('button', { name: /Avançar para Alocação/i }));
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: 'Confirmar Alocação de Lucas' })).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByLabelText(/Data Início/i), { target: { value: '2026-11-20' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Confirmar Alocação de Lucas' }));
+
+        await waitFor(() => {
+            expect(vagasApi.allocate).toHaveBeenCalledTimes(1);
+            expect(vagasApi.allocate).toHaveBeenCalledWith('vaga-123', {
+                resourceId: 'rec-1',
+                startDate: '2026-11-20',
+                role: 'Senior Frontend',
+            });
+            expect(handleAllocationSuccess).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('deve buscar e exibir o motivo do preenchimento quando a vaga estiver com status FILLED', async () => {
+        vi.mocked(vagasApi.getAllocations).mockResolvedValue([
+            {
+                id: 'alloc-1',
+                jobPostingId: 'vaga-123',
+                resourceId: 'rec-1',
+                resourceName: 'Diogo Carrasco',
+                projectName: 'Iris Mobile',
+                squadName: 'Squad A1',
+                startDate: '2026-11-18',
+                role: 'Frontend Lead',
+                active: true,
+            },
+        ]);
+
+        renderWithClient(
+            <VagaWizard
+                initial={{ id: 'vaga-123', status: 'FILLED' }}
+                saving={false}
+                onSave={vi.fn()}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(vagasApi.getAllocations).toHaveBeenCalledWith('vaga-123');
+            expect(screen.getByText('Vaga preenchida por alocação de recurso')).toBeInTheDocument();
+            expect(screen.getByText('Diogo Carrasco')).toBeInTheDocument();
+            expect(screen.getByText('Frontend Lead')).toBeInTheDocument();
+            expect(screen.getByText(/Início: 18\/11\/2026/)).toBeInTheDocument();
         });
     });
 });

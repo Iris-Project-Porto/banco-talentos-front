@@ -92,3 +92,30 @@ export interface CandidateFiltersParams {
 }
 
 export type JobPostingPayload = Omit<JobPosting, "id" | "projectName" | "squadName" | "active" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "experienceLevelDescription">;
+
+export interface JobPostingAllocationPayload {
+  resourceId: string;
+  startDate: string; // YYYY-MM-DD
+  role: string;
+}
+
+export interface JobPostingAllocationResponse {
+  id: string;
+  jobPostingId: string;
+  resourceId: string;
+  resourceName: string;
+  projectId?: string;
+  projectName?: string;
+  squadId?: string;
+  squadName?: string;
+  startDate: string;
+  role: string;
+  active: boolean;
+  createdAt?: string;
+  createdBy?: string;
+}
+
+export interface JobPostingAllocationResult {
+  jobPosting: JobPosting;
+  allocations: JobPostingAllocationResponse[];
+}
