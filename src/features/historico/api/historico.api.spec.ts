@@ -14,13 +14,29 @@ describe("historicoApi", () => {
   });
 
   it("lista auditorias sem filtro", async () => {
-    vi.mocked(http.get).mockResolvedValueOnce({ data: [] });
+    const records = [{
+      id: "audit-123",
+      userId: "executor-123",
+      userName: "Ana Silva",
+      userAffectedId: "affected-123",
+      userAffectedName: "João Souza",
+      operation: "UPDATE",
+      entityType: "PROJECT",
+      entityName: "Projeto Atlas",
+      description: null,
+      entityId: "project-123",
+      createdAt: "2026-11-01T10:00:00Z",
+    }];
+    vi.mocked(http.get).mockResolvedValueOnce({ data: records });
 
-    await historicoApi.getAuditList();
+    const result = await historicoApi.getAuditList();
 
     expect(http.get).toHaveBeenCalledWith("/v1/audit", {
       params: undefined,
     });
+    expect(result).toEqual(records);
+    expect(result[0]).not.toHaveProperty("oldValue");
+    expect(result[0]).not.toHaveProperty("newValue");
   });
 
   it("filtra pelo usuario afetado", async () => {
