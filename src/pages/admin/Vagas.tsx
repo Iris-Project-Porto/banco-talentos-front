@@ -1,60 +1,46 @@
-import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
 import { vagasApi, VagaCard, type JobPosting } from "@/features/vagas";
-import { PageHeader, Button, ConfirmModal, Input, Pagination } from "@/components/ui";
+import { useVagasList } from "../../features/vagas/hooks/useVagasList"; 
+import { VagaFilters } from "../../features/vagas/components/VagaFilter/VagaFilters";
+import { PageHeader, Button, ConfirmModal, Pagination } from "@/components/ui";
 
 export default function Vagas() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [vagaToCancel, setVagaToCancel] = useState<JobPosting | null>(null);
-  const [viewActive, setViewActive] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    setPage(0);
-  }, [viewActive, search]);
-
-  const { data: activeData, isLoading: loadingActive } = useQuery({
-    queryKey: ['vagas', 'active', page],
-    queryFn: () => vagasApi.getActive(page)
-  });
-  const { data: inactiveData, isLoading: loadingInactive } = useQuery({
-    queryKey: ['vagas', 'inactive', page],
-    queryFn: () => vagasApi.getInactive(page)
-  });
+  const {
+    viewActive,
+    setViewActive,
+    page,
+    setPage,
+    filters,
+    setFilter,
+    applyFilters,
+    clearFilters,
+    vagas,
+    totalPages,
+    isLoading,
+    projects,
+    squads,
+  } = useVagasList();
 
   const cancelMutation = useMutation({
     mutationFn: async ({ id }: { id: string }) =>
       vagasApi.updateStatus(id, "CANCELLED"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vagas'] });
+      queryClient.invalidateQueries({ queryKey: ["vagas"] });
       setVagaToCancel(null);
       toast.success("Vaga cancelada com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao cancelar", error);
       toast.error("Ocorreu um erro ao cancelar a vaga. Tente novamente.");
-    }
-  });
-
-  const currentData = viewActive ? activeData : inactiveData;
-  const currentList = currentData?.content || [];
-  const totalPages = currentData?.totalPages || 1;
-  const isLoading = viewActive ? loadingActive : loadingInactive;
-
-  const filtered = currentList.filter((v: JobPosting) => {
-    const q = search.toLowerCase();
-    return !q ||
-      (v.vacancyCode?.toLowerCase() || "").includes(q) ||
-      (v.title?.toLowerCase() || "").includes(q) ||
-      (v.projectName?.toLowerCase() || "").includes(q) ||
-      (v.recruiter?.toLowerCase() || "").includes(q) ||
-      (v.status?.toLowerCase() || "").includes(q) ||
-      (v.experienceLevel?.toLowerCase() || "").includes(q);
+    },
   });
 
   function openNew() { navigate("/admin/vagas/nova"); }
@@ -80,45 +66,48 @@ export default function Vagas() {
         actions={<Button variant="primary" size="md" onClick={openNew}>+ Nova Vaga</Button>}
       />
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-card px-5 py-4 flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-          <button
-            onClick={() => setViewActive(true)}
-            className={`px-4 py-1.5 rounded-md text-xs font-semibold ${viewActive ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-          >
-            Ativas
-          </button>
-          <button
-            onClick={() => setViewActive(false)}
-            className={`px-4 py-1.5 rounded-md text-xs font-semibold ${!viewActive ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
-          >
-            Inativas / Histórico
-          </button>
-        </div>
-        <div className="flex-1 min-w-[280px] relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-10" />
-          <Input
-            placeholder="Buscar por código, título, projeto, recrutador, senioridade..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-3"
-          />
-        </div>
+      <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg w-fit">
+        <button
+          onClick={() => setViewActive(true)}
+          className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            viewActive ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Ativas
+        </button>
+        <button
+          onClick={() => setViewActive(false)}
+          className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            !viewActive ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Inativas / Histórico
+        </button>
       </div>
+
+      <VagaFilters
+        filters={filters}
+        projects={projects}
+        squads={squads}
+        onChange={setFilter}
+        onApply={applyFilters}
+        onClear={clearFilters}
+      />
 
       {isLoading ? (
         <p className="text-sm text-slate-400">Carregando...</p>
-      ) : filtered.length === 0 ? (
-        <div className="bg-white border rounded-xl py-16 text-center">
+      ) : vagas.length === 0 ? (
+        <div className="bg-white border rounded-xl py-16 text-center shadow-sm">
           <p className="text-slate-400 text-sm">Nenhuma vaga encontrada.</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((v: JobPosting) => (
+            {vagas.map((v: JobPosting) => (
               <VagaCard key={v.id} vaga={v} onEdit={openEdit} onCancel={handleCancelJob} />
             ))}
           </div>
+          
           <Pagination
             currentPage={page}
             totalPages={totalPages}
