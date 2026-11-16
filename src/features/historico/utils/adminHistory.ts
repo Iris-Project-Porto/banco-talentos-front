@@ -1,13 +1,12 @@
 import type { AuditOperation, AuditSummary } from "../types/historico";
 
-export const auditCategories = ["Projetos", "Squads", "Recursos"] as const;
+export const auditCategories = ["Projetos", "Squads", "Recursos", "Vagas"] as const;
 export type AuditCategory = (typeof auditCategories)[number];
 
 const resourceEntityTypes = new Set([
     "PROFILE",
     "PROFILE_SKILL",
     "RESOURCE_EQUIPMENT",
-    "JOB_POSTING",
 ]);
 
 export function getAuditCategory(
@@ -18,6 +17,8 @@ export function getAuditCategory(
             return "Projetos";
         case "SQUAD":
             return "Squads";
+        case "JOB_POSTING":
+            return "Vagas";
         default: {
             return resourceEntityTypes.has(record.entityType) ? "Recursos" : null;
         }
