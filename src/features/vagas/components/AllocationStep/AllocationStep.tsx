@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Avatar, Button, Input } from "@/components/ui";
-import type { Match } from "../../types/types";
+import { isResourceAllocated, type Match } from "../../types/types";
 
 export interface AllocationResourceData {
     resourceId: string;
@@ -71,16 +71,21 @@ export function AllocationStep({
         });
     }, [selectedMatches]);
 
+    const availableMatches = useMemo(
+        () => sortedMatches.filter((m) => !isResourceAllocated(m.availability)),
+        [sortedMatches]
+    );
+
     const [selectedResourceId, setSelectedResourceId] = useState<string | null>(() =>
-        sortedMatches.length === 1 ? sortedMatches[0].id : null
+        availableMatches.length === 1 ? availableMatches[0].id : null
     );
 
     const effectiveSelectedId = useMemo(() => {
-        if (selectedResourceId && sortedMatches.some((m) => m.id === selectedResourceId)) {
+        if (selectedResourceId && availableMatches.some((m) => m.id === selectedResourceId)) {
             return selectedResourceId;
         }
-        return sortedMatches.length === 1 ? sortedMatches[0].id : null;
-    }, [selectedResourceId, sortedMatches]);
+        return availableMatches.length === 1 ? availableMatches[0].id : null;
+    }, [selectedResourceId, availableMatches]);
 
     const selectedMatch = useMemo(
         () => sortedMatches.find((m) => m.id === effectiveSelectedId) || null,
@@ -105,6 +110,8 @@ export function AllocationStep({
     const [fieldErrors, setFieldErrors] = useState<{ startDate?: string; role?: string }>({});
 
     function selectCandidate(matchId: string) {
+        const candidate = sortedMatches.find((m) => m.id === matchId);
+        if (candidate && isResourceAllocated(candidate.availability)) return;
         setSelectedResourceId(matchId);
         setFieldErrors({});
     }
@@ -123,7 +130,7 @@ export function AllocationStep({
     }
 
     function handleConfirm() {
-        if (!selectedMatch) return;
+        if (!selectedMatch || isResourceAllocated(selectedMatch.availability)) return;
         const current = allocations[selectedMatch.id] || getDefaultAllocation(selectedMatch);
         const errors: { startDate?: string; role?: string } = {};
         if (!current.startDate) {
@@ -248,38 +255,58 @@ export function AllocationStep({
                         {sortedMatches.map((match, index) => {
                             const item = allocations[match.id] || getDefaultAllocation(match);
                             const isSelected = effectiveSelectedId === match.id;
+                            const isAllocated = isResourceAllocated(match.availability);
                             return (
                                 <div
                                     key={match.id}
-                                    onClick={() => selectCandidate(match.id)}
-                                    className={`rounded-xl border bg-white p-5 shadow-card flex flex-col justify-between cursor-pointer transition-all ${
-                                        isSelected
-                                            ? "border-pink ring-2 ring-pink/15"
-                                            : "border-slate-200 hover:border-slate-300"
+                                    onClick={() => !isAllocated && selectCandidate(match.id)}
+                                    title={isAllocated ? "Recurso já alocado em outro projeto (seleção desabilitada)" : undefined}
+                                    className={`rounded-xl border bg-white p-5 shadow-card flex flex-col justify-between transition-all ${
+                                        isAllocated
+                                            ? "border-slate-200 opacity-60 cursor-not-allowed bg-slate-50/50"
+                                            : isSelected
+                                                ? "border-pink ring-2 ring-pink/15 cursor-pointer"
+                                                : "border-slate-200 hover:border-slate-300 cursor-pointer"
                                     }`}
                                 >
                                     <div>
                                         <div className="flex items-center justify-between gap-2">
                                             <span className="text-xs font-bold text-slate-400">{index + 1}</span>
                                             <label
-                                                className="inline-flex items-center gap-2 cursor-pointer"
-                                                onClick={(e) => e.stopPropagation()}
+                                                className={`inline-flex items-center gap-2 ${
+                                                    isAllocated ? "cursor-not-allowed" : "cursor-pointer"
+                                                }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (isAllocated) e.preventDefault();
+                                                }}
                                             >
                                                 <input
                                                     type="radio"
                                                     name="allocation-candidate"
                                                     value={match.id}
                                                     checked={isSelected}
-                                                    onChange={() => selectCandidate(match.id)}
-                                                    aria-label={`Selecionar ${match.name}`}
-                                                    className="size-4 accent-pink cursor-pointer"
+                                                    disabled={isAllocated}
+                                                    onChange={() => !isAllocated && selectCandidate(match.id)}
+                                                    aria-label={
+                                                        isAllocated
+                                                            ? `${match.name} está em projeto - seleção desabilitada`
+                                                            : `Selecionar ${match.name}`
+                                                    }
+                                                    className={`size-4 accent-pink ${
+                                                        isAllocated ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                                                    }`}
                                                 />
                                                 <span
                                                     className={`text-xs font-semibold ${
-                                                        isSelected ? "text-pink" : "text-slate-500"
+                                                        isAllocated
+                                                            ? "text-slate-400"
+                                                            : isSelected
+                                                                ? "text-pink"
+                                                                : "text-slate-500"
                                                     }`}
                                                 >
-                                                    {isSelected ? "Selecionado" : "Selecionar"}
+                                                    {isAllocated ? "Indisponível (Em projeto)" : isSelected ? "Selecionado" : "Selecionar"}
                                                 </span>
                                             </label>
                                         </div>
@@ -294,9 +321,16 @@ export function AllocationStep({
                                                     </p>
                                                 </div>
                                             </div>
-                                            <span className="text-sm font-bold text-emerald-600 shrink-0">
-                                                {match.matchScore}% Match
-                                            </span>
+                                            <div className="flex flex-col items-end gap-1 shrink-0">
+                                                <span className="text-sm font-bold text-emerald-600">
+                                                    {match.matchScore}% Match
+                                                </span>
+                                                {isAllocated && (
+                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                        Em projeto
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -309,6 +343,7 @@ export function AllocationStep({
                                                 aria-label="Data Início"
                                                 label="Data Início"
                                                 type="date"
+                                                disabled={isAllocated}
                                                 value={item.startDate}
                                                 error={isSelected ? fieldErrors.startDate : undefined}
                                                 onChange={(e) => updateField(match, "startDate", e.target.value)}
@@ -318,6 +353,7 @@ export function AllocationStep({
                                                 label="Papel"
                                                 list="role-suggestions"
                                                 placeholder="Ex: Tech Lead Frontend"
+                                                disabled={isAllocated}
                                                 value={item.role}
                                                 error={isSelected ? fieldErrors.role : undefined}
                                                 onChange={(e) => updateField(match, "role", e.target.value)}
@@ -345,7 +381,7 @@ export function AllocationStep({
                 <Button
                     type="button"
                     variant="primary"
-                    disabled={!selectedMatch}
+                    disabled={!selectedMatch || isResourceAllocated(selectedMatch.availability)}
                     loading={saving}
                     onClick={handleConfirm}
                 >

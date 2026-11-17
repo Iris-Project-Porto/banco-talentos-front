@@ -274,5 +274,79 @@ describe("AllocationStep Component", () => {
         expect(screen.getByText("Informe o papel")).toBeInTheDocument();
         expect(handleConfirm).not.toHaveBeenCalled();
     });
+
+    describe("RN02 - Restrição de Seleção por Disponibilidade na Alocação", () => {
+        const allocatedMatch: Match = {
+            id: "mat-alloc",
+            name: "Roberto Mendes",
+            photoUrl: undefined,
+            description: "Senior Backend",
+            squadName: "Squad Pagamentos",
+            rankingScore: 1,
+            matchScore: 92,
+            availability: "allocated",
+            mainSkills: [],
+        };
+
+        const availableMatch: Match = {
+            id: "mat-avail",
+            name: "Lucas Silveira",
+            photoUrl: undefined,
+            description: "Senior Frontend",
+            squadName: "Squad Checkout",
+            rankingScore: 2,
+            matchScore: 89,
+            availability: "available",
+            mainSkills: [],
+        };
+
+        it("deve desativar a ação de seleção (radio/card) para recurso em projeto (RN02)", async () => {
+            const handleConfirm = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <AllocationStep
+                    vaga={mockVaga}
+                    selectedMatches={[allocatedMatch, availableMatch]}
+                    onBack={vi.fn()}
+                    onConfirm={handleConfirm}
+                />
+            );
+
+            const allocRadio = screen.getByRole("radio", { name: /Roberto Mendes está em projeto/i });
+            const availRadio = screen.getByRole("radio", { name: /Selecionar Lucas Silveira/i });
+
+            expect(allocRadio).toBeDisabled();
+            expect(availRadio).toBeEnabled();
+            expect(screen.getByText("Indisponível (Em projeto)")).toBeInTheDocument();
+
+            // Clicar no radio desativado não deve selecioná-lo
+            await user.click(allocRadio);
+            expect(allocRadio).not.toBeChecked();
+
+            // Clicar no recurso disponível deve selecioná-lo
+            await user.click(availRadio);
+            expect(availRadio).toBeChecked();
+            expect(screen.getByRole("button", { name: /Confirmar Alocação de Lucas/i })).toBeEnabled();
+        });
+
+        it("não deve auto-selecionar candidato único se ele estiver em projeto (RN02)", () => {
+            render(
+                <AllocationStep
+                    vaga={mockVaga}
+                    selectedMatches={[allocatedMatch]}
+                    onBack={vi.fn()}
+                    onConfirm={vi.fn()}
+                />
+            );
+
+            const radio = screen.getByRole("radio", { name: /Roberto Mendes está em projeto/i });
+            expect(radio).toBeDisabled();
+            expect(radio).not.toBeChecked();
+
+            const confirmBtn = screen.getByRole("button", { name: /Confirmar Alocação do Recurso/i });
+            expect(confirmBtn).toBeDisabled();
+        });
+    });
 });
 

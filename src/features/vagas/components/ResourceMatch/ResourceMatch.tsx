@@ -3,7 +3,7 @@ import { Loader2, UsersRoundIcon } from "lucide-react";
 import { MatchTable } from "../MatchTable/MatchTable";
 import { useEffect, useMemo, useState } from "react";
 import { MatchFilters } from "../MatchFilters/MatchFilters";
-import type { Match, MatchAvailabilityFilter, MatchSquadFilter } from "../../types/types";
+import { isResourceAllocated, type Match, type MatchAvailabilityFilter, type MatchSquadFilter } from "../../types/types";
 import { SummaryMatchModal } from "../SummaryMatchModal/SummaryMatchModal";
 import { useQuery } from "@tanstack/react-query";
 import { vagasApi } from "../../api/vagas.api";
@@ -78,6 +78,7 @@ export function MatchResources({
 
     function handleToggleSelect(match: Match) {
         if (!onSelectedMatchesChange) return;
+        if (isResourceAllocated(match.availability)) return;
         const exists = selectedIds.includes(match.id);
         if (exists) {
             onSelectedMatchesChange(selectedMatches.filter((m) => m.id !== match.id));
@@ -88,13 +89,14 @@ export function MatchResources({
 
     function handleSelectAll(visible: Match[]) {
         if (!onSelectedMatchesChange) return;
-        const allSelected = visible.length > 0 && visible.every((m) => selectedIds.includes(m.id));
+        const selectable = visible.filter((m) => !isResourceAllocated(m.availability));
+        const allSelected = selectable.length > 0 && selectable.every((m) => selectedIds.includes(m.id));
         if (allSelected) {
-            const visibleIds = new Set(visible.map((m) => m.id));
-            onSelectedMatchesChange(selectedMatches.filter((m) => !visibleIds.has(m.id)));
+            const selectableIds = new Set(selectable.map((m) => m.id));
+            onSelectedMatchesChange(selectedMatches.filter((m) => !selectableIds.has(m.id)));
         } else {
             const current = [...selectedMatches];
-            visible.forEach((m) => {
+            selectable.forEach((m) => {
                 if (!current.some((c) => c.id === m.id)) {
                     current.push(m);
                 }
@@ -184,7 +186,7 @@ export function MatchResources({
                             <Button
                                 type="button"
                                 variant="primary"
-                                disabled={selectedMatches.length === 0}
+                                disabled={selectedMatches.length === 0 || !selectedMatches.some((m) => !isResourceAllocated(m.availability))}
                                 onClick={onProceedToAllocation}
                             >
                                 Avançar para Alocação {selectedMatches.length > 0 ? `(${selectedMatches.length})` : ""}

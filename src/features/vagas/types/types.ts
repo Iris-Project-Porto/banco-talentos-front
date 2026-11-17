@@ -46,6 +46,11 @@ export interface JobPosting {
 
 export type MatchAvailability = "available" | "allocated" | "waiting";
 
+
+export function isResourceAllocated(availability?: string): boolean {
+  return availability?.trim().toLowerCase() === "allocated";
+}
+
 export type MatchSquadFilter = "all" | string;
 
 export type MatchAvailabilityFilter = "all" | MatchAvailability | string;

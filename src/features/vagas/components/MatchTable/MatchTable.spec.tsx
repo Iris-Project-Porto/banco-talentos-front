@@ -120,5 +120,92 @@ describe("MatchTable Component", () => {
         expect(handleView).toHaveBeenCalledTimes(1);
         expect(handleView).toHaveBeenCalledWith(mockMatches[0]);
     });
+
+    describe("RN02 - Restrição de Seleção por Disponibilidade", () => {
+        const matchesWithAllocated: Match[] = [
+            {
+                id: "mat-avail",
+                name: "Lucas Silveira",
+                rankingScore: 1,
+                matchScore: 95,
+                availability: "available",
+                description: "Frontend",
+                mainSkills: [],
+            },
+            {
+                id: "mat-alloc",
+                name: "Roberto Mendes",
+                rankingScore: 2,
+                matchScore: 85,
+                availability: "allocated",
+                description: "Backend",
+                mainSkills: [],
+            },
+            {
+                id: "mat-project",
+                name: "Camila Dias",
+                rankingScore: 3,
+                matchScore: 80,
+                availability: "allocated",
+                description: "Fullstack",
+                mainSkills: [],
+            },
+        ];
+
+        it("deve exibir o status 'Em projeto' com badge para recursos alocados", () => {
+            render(<MatchTable data={matchesWithAllocated} />);
+
+            expect(screen.getByText("Disponível")).toBeInTheDocument();
+            const emProjetoBadges = screen.getAllByText("Em projeto");
+            expect(emProjetoBadges).toHaveLength(2);
+        });
+
+        it("deve desativar o checkbox e impedir a seleção de recursos em projeto (RN02)", async () => {
+            const handleToggle = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <MatchTable
+                    data={matchesWithAllocated}
+                    selectedIds={[]}
+                    onToggleSelect={handleToggle}
+                />
+            );
+
+            const availCheckbox = screen.getByRole("checkbox", { name: "Selecionar Lucas Silveira" });
+            const allocCheckbox1 = screen.getByRole("checkbox", { name: /Roberto Mendes está em projeto/i });
+            const allocCheckbox2 = screen.getByRole("checkbox", { name: /Camila Dias está em projeto/i });
+
+            expect(availCheckbox).toBeEnabled();
+            expect(allocCheckbox1).toBeDisabled();
+            expect(allocCheckbox2).toBeDisabled();
+
+            await user.click(allocCheckbox1);
+            expect(handleToggle).not.toHaveBeenCalled();
+
+            await user.click(availCheckbox);
+            expect(handleToggle).toHaveBeenCalledTimes(1);
+            expect(handleToggle).toHaveBeenCalledWith(matchesWithAllocated[0]);
+        });
+
+        it("deve selecionar apenas recursos disponíveis ao clicar em 'Selecionar todos' (RN02)", async () => {
+            const handleSelectAll = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <MatchTable
+                    data={matchesWithAllocated}
+                    selectedIds={[]}
+                    onToggleSelect={vi.fn()}
+                    onSelectAll={handleSelectAll}
+                />
+            );
+
+            const selectAllCheckbox = screen.getByRole("checkbox", { name: "Selecionar todos os recursos" });
+            await user.click(selectAllCheckbox);
+
+            expect(handleSelectAll).toHaveBeenCalledWith([matchesWithAllocated[0]]);
+        });
+    });
 });
 

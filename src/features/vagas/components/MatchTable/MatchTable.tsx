@@ -1,7 +1,7 @@
 import { Eye } from "lucide-react";
 import { Avatar, Badge, ProgressRing, Tag } from "@/components/ui";
 import { Table } from "@/components/ui/Table/Table";
-import type { Match } from "../../types/types";
+import { isResourceAllocated, type Match } from "../../types/types";
 
 interface Props {
     data: Match[];
@@ -15,14 +15,26 @@ export function MatchTable({ data, selectedIds = [], onToggleSelect, onSelectAll
     const selection = onToggleSelect
         ? {
               selectedKeys: selectedIds,
-              onToggleRow: (match: Match) => onToggleSelect(match),
+              onToggleRow: (match: Match) => {
+                  if (isResourceAllocated(match.availability)) return;
+                  onToggleSelect(match);
+              },
               onToggleAll: (checked: boolean) => {
                   if (onSelectAll) {
-                      onSelectAll(checked ? data : []);
+                      const selectableMatches = data.filter((m) => !isResourceAllocated(m.availability));
+                      onSelectAll(checked ? selectableMatches : []);
                   }
               },
+              isRowDisabled: (match: Match) => isResourceAllocated(match.availability),
+              getRowDisabledTooltip: (match: Match) =>
+                  isResourceAllocated(match.availability)
+                      ? "Recurso já alocado em outro projeto (seleção desabilitada)"
+                      : undefined,
               selectAllAriaLabel: "Selecionar todos os recursos",
-              getRowAriaLabel: (match: Match) => `Selecionar ${match.name}`,
+              getRowAriaLabel: (match: Match) =>
+                  isResourceAllocated(match.availability)
+                      ? `Recurso ${match.name} está em projeto - seleção desabilitada`
+                      : `Selecionar ${match.name}`,
           }
         : undefined;
 
