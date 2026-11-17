@@ -111,7 +111,7 @@ export interface VagaFiltersParams {
 
 export interface JobPostingAllocationPayload {
   resourceId: string;
-  startDate: string; // YYYY-MM-DD
+  startDate: string;
   role: string;
 }
 
