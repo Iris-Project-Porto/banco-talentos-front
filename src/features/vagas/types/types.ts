@@ -46,6 +46,11 @@ export interface JobPosting {
 
 export type MatchAvailability = "available" | "allocated" | "waiting";
 
+
+export function isResourceAllocated(availability?: string): boolean {
+  return availability?.trim().toLowerCase() === "allocated";
+}
+
 export type MatchSquadFilter = "all" | string;
 
 export type MatchAvailabilityFilter = "all" | MatchAvailability | string;
@@ -102,4 +107,31 @@ export interface VagaFiltersParams {
   status?: string;
   recruiter?: string;
   skills?: string[];
+}
+
+export interface JobPostingAllocationPayload {
+  resourceId: string;
+  startDate: string;
+  role: string;
+}
+
+export interface JobPostingAllocationResponse {
+  id: string;
+  jobPostingId: string;
+  resourceId: string;
+  resourceName: string;
+  projectId?: string;
+  projectName?: string;
+  squadId?: string;
+  squadName?: string;
+  startDate: string;
+  role: string;
+  active: boolean;
+  createdAt?: string;
+  createdBy?: string;
+}
+
+export interface JobPostingAllocationResult {
+  jobPosting: JobPosting;
+  allocations: JobPostingAllocationResponse[];
 }

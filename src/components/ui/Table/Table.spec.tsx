@@ -143,4 +143,27 @@ describe('Componente Table', () => {
 
         expect(container.querySelectorAll('tbody tr')).toHaveLength(3);
     });
+
+    describe('Seleção na Tabela com isRowDisabled', () => {
+        it('deve desativar checkbox e clique na linha quando isRowDisabled retornar true', () => {
+            render(
+                <Table
+                    columns={columns}
+                    data={data}
+                    keyExtractor={(row) => row.id}
+                    selection={{
+                        selectedKeys: [],
+                        onToggleRow: () => {},
+                        onToggleAll: () => {},
+                        isRowDisabled: (row) => row.id === '2',
+                        getRowDisabledTooltip: (row) => row.id === '2' ? 'Item desativado' : undefined,
+                    }}
+                />
+            );
+
+            const checkboxes = screen.getAllByRole('checkbox');
+            expect(checkboxes[1]).toBeEnabled();
+            expect(checkboxes[2]).toBeDisabled();
+        });
+    });
 });

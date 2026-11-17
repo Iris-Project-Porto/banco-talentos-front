@@ -2,6 +2,9 @@ import { http } from "@/lib/axios";
 import type {
   CandidateFiltersParams,
   JobPosting,
+  JobPostingAllocationPayload,
+  JobPostingAllocationResponse,
+  JobPostingAllocationResult,
   JobPostingPayload,
   JobStatus,
   MatchCandidatesResponse,
@@ -49,7 +52,6 @@ export const vagasApi = {
 
   getById: (id: string) =>
     http.get<JobPosting>(`/v1/admin/job-postings/${id}`).then((r) => r.data),
-
   getMatches: (id: string, params?: CandidateFiltersParams) =>
     http
       .get<MatchCandidatesResponse>(`/v1/admin/job-postings/${id}/matches`, {
@@ -57,6 +59,15 @@ export const vagasApi = {
       })
       .then((r) => r.data),
 
+  allocate: (id: string, data: JobPostingAllocationPayload) =>
+    http
+      .post<JobPostingAllocationResult>(`/v1/admin/job-postings/${id}/allocations`, data)
+      .then((r) => r.data),
+
+  getAllocations: (id: string) =>
+    http
+      .get<JobPostingAllocationResponse[]>(`/v1/admin/job-postings/${id}/allocations`)
+      .then((r) => r.data),
   create: (data: JobPostingPayload) =>
     http.post<JobPosting>("/v1/admin/job-postings", data).then((r) => r.data),
 

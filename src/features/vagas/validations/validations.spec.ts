@@ -48,4 +48,19 @@ describe('Vagas Validations', () => {
             expect(result.data.isUrgent).toBe(false);
         }
     });
+
+    describe('RN02 - isResourceAllocated helper', () => {
+        it('deve identificar recursos com status allocated', async () => {
+            const { isResourceAllocated } = await import('../types/types');
+
+            expect(isResourceAllocated('allocated')).toBe(true);
+            expect(isResourceAllocated('ALLOCATED')).toBe(true);
+            expect(isResourceAllocated('Allocated')).toBe(true);
+
+            expect(isResourceAllocated('available')).toBe(false);
+            expect(isResourceAllocated('waiting')).toBe(false);
+            expect(isResourceAllocated(undefined)).toBe(false);
+            expect(isResourceAllocated('')).toBe(false);
+        });
+    });
 });
