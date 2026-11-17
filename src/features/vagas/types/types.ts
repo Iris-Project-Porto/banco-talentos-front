@@ -97,6 +97,17 @@ export interface CandidateFiltersParams {
 }
 
 export type JobPostingPayload = Omit<JobPosting, "id" | "projectName" | "squadName" | "active" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "experienceLevelDescription">;
+export interface VagaFiltersParams {
+  vacancyCode?: string;
+  title?: string;
+  projectId?: string;
+  squadId?: string;
+  experienceLevel?: string;
+  modality?: string;
+  status?: string;
+  recruiter?: string;
+  skills?: string[];
+}
 
 export interface JobPostingAllocationPayload {
   resourceId: string;
