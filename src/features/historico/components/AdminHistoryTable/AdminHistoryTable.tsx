@@ -9,13 +9,15 @@ import {
   operationLabels,
   operationVariants,
 } from "../../utils/adminHistory";
+import type { AuditCategory } from "../../utils/adminHistory";
 
 interface Props {
   records: AuditSummary[];
+  activeTab: AuditCategory;
   onView: (record: AuditSummary) => void;
 }
 
-export function AdminHistoryTable({ records, onView }: Props) {
+export function AdminHistoryTable({ records, activeTab, onView }: Props) {
   const columns = [
     {
       header: "Tipo de alteração",
@@ -50,14 +52,17 @@ export function AdminHistoryTable({ records, onView }: Props) {
         </span>
       ),
     },
-    {
-      header: "Usuário afetado",
-      render: (record: AuditSummary) => (
-        <span className="text-slate-600">
-          {getAuditUserLabel(record.userAffectedName)}
-        </span>
-      ),
-    },
+    //renderiza a coluna apenas se a aba ativa for Recursos
+    activeTab === "Recursos"
+      ? {
+        header: "Usuário afetado",
+        render: (record: AuditSummary) => (
+          <span className="text-slate-600">
+            {getAuditUserLabel(record.userAffectedName)}
+          </span>
+        ),
+      }
+      : null,
     {
       header: "Detalhes",
       className: "text-right",
@@ -73,7 +78,7 @@ export function AdminHistoryTable({ records, onView }: Props) {
         </button>
       ),
     },
-  ];
+  ].filter(Boolean) as any[] //remove o null do array se a aba não for Recurso; 
 
   return (
     <Table
