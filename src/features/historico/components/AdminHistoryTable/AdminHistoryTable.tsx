@@ -27,9 +27,14 @@ export function AdminHistoryTable({ records, activeTab, onView }: Props) {
             {operationLabels[record.operation]}
           </Badge>
 
-          <p className="mt-0.5 text-sm font-medium text-slate-700">
+
+          <p
+            className="mt-0.5 text-sm font-medium text-slate-700 truncate max-w-[16rem] sm:max-w-[24rem]"
+            title={record.entityName?.trim() || "Contexto indisponível"}
+          >
             {record.entityName?.trim() || "Contexto indisponível"}
           </p>
+
           <p className="mt-1 text-xs text-slate-400">
             {entityLabels[record.entityType] ?? record.entityType}
           </p>
