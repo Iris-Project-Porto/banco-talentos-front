@@ -46,8 +46,8 @@ export default function Squads() {
         queryKey: ["squads", statusType, page, search],
         queryFn: () =>
             statusType === "ACTIVE"
-                ? squadsApi.getActive({ page, size: 10, search })
-                : squadsApi.getInactive({ page, size: 10, search }),
+                ? squadsApi.getActive({ page, size: 10, search, sort: "createdAt,desc" })
+                : squadsApi.getInactive({ page, size: 10, search, sort: "createdAt,desc" }),
     });
 
     const squads: Squad[] = data?.content || [];

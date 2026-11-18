@@ -65,6 +65,15 @@ function formatAverageProficiency(value?: number) {
 }
 
 export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) {
+    const sortedData = [...data].sort((a, b) => {
+        const aCreatedAt = a.createdAt;
+        const bCreatedAt = b.createdAt;
+        const aTimestamp = aCreatedAt ? Date.parse(aCreatedAt) : 0;
+        const bTimestamp = bCreatedAt ? Date.parse(bCreatedAt) : 0;
+
+        return bTimestamp - aTimestamp;
+    });
+
     const columns = [
         {
             header: "Skill",
@@ -135,7 +144,7 @@ export function SkillsTable({ data, deletingSkillId, onEdit, onDelete }: Props) 
     return (
         <Table
             columns={columns}
-            data={data}
+            data={sortedData}
             keyExtractor={(skill) => skill.id}
             emptyMessage="Nenhuma skill encontrada"
         />
