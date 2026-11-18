@@ -45,7 +45,7 @@ describe("AuditDetailPanel", () => {
         });
     });
 
-    it("busca pelo ID da auditoria e compara os valores sem mostrar IDs", () => {
+    it("busca pelo ID da auditoria e compara os valores sem mostrar IDs (Aba Recursos)", () => {
         useAuditDetailMock.mockReturnValue({
             audit: createDetail({
                 oldValue: {
@@ -68,7 +68,7 @@ describe("AuditDetailPanel", () => {
             refetch: vi.fn(),
         });
 
-        render(<AuditDetailPanel record={record} onClose={vi.fn()} />);
+        render(<AuditDetailPanel record={record} activeTab="Recursos" onClose={vi.fn()} />);
 
         expect(screen.getByRole("complementary", { name: "Detalhes do evento" })).toBeInTheDocument();
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -84,6 +84,13 @@ describe("AuditDetailPanel", () => {
         expect(screen.queryByText("owner-old-id")).not.toBeInTheDocument();
         expect(screen.queryByText("owner-new-id")).not.toBeInTheDocument();
         expect(screen.queryByText("ID")).not.toBeInTheDocument();
+    });
+
+    it("não renderiza 'Usuário afetado' se a aba ativa não for 'Recursos'", () => {
+        render(<AuditDetailPanel record={record} activeTab="Projetos" onClose={vi.fn()} />);
+
+        expect(screen.queryByText("Usuário afetado")).not.toBeInTheDocument();
+        expect(screen.queryByText("João Souza")).not.toBeInTheDocument();
     });
 
     it("mostra o novo snapshot para CREATE", () => {
@@ -103,6 +110,7 @@ describe("AuditDetailPanel", () => {
         render(
             <AuditDetailPanel
                 record={{ ...record, operation: "CREATE" }}
+                activeTab="Squads"
                 onClose={vi.fn()}
             />,
         );
@@ -134,6 +142,7 @@ describe("AuditDetailPanel", () => {
         render(
             <AuditDetailPanel
                 record={{ ...record, operation: "CREATE", entityType: "PROFILE_SKILL" }}
+                activeTab="Skills"
                 onClose={vi.fn()}
             />,
         );
@@ -163,6 +172,7 @@ describe("AuditDetailPanel", () => {
         render(
             <AuditDetailPanel
                 record={{ ...record, operation: "DELETE" }}
+                activeTab="Squads"
                 onClose={vi.fn()}
             />,
         );
@@ -181,7 +191,7 @@ describe("AuditDetailPanel", () => {
             refetch: vi.fn(),
         });
 
-        render(<AuditDetailPanel record={record} onClose={vi.fn()} />);
+        render(<AuditDetailPanel record={record} activeTab="Recursos" onClose={vi.fn()} />);
 
         expect(screen.getByRole("status")).toHaveTextContent("Carregando detalhes...");
     });
@@ -199,7 +209,7 @@ describe("AuditDetailPanel", () => {
             refetch: vi.fn(),
         });
 
-        render(<AuditDetailPanel record={record} onClose={vi.fn()} />);
+        render(<AuditDetailPanel record={record} activeTab="Recursos" onClose={vi.fn()} />);
 
         expect(screen.getByRole("alert")).toHaveTextContent(
             "Registro não encontrado ou você não tem autorização para acessá-lo.",

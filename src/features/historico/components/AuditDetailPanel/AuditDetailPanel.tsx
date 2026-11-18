@@ -10,11 +10,13 @@ import {
     formatAuditDate,
     getAuditUserLabel,
     operationLabels,
+    type AuditCategory,
 } from "../../utils/adminHistory";
 import { getHistoryChanges } from "../../utils/historyChanges";
 
 interface Props {
     record: AuditSummary;
+    activeTab: AuditCategory;
     onClose: () => void;
 }
 
@@ -202,7 +204,7 @@ function getErrorMessage(error: unknown): string {
     return getApiError(error, "Não foi possível carregar os detalhes da auditoria.");
 }
 
-export function AuditDetailPanel({ record, onClose }: Props) {
+export function AuditDetailPanel({ record, activeTab, onClose }: Props) {
     const { audit, isLoading, isError, error, refetch } = useAuditDetail(record.id);
     const operation = audit?.operation ?? record.operation;
     const entityName = entityLabels[record.entityType] ?? record.entityType;
@@ -305,10 +307,15 @@ export function AuditDetailPanel({ record, onClose }: Props) {
                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário executor</dt>
                         <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userName)}</dd>
                     </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                        <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário afetado</dt>
-                        <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userAffectedName)}</dd>
-                    </div>
+
+
+                    {activeTab === "Recursos" && (
+                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário afetado</dt>
+                            <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userAffectedName)}</dd>
+                        </div>
+                    )}
+
                     <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 sm:col-span-2">
                         <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             {operationDateLabels[operation]}
