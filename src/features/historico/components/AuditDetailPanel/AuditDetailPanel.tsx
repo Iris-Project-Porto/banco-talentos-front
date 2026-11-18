@@ -76,6 +76,23 @@ function isAuditObject(value: AuditJsonValue): value is { [key: string]: AuditJs
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function parseSnapshotValue(value?: AuditJsonValue | null): AuditJsonValue | null | undefined {
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (
+            (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+            (trimmed.startsWith("[") && trimmed.endsWith("]"))
+        ) {
+            try {
+                return JSON.parse(trimmed);
+            } catch {
+                return value;
+            }
+        }
+    }
+    return value;
+}
+
 function SnapshotValue({ value }: { value: unknown }) {
     const formattedValue = formatValue(value);
 
@@ -163,15 +180,18 @@ export function AuditDetailPanel({ record, onClose }: Props) {
     function renderSnapshots() {
         if (!audit) return null;
 
+        const parsedOld = parseSnapshotValue(audit.oldValue);
+        const parsedNew = parseSnapshotValue(audit.newValue);
+
         if (operation === "CREATE") {
-            return <SnapshotFields value={audit.newValue} />;
+            return <SnapshotFields value={parsedNew} />;
         }
         if (operation === "DELETE") {
-            return <SnapshotFields value={audit.oldValue} />;
+            return <SnapshotFields value={parsedOld} />;
         }
 
-        const oldValue = audit.oldValue ? omitIdentifiers(audit.oldValue) : audit.oldValue;
-        const newValue = audit.newValue ? omitIdentifiers(audit.newValue) : audit.newValue;
+        const oldValue = parsedOld ? omitIdentifiers(parsedOld) : parsedOld;
+        const newValue = parsedNew ? omitIdentifiers(parsedNew) : parsedNew;
         const changes = getHistoryChanges(oldValue, newValue);
         if (changes.length === 0) {
             return <p className="text-sm text-slate-500">Não há diferenças disponíveis.</p>;
