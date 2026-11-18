@@ -31,7 +31,9 @@ export function AdminHistoryTable({ records, onView }: Props) {
           <p className="mt-1 text-xs text-slate-400">
             {entityLabels[record.entityType] ?? record.entityType}
           </p>
-          {(record.entityType === "PROJECT" || record.entityType === "SQUAD") &&
+          {(record.entityType === "PROJECT" ||
+            record.entityType === "SQUAD" ||
+            record.entityType === "SKILL") &&
             record.description?.trim() && (
               <p className="mt-1 text-xs text-slate-500">
                 {record.description.trim()}
