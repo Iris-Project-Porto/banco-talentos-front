@@ -4,7 +4,7 @@ import { History, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import { getApiError } from "@/lib/axios";
 import { useAuditDetail } from "../../hooks/useAuditDetail";
-import type { AuditJsonValue, AuditSummary } from "../../types/historico";
+import type { AuditJsonValue, AuditOperation, AuditSummary } from "../../types/historico";
 import {
     entityLabels,
     formatAuditDate,
@@ -18,10 +18,24 @@ interface Props {
     onClose: () => void;
 }
 
+const FIELD_LABELS: Record<string, string> = {
+    openingDate: "Data de abertura",
+    dataAbertura: "Data de abertura",
+    closingDate: "Data de fechamento",
+    dataFechamento: "Data de fechamento",
+};
+
+const operationDateLabels: Record<AuditOperation, string> = {
+    CREATE: "Data de criação",
+    UPDATE: "Data de alteração",
+    DELETE: "Data de remoção",
+};
+
 function formatFieldLabel(label: string): string {
     return label
         .split(" / ")
         .map((part) =>
+            FIELD_LABELS[part] ??
             part
                 .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
                 .replace(/[_-]+/g, " ")
@@ -30,10 +44,31 @@ function formatFieldLabel(label: string): string {
         .join(" / ");
 }
 
+function formatDateValue(value: string): string | null {
+    const trimmed = value.trim();
+    const match = /^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/.exec(trimmed);
+    if (!match) return null;
+
+    const [, year, month, day] = match;
+    const y = Number(year);
+    const m = Number(month);
+    const d = Number(day);
+
+    if (y >= 1900 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+        return `${day}/${month}/${year}`;
+    }
+
+    return null;
+}
+
 function formatValue(value: unknown): string {
     if (value === null || value === undefined || value === "") return "Sem valor";
     if (typeof value === "boolean") return value ? "Sim" : "Não";
-    if (typeof value === "string" || typeof value === "number") return String(value);
+    if (typeof value === "number") return String(value);
+    if (typeof value === "string") {
+        const dateFormatted = formatDateValue(value);
+        return dateFormatted ?? value;
+    }
     if (Array.isArray(value)) {
         return value.length
             ? value.map((item, index) => `Item ${index + 1}: ${formatValue(item)}`).join("\n")
@@ -231,84 +266,86 @@ export function AuditDetailPanel({ record, onClose }: Props) {
         >
             <div className="h-1 bg-pink/60" aria-hidden="true" />
             <header className="flex items-center justify-between border-b border-pink-100 bg-gradient-to-r from-pink-50/70 to-white px-4 py-4">
-                    <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-100/70 text-pink">
-                            <History className="h-5 w-5" aria-hidden="true" />
-                        </span>
-                        <div>
-                            <h2 id="audit-detail-title" className="text-lg font-bold text-slate-900">
-                                Detalhes da auditoria
-                            </h2>
-                            <p className="mt-1 text-xs text-slate-500">
-                                {operationLabels[operation]} de {entityName}
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-100/70 text-pink">
+                        <History className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                        <h2 id="audit-detail-title" className="text-lg font-bold text-slate-900">
+                            Detalhes da auditoria
+                        </h2>
+                        <p className="mt-1 text-xs text-slate-500">
+                            {operationLabels[operation]} de {entityName}
+                        </p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        aria-label="Fechar"
-                        className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-pink-100/70 hover:text-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink"
-                    >
-                        <X className="h-4 w-4" aria-hidden="true" />
-                    </button>
+                </div>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Fechar"
+                    className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-pink-100/70 hover:text-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink"
+                >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                </button>
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 py-4">
-                    <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entidade</dt>
-                            <dd className="mt-1 text-sm font-medium text-slate-800">
-                                {record.entityName?.trim() || "Contexto indisponível"}
-                            </dd>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entidade</dt>
+                        <dd className="mt-1 text-sm font-medium text-slate-800">
+                            {record.entityName?.trim() || "Contexto indisponível"}
+                        </dd>
+                    </div>
+                    <div className="rounded-xl border border-pink-100 bg-pink-50/40 p-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-pink-700">Operação</dt>
+                        <dd className="mt-1 text-sm font-medium text-slate-800">{operationLabels[operation]}</dd>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário executor</dt>
+                        <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userName)}</dd>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário afetado</dt>
+                        <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userAffectedName)}</dd>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 sm:col-span-2">
+                        <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            {operationDateLabels[operation]}
+                        </dt>
+                        <dd className="mt-1 text-sm font-medium text-slate-800">
+                            <time dateTime={record.createdAt}>{formatAuditDate(record.createdAt)}</time>
+                        </dd>
+                    </div>
+                    {record.description?.trim() && (
+                        <div className="rounded-xl border border-pink-100 bg-pink-50/40 p-3 sm:col-span-2">
+                            <dt className="text-xs font-semibold uppercase tracking-wide text-pink-700">Descrição</dt>
+                            <dd className="mt-1 text-sm font-medium text-slate-800">{record.description.trim()}</dd>
                         </div>
-                        <div className="rounded-xl border border-pink-100 bg-pink-50/40 p-3">
-                            <dt className="text-xs font-semibold uppercase tracking-wide text-pink-700">Operação</dt>
-                            <dd className="mt-1 text-sm font-medium text-slate-800">{operationLabels[operation]}</dd>
-                        </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário executor</dt>
-                            <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userName)}</dd>
-                        </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuário afetado</dt>
-                            <dd className="mt-1 text-sm font-medium text-slate-800">{getAuditUserLabel(record.userAffectedName)}</dd>
-                        </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 sm:col-span-2">
-                            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Data e hora</dt>
-                            <dd className="mt-1 text-sm font-medium text-slate-800">
-                                <time dateTime={record.createdAt}>{formatAuditDate(record.createdAt)}</time>
-                            </dd>
-                        </div>
-                        {record.description?.trim() && (
-                            <div className="rounded-xl border border-pink-100 bg-pink-50/40 p-3 sm:col-span-2">
-                                <dt className="text-xs font-semibold uppercase tracking-wide text-pink-700">Descrição</dt>
-                                <dd className="mt-1 text-sm font-medium text-slate-800">{record.description.trim()}</dd>
-                            </div>
-                        )}
-                    </dl>
+                    )}
+                </dl>
 
-                    <section className="mt-6 border-t border-pink-100 pt-5">
-                        <h3 className="mb-3 border-l-2 border-pink px-3 text-sm font-bold text-slate-900">
-                            {operation === "CREATE" ? "Novo valor" : operation === "DELETE" ? "Valor anterior" : "Alterações"}
-                        </h3>
-                        {isLoading ? (
-                            <p role="status" className="text-sm text-slate-400">Carregando detalhes...</p>
-                        ) : isError ? (
-                            <div className="rounded-lg border border-red-100 bg-red-50 p-4">
-                                <p role="alert" className="text-sm text-red-700">{getErrorMessage(error)}</p>
-                                <button
-                                    type="button"
-                                    onClick={() => refetch()}
-                                    className="mt-2 text-sm font-medium text-slate-900 underline"
-                                >
-                                    Tentar novamente
-                                </button>
-                            </div>
-                        ) : (
-                            renderSnapshots()
-                        )}
-                    </section>
+                <section className="mt-6 border-t border-pink-100 pt-5">
+                    <h3 className="mb-3 border-l-2 border-pink px-3 text-sm font-bold text-slate-900">
+                        {operation === "CREATE" ? "Novo valor" : operation === "DELETE" ? "Valor anterior" : "Alterações"}
+                    </h3>
+                    {isLoading ? (
+                        <p role="status" className="text-sm text-slate-400">Carregando detalhes...</p>
+                    ) : isError ? (
+                        <div className="rounded-lg border border-red-100 bg-red-50 p-4">
+                            <p role="alert" className="text-sm text-red-700">{getErrorMessage(error)}</p>
+                            <button
+                                type="button"
+                                onClick={() => refetch()}
+                                className="mt-2 text-sm font-medium text-slate-900 underline"
+                            >
+                                Tentar novamente
+                            </button>
+                        </div>
+                    ) : (
+                        renderSnapshots()
+                    )}
+                </section>
             </div>
 
             <footer className="flex justify-end border-t border-slate-200 px-4 py-3">
