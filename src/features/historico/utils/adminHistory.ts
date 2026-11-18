@@ -1,6 +1,6 @@
 import type { AuditOperation, AuditSummary } from "../types/historico";
 
-export const auditCategories = ["Projetos", "Squads", "Recursos", "Vagas"] as const;
+export const auditCategories = ["Projetos", "Squads", "Recursos", "Vagas", "Skills"] as const;
 export type AuditCategory = (typeof auditCategories)[number];
 
 const resourceEntityTypes = new Set([
@@ -12,15 +12,18 @@ const resourceEntityTypes = new Set([
 export function getAuditCategory(
     record: Pick<AuditSummary, "entityType">,
 ): AuditCategory | null {
-    switch (record.entityType) {
+    const type = record.entityType?.toUpperCase();
+    switch (type) {
         case "PROJECT":
             return "Projetos";
         case "SQUAD":
             return "Squads";
         case "JOB_POSTING":
             return "Vagas";
+        case "SKILL":
+            return "Skills";
         default: {
-            return resourceEntityTypes.has(record.entityType) ? "Recursos" : null;
+            return type && resourceEntityTypes.has(type) ? "Recursos" : null;
         }
     }
 }
@@ -79,6 +82,7 @@ export const entityLabels: Record<string, string> = {
     PROJECT: "Projeto",
     SQUAD: "Squad",
     JOB_POSTING: "Vaga",
+    SKILL: "Skill",
 };
 
 export function formatAuditDate(date: string) {
