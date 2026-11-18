@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { vagasApi } from "../api/vagas.api";
 import type { VagaFiltersParams } from "../types/types";
@@ -55,6 +55,15 @@ export function useVagasList() {
   const currentData = viewActive ? activeData : inactiveData;
   const isLoading = viewActive ? loadingActive : loadingInactive;
   const isError = viewActive ? errorActive : errorInactive;
+  const vagas = useMemo(() => {
+    const items = currentData?.content ?? [];
+
+    return [...items].sort((a, b) => {
+      const aTimestamp = a.updatedAt ? Date.parse(a.updatedAt) : 0;
+      const bTimestamp = b.updatedAt ? Date.parse(b.updatedAt) : 0;
+      return bTimestamp - aTimestamp;
+    });
+  }, [currentData?.content]);
 
   return {
     viewActive,
@@ -65,7 +74,7 @@ export function useVagasList() {
     setFilter,
     applyFilters,
     clearFilters,
-    vagas: currentData?.content || [],
+    vagas,
     totalElements: currentData?.totalElements || 0,
     totalPages: currentData?.totalPages || 1,
     isLoading,
