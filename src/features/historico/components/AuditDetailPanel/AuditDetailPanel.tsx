@@ -53,7 +53,11 @@ function isIdentifierField(key: string): boolean {
     return normalizedKey.startsWith("id") ||
         normalizedKey.endsWith("id") ||
         normalizedKey.includes("uuid") ||
-        normalizedKey.includes("identifier");
+        normalizedKey.includes("identifier") ||
+        normalizedKey.includes("criado") ||
+        normalizedKey.includes("atualizado") ||
+        normalizedKey.includes("created") ||
+        normalizedKey.includes("updated");
 }
 
 function omitIdentifiers(value: AuditJsonValue): AuditJsonValue {
