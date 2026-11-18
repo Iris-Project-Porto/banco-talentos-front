@@ -94,11 +94,10 @@ export default function Historico() {
                                 aria-selected={activeTab === tab}
                                 aria-controls="audit-tabpanel"
                                 onClick={() => setActiveTab(tab)}
-                                className={`whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
-                                    activeTab === tab
-                                        ? "border-slate-900 text-slate-900"
-                                        : "border-transparent text-slate-400 hover:text-slate-600"
-                                }`}
+                                className={`whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${activeTab === tab
+                                    ? "border-slate-900 text-slate-900"
+                                    : "border-transparent text-slate-400 hover:text-slate-600"
+                                    }`}
                             >
                                 {tab}
                             </button>
@@ -143,6 +142,7 @@ export default function Historico() {
                             <AdminHistoryTable
                                 records={visibleRecords}
                                 onView={setSelectedRecord}
+                                activeTab={activeTab}
                             />
 
                             <Pagination
@@ -155,6 +155,8 @@ export default function Historico() {
                         {selectedRecord && (
                             <AuditDetailPanel
                                 record={selectedRecord}
+                                activeTab={activeTab}
+
                                 onClose={() => setSelectedRecord(null)}
                             />
                         )}
