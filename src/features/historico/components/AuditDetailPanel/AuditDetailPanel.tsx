@@ -10,9 +10,11 @@ import {
     formatAuditDate,
     getAuditUserLabel,
     operationLabels,
+    ENUM_TRANSLATIONS,
     type AuditCategory,
 } from "../../utils/adminHistory";
 import { getHistoryChanges } from "../../utils/historyChanges";
+
 
 interface Props {
     record: AuditSummary;
@@ -26,6 +28,7 @@ const FIELD_LABELS: Record<string, string> = {
     closingDate: "Data de fechamento",
     dataFechamento: "Data de fechamento",
 };
+
 
 const operationDateLabels: Record<AuditOperation, string> = {
     CREATE: "Data de criação",
@@ -67,21 +70,35 @@ function formatValue(value: unknown): string {
     if (value === null || value === undefined || value === "") return "Sem valor";
     if (typeof value === "boolean") return value ? "Sim" : "Não";
     if (typeof value === "number") return String(value);
+
     if (typeof value === "string") {
+        if (ENUM_TRANSLATIONS[value]) {
+            return ENUM_TRANSLATIONS[value];
+        }
         const dateFormatted = formatDateValue(value);
         return dateFormatted ?? value;
     }
+
     if (Array.isArray(value)) {
         return value.length
-            ? value.map((item, index) => `Item ${index + 1}: ${formatValue(item)}`).join("\n")
+            ? value
+                .map((item, index) => {
+                    const formattedItem = formatValue(item).replace(/\n/g, "\n  ");
+                    return `• Item ${index + 1}:\n  ${formattedItem}`;
+                })
+                .join("\n\n")
             : "Nenhum item";
     }
+
     if (typeof value === "object") {
         const entries = Object.entries(value).filter(([key]) => !isIdentifierField(key));
         return entries.length
-            ? entries.map(([key, item]) => `${formatFieldLabel(key)}: ${formatValue(item)}`).join("\n")
+            ? entries
+                .map(([key, item]) => `${formatFieldLabel(key)}: ${formatValue(item)}`)
+                .join("\n")
             : "Sem dados";
     }
+
     return String(value);
 }
 
