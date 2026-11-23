@@ -130,9 +130,7 @@ function omitIdentifiers(value: AuditJsonValue): AuditJsonValue {
     return value;
 }
 
-function isAuditObject(value: AuditJsonValue): value is { [key: string]: AuditJsonValue } {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+
 
 function parseSnapshotValue(value?: AuditJsonValue | null): AuditJsonValue | null | undefined {
     if (typeof value === "string") {
