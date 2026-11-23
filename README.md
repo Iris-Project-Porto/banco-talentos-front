@@ -1,4 +1,4 @@
-# 🌟 VILT — Banco de Talentos Front-End
+# 🌟 VILT — Central de Recursos Front-End
 
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.3.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -10,7 +10,7 @@
 [![Axios](https://img.shields.io/badge/Axios-1.7.x-5A29E4?style=for-the-badge&logo=axios&logoColor=white)](https://axios-http.com/)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-Aplicação web central da **VILT** para gerenciamento de talentos e recursos humanos. Permite a visualização, gestão e controle do status de colaboradores — alocados em projetos ou disponíveis no bench — com integração direta ao *Banco de Talentos Form Builder*.
+Aplicação web central da **VILT** para gerenciamento de talentos e recursos humanos. Permite a visualização, gestão e controle do status de colaboradores — alocados em projetos ou disponíveis no bench — com integração direta ao *Central de Recursos Form Builder*.
 
 ---
 
@@ -51,10 +51,10 @@ CRUD de squads com listagem paginada, filtros por nome e status (Ativa/Inativa) 
 Consulta do ciclo de vida dos recursos com filtros por status, matrícula, gerente, projeto, billable, onboarding Porto e período de entrada. Cobertura de matrícula, histórico, máquinas e atualização de contato.
 
 **Integração com Form Builder**
-Seção dedicada para visualização e acesso à URL dos formulários customizados gerados pelo *Banco de Talentos Form Builder* (Next.js) através de um iFrame embutido.
+Seção dedicada para visualização e acesso à URL dos formulários customizados gerados pelo *Central de Recursos Form Builder* (Next.js) através de um iFrame embutido.
 
 **Perfis diferenciados por papel:**
-- **Admin / Recrutador** — acesso global ao Banco de Talentos (cadastro e consulta de recursos), Vagas, Projetos, Squads, Skills, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
+- **Admin / Recrutador** — acesso global à Central de Recursos (cadastro e consulta de recursos), Vagas, Projetos, Squads, Skills, Fila de Revisão, Usuários Pendentes e Dashboards com KPIs.
 - **Recurso (Talento)** — sidebar com "Meu Perfil" e "Meu Histórico". No primeiro acesso, é direcionado a criar o perfil; depois pode visualizar e editar seus dados.
 
 **Autenticação completa e segura**
@@ -133,7 +133,7 @@ src/
 │   ├── profiles/
 │   │   ├── api/               # Endpoints de perfil e listagem
 │   │   ├── components/
-│   │   │   ├── BancoTalentosList/  # Listagem do banco de talentos
+│   │   │   ├── BancoTalentosList/  # Listagem do Central de Recursos
 │   │   │   ├── PersonCard/         # Card de exibição de talento
 │   │   │   ├── ProfileReadOnly/    # Visualização do perfil em modo leitura
 │   │   │   ├── StackInput/         # Input de skills com nível de proficiência
@@ -399,7 +399,7 @@ Base path: `/v1/admin/resources`
 | `POST` | `/v1/admin/users/:id/approve` | Aprova acesso de um usuário |
 | `POST` | `/v1/admin/users/:id/reject` | Rejeita ou bloqueia acesso de um usuário |
 | `GET` | `/v1/admin/profiles` | Lista irrestrita de todos os perfis |
-| `GET` | `/v1/admin/profiles/active` | Lista talentos ativos (Banco de Talentos e Alocados) |
+| `GET` | `/v1/admin/profiles/active` | Lista talentos ativos (Central de Recursos e Alocados) |
 | `GET` | `/v1/admin/profiles/pending` | Lista currículos na fila de revisão |
 | `GET` | `/v1/admin/profiles/:id` | Abre o perfil completo de um talento |
 | `PATCH` | `/v1/admin/profiles/:id` | Edita o status de um talento |

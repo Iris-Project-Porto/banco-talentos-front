@@ -28,7 +28,7 @@ describe('ProfileReadOnly Component', () => {
     it('deve renderizar o cabeçalho e badge corretamente quando o perfil está ATIVO', () => {
         render(<ProfileReadOnly profile={mockProfileBase} />);
 
-        expect(screen.getByText('Seu perfil está ativo no banco de talentos')).toBeInTheDocument();
+        expect(screen.getByText('Seu perfil está ativo na central de recursos')).toBeInTheDocument();
         expect(screen.getByText('Ativo')).toBeInTheDocument();
         expect(screen.getByText('Pleno')).toBeInTheDocument();
     });
