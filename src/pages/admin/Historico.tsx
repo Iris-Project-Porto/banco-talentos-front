@@ -94,11 +94,10 @@ export default function Historico() {
                                 aria-selected={activeTab === tab}
                                 aria-controls="audit-tabpanel"
                                 onClick={() => setActiveTab(tab)}
-                                className={`whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
-                                    activeTab === tab
-                                        ? "border-slate-900 text-slate-900"
-                                        : "border-transparent text-slate-400 hover:text-slate-600"
-                                }`}
+                                className={`whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${activeTab === tab
+                                    ? "border-slate-900 text-slate-900"
+                                    : "border-transparent text-slate-400 hover:text-slate-600"
+                                    }`}
                             >
                                 {tab}
                             </button>
@@ -136,25 +135,24 @@ export default function Historico() {
                         </p>
                     </div>
                 ) : (
-                    <div className={selectedRecord
-                        ? "grid items-start gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.85fr)]"
-                        : ""}>
-                        <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-                            <AdminHistoryTable
-                                records={visibleRecords}
-                                onView={setSelectedRecord}
-                            />
+                    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+                        <AdminHistoryTable
+                            records={visibleRecords}
+                            activeTab={activeTab}
+                            onView={setSelectedRecord}
+                        />
 
-                            <Pagination
-                                className="mt-0 border-t-0 px-4 py-4"
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setPage}
-                            />
-                        </div>
+                        <Pagination
+                            className="mt-0 border-t-0 px-4 py-4"
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+
                         {selectedRecord && (
                             <AuditDetailPanel
                                 record={selectedRecord}
+                                activeTab={activeTab}
                                 onClose={() => setSelectedRecord(null)}
                             />
                         )}
