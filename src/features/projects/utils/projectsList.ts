@@ -3,6 +3,7 @@ import type { Project, ProjectsListParams, ProjectsPaginatedResponse } from "../
 
 export const PROJECTS_PAGE_SIZE = 10;
 export const PROJECTS_CATALOG_PAGE_SIZE = 100;
+const PROJECTS_SORT = "createdAt,desc";
 
 function emptyProjectsPage(params?: ProjectsListParams): ProjectsPaginatedResponse {
     const size = params?.size ?? 20;
@@ -26,9 +27,10 @@ export async function listProjectsSafe(
     params?: ProjectsListParams,
 ): Promise<ProjectsPaginatedResponse> {
     try {
+        const sortedParams = { ...params, sort: params?.sort ?? PROJECTS_SORT };
         return status === "ACTIVE"
-            ? await projectsApi.getActive(params)
-            : await projectsApi.getInactive(params);
+            ? await projectsApi.getActive(sortedParams)
+            : await projectsApi.getInactive(sortedParams);
     } catch {
         return emptyProjectsPage(params);
     }

@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Dashboard" subtitle="Visão geral do banco de talentos" />
+      <PageHeader title="Dashboard" subtitle="Visão geral da central de recursos" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard label="Recursos Disponíveis" value={stats.disponiveisBench} accentColor="#10B981" to="/admin/talentos" />
@@ -94,7 +94,7 @@ export default function Dashboard() {
         <Card className="col-span-1 lg:col-span-2">
           <div className="flex flex-col mb-4">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Top Skills por Proficiência</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Clique em uma skill para filtrar os recursos correspondentes no banco de talentos</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Clique em uma skill para filtrar os recursos correspondentes na central de recursos</p>
           </div>
           <div className="flex flex-col gap-2.5">
             {stats.skillsToRender.length === 0 && <p className="text-sm text-slate-400">Nenhuma skill ainda.</p>}

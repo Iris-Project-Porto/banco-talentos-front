@@ -13,6 +13,10 @@ export interface TableSelection<T> {
     selectedKeys: RowKey[];
     onToggleRow: (row: T) => void;
     onToggleAll: (checked: boolean) => void;
+    selectAllAriaLabel?: string;
+    getRowAriaLabel?: (row: T) => string;
+    isRowDisabled?: (row: T) => boolean;
+    getRowDisabledTooltip?: (row: T) => string | undefined;
 }
 
 interface Props<T> {
@@ -34,11 +38,13 @@ const selectionCellCls = "py-3 px-4 w-12";
 interface CheckboxProps {
     checked: boolean;
     indeterminate?: boolean;
+    disabled?: boolean;
+    title?: string;
     onChange: (checked: boolean) => void;
     "aria-label": string;
 }
 
-function TableCheckbox({ checked, indeterminate = false, onChange, ...rest }: CheckboxProps) {
+function TableCheckbox({ checked, indeterminate = false, disabled = false, onChange, title, ...rest }: CheckboxProps) {
     const ref = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -51,9 +57,14 @@ function TableCheckbox({ checked, indeterminate = false, onChange, ...rest }: Ch
         <input
             ref={ref}
             type="checkbox"
-            className={checkboxCls}
+            disabled={disabled}
+            title={title}
+            className={twMerge(
+                checkboxCls,
+                disabled && "cursor-not-allowed opacity-50 accent-slate-400"
+            )}
             checked={checked}
-            onChange={(event) => onChange(event.target.checked)}
+            onChange={(event) => !disabled && onChange(event.target.checked)}
             {...rest}
         />
     );
@@ -65,16 +76,32 @@ interface TableRowProps<T> {
     columns: Column<T>[];
     selectable: boolean;
     isSelected: boolean;
+    disabled?: boolean;
+    disabledTooltip?: string;
     onToggle?: (row: T) => void;
+    rowAriaLabel?: string;
 }
 
-function TableRowInner<T>({ row, rowKey, columns, selectable, isSelected, onToggle }: TableRowProps<T>) {
+function TableRowInner<T>({
+    row,
+    rowKey,
+    columns,
+    selectable,
+    isSelected,
+    disabled = false,
+    disabledTooltip,
+    onToggle,
+    rowAriaLabel,
+}: TableRowProps<T>) {
     return (
         <tr
-            onClick={selectable && onToggle ? () => onToggle(row) : undefined}
+            onClick={selectable && onToggle && !disabled ? () => onToggle(row) : undefined}
+            title={disabled ? disabledTooltip : undefined}
             className={twMerge(
-                "border-b border-slate-100 hover:bg-slate-50 transition-colors",
-                selectable && "cursor-pointer",
+                "border-b border-slate-100 transition-colors",
+                selectable && !disabled && "cursor-pointer hover:bg-slate-50",
+                selectable && disabled && "opacity-60 cursor-not-allowed bg-slate-50/50",
+                !selectable && "hover:bg-slate-50",
                 isSelected && "bg-pink/5",
             )}
         >
@@ -85,8 +112,10 @@ function TableRowInner<T>({ row, rowKey, columns, selectable, isSelected, onTogg
                 >
                     <TableCheckbox
                         checked={isSelected}
-                        onChange={() => onToggle?.(row)}
-                        aria-label={`Selecionar linha ${rowKey}`}
+                        disabled={disabled}
+                        title={disabled ? disabledTooltip : undefined}
+                        onChange={() => !disabled && onToggle?.(row)}
+                        aria-label={rowAriaLabel || `Selecionar linha ${rowKey}`}
                     />
                 </td>
             )}
@@ -117,10 +146,17 @@ export function Table<T>({
     const emptyRows = data.length === 0 ? 0 : Math.max(0, minRows - data.length);
     const totalColumns = columns.length + (selection ? 1 : 0);
 
+    const isRowDisabled = selection?.isRowDisabled;
+    const selectableRows = useMemo(() => {
+        if (!selection) return [];
+        return isRowDisabled ? data.filter((row) => !isRowDisabled(row)) : data;
+    }, [data, selection, isRowDisabled]);
+
     const selectedKeys = selection?.selectedKeys;
     const selectedSet = useMemo(() => new Set(selectedKeys ?? []), [selectedKeys]);
-    const allSelected = data.length > 0 && data.every((row) => selectedSet.has(keyExtractor(row)));
-    const someSelected = data.some((row) => selectedSet.has(keyExtractor(row))) && !allSelected;
+    const allSelected = selectableRows.length > 0 && selectableRows.every((row) => selectedSet.has(keyExtractor(row)));
+    const someSelected = selectableRows.some((row) => selectedSet.has(keyExtractor(row))) && !allSelected;
+    const allDisabled = Boolean(selection) && data.length > 0 && selectableRows.length === 0;
 
     return (
         <div className={twMerge("overflow-x-auto", wrapperClassName)}>
@@ -132,8 +168,9 @@ export function Table<T>({
                                 <TableCheckbox
                                     checked={allSelected}
                                     indeterminate={someSelected}
+                                    disabled={allDisabled}
                                     onChange={selection.onToggleAll}
-                                    aria-label="Selecionar todos"
+                                    aria-label={selection.selectAllAriaLabel || "Selecionar todos"}
                                 />
                             </th>
                         )}
@@ -162,6 +199,8 @@ export function Table<T>({
                         <>
                             {data.map((row) => {
                                 const key = keyExtractor(row);
+                                const disabled = Boolean(isRowDisabled?.(row));
+                                const disabledTooltip = disabled ? selection?.getRowDisabledTooltip?.(row) : undefined;
 
                                 return (
                                     <TableRow
@@ -171,7 +210,10 @@ export function Table<T>({
                                         columns={columns}
                                         selectable={Boolean(selection)}
                                         isSelected={selectedSet.has(key)}
+                                        disabled={disabled}
+                                        disabledTooltip={disabledTooltip}
                                         onToggle={selection?.onToggleRow}
+                                        rowAriaLabel={selection?.getRowAriaLabel ? selection.getRowAriaLabel(row) : undefined}
                                     />
                                 );
                             })}

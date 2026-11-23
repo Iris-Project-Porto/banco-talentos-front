@@ -48,6 +48,7 @@ export interface Skill {
   category: SkillCategory;
   resourcesCount: number;
   averageProficiency: number;
+  createdAt?: string;
   avatars?: SkillAvatar[];
 }
 

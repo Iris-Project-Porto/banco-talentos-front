@@ -104,6 +104,11 @@ describe("Hook useRecursosList", () => {
         });
 
         expect(result.current.profiles).toHaveLength(3);
+        expect(result.current.profiles.map((profile) => profile.name)).toEqual([
+            "Ana Costa",
+            "Carlos Ramos",
+            "Rui Santos",
+        ]);
         await waitFor(() => {
             expect(result.current.projects).toEqual([
                 { id: "p1", name: "Plataforma Digital" },

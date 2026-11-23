@@ -68,6 +68,24 @@ export default function VagaForm() {
         navigate("/admin/vagas");
     }
 
+    async function handleAllocationSuccess() {
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["vagas"] }),
+            queryClient.invalidateQueries({ queryKey: ["squads"] }),
+            queryClient.invalidateQueries({ queryKey: ["projects"] }),
+            queryClient.invalidateQueries({ queryKey: ["profiles-catalog"] }),
+            queryClient.invalidateQueries({ queryKey: ["profiles-ativos"] }),
+            queryClient.invalidateQueries({ queryKey: ["profiles-todos"] }),
+            queryClient.invalidateQueries({ queryKey: ["profiles"] }),
+            queryClient.invalidateQueries({ queryKey: ["talento"] }),
+            queryClient.invalidateQueries({ queryKey: ["dashboard-data"] }),
+            queryClient.invalidateQueries({ queryKey: ["dashboard-vagas-ativas"] }),
+            queryClient.invalidateQueries({ queryKey: ["audit"] }),
+            queryClient.invalidateQueries({ queryKey: ["historico"] }),
+        ]);
+        goBack();
+    }
+
     if (loadingVaga) {
         return <p className="text-sm text-slate-400">Carregando...</p>;
     }
@@ -83,6 +101,7 @@ export default function VagaForm() {
             onSave={(payload) => saveMutation.mutateAsync(payload)}
             onStatusChange={(status) => statusMutation.mutate(status)}
             onCancel={goBack}
+            onAllocationSuccess={handleAllocationSuccess}
         />
     );
 }
