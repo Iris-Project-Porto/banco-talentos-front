@@ -33,7 +33,7 @@ export default function MeuPerfil() {
                 isAtivo ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
               }`}
             >
-              {isAtivo ? "Ativo no banco de talentos" : "Aguardando revisão"}
+              {isAtivo ? "Ativo na central de recursos" : "Aguardando revisão"}
             </span>
           )}
         </div>
