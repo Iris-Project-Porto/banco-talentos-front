@@ -108,7 +108,14 @@ export function useRecursosList() {
     });
 
     const allProfiles = useMemo<UserProfile[]>(
-        () => catalogQuery.data?.content ?? [],
+        () => {
+            const profiles = catalogQuery.data?.content ?? [];
+            const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
+
+            return [...profiles].sort((a, b) =>
+                collator.compare(a.name?.trim() ?? "", b.name?.trim() ?? ""),
+            );
+        },
         [catalogQuery.data?.content],
     );
 

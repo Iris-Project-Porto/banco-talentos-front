@@ -38,6 +38,19 @@ const mockSkills: Skill[] = [
 ];
 
 describe('Componente SkillsTable', () => {
+    it('deve ordenar as skills pela data de criação, da mais nova para a mais antiga', () => {
+        const skills = [
+            { ...mockSkills[0], name: 'Skill antiga', createdAt: '2026-01-10T10:00:00Z' },
+            { ...mockSkills[1], name: 'Skill nova', createdAt: '2026-11-10T10:00:00Z' },
+        ];
+
+        const { container } = render(<SkillsTable data={skills} />);
+        const firstRowNames = container.querySelectorAll('tbody tr td:first-child p:first-child');
+
+        expect(firstRowNames[0]).toHaveTextContent('Skill nova');
+        expect(firstRowNames[1]).toHaveTextContent('Skill antiga');
+    });
+
     it('deve renderizar a tabela com os dados das skills', () => {
         render(<SkillsTable data={mockSkills} />);
 

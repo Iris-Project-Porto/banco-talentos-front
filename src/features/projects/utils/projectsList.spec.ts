@@ -1,6 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import { filterProjects, paginateLocally } from './projectsList';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { filterProjects, listProjectsSafe, paginateLocally } from './projectsList';
+import { projectsApi } from '../api/projects.api';
 import type { Project } from '../types/types';
+
+vi.mock('../api/projects.api', () => ({
+    projectsApi: {
+        getActive: vi.fn(),
+        getInactive: vi.fn(),
+    },
+}));
 
 const mockProjects: Project[] = [
     {
@@ -26,6 +34,26 @@ const mockProjects: Project[] = [
 ];
 
 describe('projectsList utils', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('deve solicitar a listagem ordenada por data de criação decrescente', async () => {
+        vi.mocked(projectsApi.getActive).mockResolvedValue({
+            content: mockProjects,
+            totalPages: 1,
+            totalElements: mockProjects.length,
+        } as never);
+
+        await listProjectsSafe('ACTIVE', { page: 0, size: 10 });
+
+        expect(projectsApi.getActive).toHaveBeenCalledWith({
+            page: 0,
+            size: 10,
+            sort: 'createdAt,desc',
+        });
+    });
+
     describe('filterProjects', () => {
         it('deve filtrar projetos ativos', () => {
             const result = filterProjects(mockProjects, { statusType: 'ACTIVE', search: '' });
