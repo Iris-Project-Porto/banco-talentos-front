@@ -18,7 +18,7 @@ const record: AuditSummary = {
 
 describe("AdminHistoryTable", () => {
     it("exibe o usuário afetado sem mostrar executor, IDs nem snapshots", () => {
-        render(<AdminHistoryTable records={[record]} onView={vi.fn()} />);
+        render(<AdminHistoryTable records={[record]} activeTab="Recursos" onView={vi.fn()} />);
 
         expect(screen.getByText("João Souza")).toBeInTheDocument();
         expect(screen.getByText("Projeto Atlas")).toBeInTheDocument();
@@ -34,6 +34,7 @@ describe("AdminHistoryTable", () => {
         render(
             <AdminHistoryTable
                 records={[{ ...record, userName: null, userAffectedName: null }]}
+                activeTab="Recursos"
                 onView={vi.fn()}
             />,
         );
@@ -41,13 +42,12 @@ describe("AdminHistoryTable", () => {
         expect(screen.getByText("Não identificado")).toBeInTheDocument();
     });
 
-    it("notifica a seleção do registro pelo botão de detalhes", () => {
+    it("notifica a seleção do registro ao clicar no conteúdo da linha", () => {
         const onView = vi.fn();
-        render(<AdminHistoryTable records={[record]} onView={onView} />);
+        render(<AdminHistoryTable records={[record]} activeTab="Recursos" onView={onView} />);
 
-        fireEvent.click(screen.getByRole("button", {
-            name: "Visualizar detalhes da auditoria audit-uuid",
-        }));
+        // Como o botão de detalhes (olho) foi removido, o clique ocorre na própria linha/texto
+        fireEvent.click(screen.getByText("Projeto Atlas"));
 
         expect(onView).toHaveBeenCalledWith(record);
     });
@@ -56,6 +56,7 @@ describe("AdminHistoryTable", () => {
         render(
             <AdminHistoryTable
                 records={[{ ...record, entityName }]}
+                activeTab="Recursos"
                 onView={vi.fn()}
             />,
         );
@@ -70,7 +71,7 @@ describe("AdminHistoryTable", () => {
             entityName: "Squad Alfa",
             description: "Vínculo de projeto: Projeto Atlas",
         };
-        render(<AdminHistoryTable records={[squadRecord]} onView={vi.fn()} />);
+        render(<AdminHistoryTable records={[squadRecord]} activeTab="Recursos" onView={vi.fn()} />);
 
         expect(screen.getByText("Vínculo de projeto: Projeto Atlas")).toBeInTheDocument();
     });
@@ -85,7 +86,7 @@ describe("AdminHistoryTable", () => {
             entityName: "Projeto Atlas",
             description,
         };
-        render(<AdminHistoryTable records={[projectRecord]} onView={vi.fn()} />);
+        render(<AdminHistoryTable records={[projectRecord]} activeTab="Recursos" onView={vi.fn()} />);
 
         expect(screen.getByText(description)).toBeInTheDocument();
         expect(screen.getByText("Projeto Atlas")).toBeInTheDocument();
@@ -100,7 +101,7 @@ describe("AdminHistoryTable", () => {
                 entityName: "Squad Alfa",
                 description,
             };
-            render(<AdminHistoryTable records={[squadRecord]} onView={vi.fn()} />);
+            render(<AdminHistoryTable records={[squadRecord]} activeTab="Recursos" onView={vi.fn()} />);
 
             expect(screen.getByText("Squad Alfa")).toBeInTheDocument();
             expect(screen.queryByText(/Vínculo de projeto/)).not.toBeInTheDocument();
@@ -111,6 +112,7 @@ describe("AdminHistoryTable", () => {
         render(
             <AdminHistoryTable
                 records={[{ ...record, entityType: "PROFILE", description: "Descrição do backend" }]}
+                activeTab="Recursos"
                 onView={vi.fn()}
             />,
         );
