@@ -15,6 +15,8 @@ interface Props {
     selectedMatches?: Match[];
     onSelectedMatchesChange?: (matches: Match[]) => void;
     onProceedToAllocation?: () => void;
+    onBack?: () => void;
+    isAdvancing?: boolean;
 }
 
 export function MatchResources({
@@ -22,6 +24,8 @@ export function MatchResources({
     selectedMatches = [],
     onSelectedMatchesChange,
     onProceedToAllocation,
+    onBack,
+    isAdvancing = false,
 }: Props) {
     const [page, setPage] = useState(0);
     const [search, setSearch] = useState("");
@@ -172,7 +176,7 @@ export function MatchResources({
                         />
                     </div>
 
-                    {onProceedToAllocation && (
+                    {(onProceedToAllocation || onBack) && (
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-card">
                             <div className="text-sm text-slate-600">
                                 {selectedMatches.length === 0 ? (
@@ -183,14 +187,28 @@ export function MatchResources({
                                     </span>
                                 )}
                             </div>
-                            <Button
-                                type="button"
-                                variant="primary"
-                                disabled={selectedMatches.length === 0 || !selectedMatches.some((m) => !isResourceAllocated(m.availability))}
-                                onClick={onProceedToAllocation}
-                            >
-                                Avançar para Alocação {selectedMatches.length > 0 ? `(${selectedMatches.length})` : ""}
-                            </Button>
+                            <div className="flex items-center gap-3">
+                                {onBack && (
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={onBack}
+                                    >
+                                        Voltar
+                                    </Button>
+                                )}
+                                {onProceedToAllocation && (
+                                    <Button
+                                        type="button"
+                                        variant="primary"
+                                        loading={isAdvancing}
+                                        disabled={isAdvancing || selectedMatches.length === 0 || !selectedMatches.some((m) => !isResourceAllocated(m.availability))}
+                                        onClick={onProceedToAllocation}
+                                    >
+                                        Avançar para Alocação
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

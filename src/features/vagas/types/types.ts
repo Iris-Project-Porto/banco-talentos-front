@@ -38,6 +38,7 @@ export interface JobPosting {
   isUrgent: boolean;
   active: boolean;
   skills: JobSkill[];
+  selectedCandidateIds?: string[];
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;

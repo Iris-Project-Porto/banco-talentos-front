@@ -1,8 +1,41 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AllocationStep, type AllocationStepProps } from "./AllocationStep";
 import type { Match } from "../../types/types";
+
+vi.mock("@/features/profiles", () => ({
+    profilesApi: {
+        getProfileById: vi.fn().mockImplementation((id: string) => {
+            if (id === "mat-1") {
+                return Promise.resolve({
+                    id: "mat-1",
+                    skills: [
+                        { skill: { name: "React" } },
+                        { skill: { name: "TypeScript" } },
+                        { skill: { name: "GraphQL" } },
+                        { skill: { name: "Docker" } },
+                    ],
+                });
+            }
+            return Promise.resolve({ id, skills: [] });
+        }),
+    },
+}));
+
+function renderWithClient(ui: React.ReactElement) {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: { retry: false },
+        },
+    });
+    return render(
+        <QueryClientProvider client={queryClient}>
+            {ui}
+        </QueryClientProvider>
+    );
+}
 
 const mockVaga: AllocationStepProps["vaga"] = {
     title: "Desenvolvedor Frontend Senior",
@@ -54,7 +87,7 @@ const mockMatches: Match[] = [
 
 describe("AllocationStep Component", () => {
     it("deve renderizar o resumo da vaga com todas as informações", () => {
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
@@ -79,7 +112,7 @@ describe("AllocationStep Component", () => {
     });
 
     it("deve renderizar mensagem de lista vazia quando não houver recursos selecionados", () => {
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[]}
@@ -94,7 +127,7 @@ describe("AllocationStep Component", () => {
     });
 
     it("deve renderizar os cards dos recursos selecionados com scores e inputs", () => {
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
@@ -117,11 +150,11 @@ describe("AllocationStep Component", () => {
         expect(screen.queryByLabelText(/Dedicação/i)).not.toBeInTheDocument();
     });
 
-    it("deve disparar onBack ao clicar em Voltar ao Match", async () => {
+    it("deve disparar onBack ao clicar em Voltar", async () => {
         const handleBack = vi.fn();
         const user = userEvent.setup();
 
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
@@ -130,7 +163,7 @@ describe("AllocationStep Component", () => {
             />
         );
 
-        const backButton = screen.getByRole("button", { name: "Voltar ao Match" });
+        const backButton = screen.getByRole("button", { name: "Voltar" });
         await user.click(backButton);
 
         expect(handleBack).toHaveBeenCalledTimes(1);
@@ -140,7 +173,7 @@ describe("AllocationStep Component", () => {
         const handleConfirm = vi.fn();
         const user = userEvent.setup();
 
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
@@ -180,7 +213,7 @@ describe("AllocationStep Component", () => {
         const handleConfirm = vi.fn();
         const user = userEvent.setup();
 
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[mockMatches[0]]}
@@ -232,7 +265,7 @@ describe("AllocationStep Component", () => {
             },
         ];
 
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={unorderedMatches}
@@ -253,7 +286,7 @@ describe("AllocationStep Component", () => {
         const handleConfirm = vi.fn();
         const user = userEvent.setup();
 
-        render(
+        renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[mockMatches[0]]}
@@ -304,7 +337,7 @@ describe("AllocationStep Component", () => {
             const handleConfirm = vi.fn();
             const user = userEvent.setup();
 
-            render(
+            renderWithClient(
                 <AllocationStep
                     vaga={mockVaga}
                     selectedMatches={[allocatedMatch, availableMatch]}
@@ -331,7 +364,7 @@ describe("AllocationStep Component", () => {
         });
 
         it("não deve auto-selecionar candidato único se ele estiver em projeto (RN02)", () => {
-            render(
+            renderWithClient(
                 <AllocationStep
                     vaga={mockVaga}
                     selectedMatches={[allocatedMatch]}
@@ -346,6 +379,22 @@ describe("AllocationStep Component", () => {
 
             const confirmBtn = screen.getByRole("button", { name: /Confirmar Alocação do Recurso/i });
             expect(confirmBtn).toBeDisabled();
+        });
+
+        it("deve carregar e exibir todas as skills do candidato vindas do perfil", async () => {
+            renderWithClient(
+                <AllocationStep
+                    vaga={mockVaga}
+                    selectedMatches={mockMatches}
+                    onBack={vi.fn()}
+                    onConfirm={vi.fn()}
+                />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText("GraphQL")).toBeInTheDocument();
+                expect(screen.getByText("Docker")).toBeInTheDocument();
+            });
         });
     });
 });

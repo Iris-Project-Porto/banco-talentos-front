@@ -57,13 +57,15 @@ describe('Componente VagaWizard', () => {
     it('deve renderizar o cabeçalho de Nova Vaga quando não houver ID inicial', () => {
         renderWithClient(<VagaWizard initial={{}} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
         expect(screen.getByText('Cadastrar Vaga')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Salvar e continuar' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Salvar' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Avançar para Match' })).toBeInTheDocument();
     });
 
     it('deve renderizar o cabeçalho de Editar Vaga quando um ID inicial for fornecido', () => {
         renderWithClient(<VagaWizard initial={{ id: 'vaga-123', status: 'OPEN' }} saving={false} onSave={vi.fn()} onCancel={vi.fn()} />);
         expect(screen.getByText('Editar Vaga')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Avançar para Match' })).toBeInTheDocument();
     });
 
     it('deve bloquear a edição e esconder o botão de salvar caso o status da vaga não permita edição', async () => {
@@ -79,6 +81,7 @@ describe('Componente VagaWizard', () => {
         expect(screen.getByText(/somente para leitura/i)).toBeInTheDocument();
         expect(screen.getByText(/Apenas o status pode ser alterado/i)).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Salvar alterações' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Avançar para Match' })).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Salvar status' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument();
     });
@@ -125,7 +128,7 @@ describe('Componente VagaWizard', () => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
-        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
+        const submitButton = screen.getByRole('button', { name: 'Avançar para Match' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -156,7 +159,7 @@ describe('Componente VagaWizard', () => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
-        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
+        const submitButton = screen.getByRole('button', { name: 'Avançar para Match' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -210,7 +213,7 @@ describe('Componente VagaWizard', () => {
             fireEvent.change(dateInput, { target: { value: '2026-07-01' } });
         }
 
-        const submitButton = screen.getByRole('button', { name: 'Salvar e continuar' });
+        const submitButton = screen.getByRole('button', { name: 'Avançar para Match' });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
@@ -224,7 +227,7 @@ describe('Componente VagaWizard', () => {
                 modality: 'REMOTO',
                 recruiter: 'Paula RH',
                 estimatedAllocationWeeks: 12,
-                status: 'OPEN',
+                status: 'SCREENING',
                 description: 'Desenvolvedor Frontend',
                 requirements: '',
                 notes: 'Urgente',
@@ -247,15 +250,16 @@ describe('Componente VagaWizard', () => {
         expect(handleCancel).toHaveBeenCalledTimes(2);
     });
 
-    it('deve desativar os botões e renderizar o indicador de carregamento quando saving for true', () => {
+    it('deve desativar os botões quando saving for true', () => {
         renderWithClient(<VagaWizard initial={{}} saving={true} onSave={vi.fn()} onCancel={vi.fn()} />);
 
         const cancelBtn = screen.getByRole('button', { name: /cancelar/i });
-        const submitBtn = screen.getByRole('button', { name: 'Salvar e continuar' });
+        const saveBtn = screen.getByRole('button', { name: 'Salvar' });
+        const advanceBtn = screen.getByRole('button', { name: 'Avançar para Match' });
 
         expect(cancelBtn).toBeDisabled();
-        expect(submitBtn).toBeDisabled();
-        expect(submitBtn.querySelector('svg')).toBeInTheDocument();
+        expect(saveBtn).toBeDisabled();
+        expect(advanceBtn).toBeDisabled();
     });
 
     it('deve resetar o campo de squad se o projeto mudar e a squad anterior se tornar inválida', async () => {
@@ -342,7 +346,7 @@ describe('Componente VagaWizard', () => {
             expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Avançar para Match' }));
 
         await waitFor(() => {
             expect(screen.getByRole('checkbox', { name: 'Selecionar Lucas Silveira' })).toBeInTheDocument();
@@ -399,6 +403,319 @@ describe('Componente VagaWizard', () => {
             expect(screen.getByText('Diogo Carrasco')).toBeInTheDocument();
             expect(screen.getByText('Frontend Lead')).toBeInTheDocument();
             expect(screen.getByText(/Início: 18\/11\/2026/)).toBeInTheDocument();
+        });
+    });
+
+    it('deve salvar e fechar/sair ao clicar em Salvar alterações', async () => {
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-123' });
+        const handleCancel = vi.fn();
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-123',
+                    vacancyCode: 'VAG-1',
+                    title: 'Dev',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'OPEN',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onCancel={handleCancel}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+
+        await waitFor(() => {
+            expect(handleSave).toHaveBeenCalledTimes(1);
+            expect(handleSave).toHaveBeenCalledWith(expect.objectContaining({
+                status: 'OPEN',
+            }));
+            expect(handleCancel).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('deve retornar à etapa de Dados da Vaga ao clicar no botão Voltar aos Dados da Vaga no Match', async () => {
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-123' });
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-123',
+                    vacancyCode: 'VAG-1',
+                    title: 'Dev',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'OPEN',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
+        });
+
+        // Avança para o Match
+        fireEvent.click(screen.getByRole('button', { name: 'Avançar para Match' }));
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
+            expect(screen.getByText('Ranking de Recursos')).toBeInTheDocument();
+        });
+
+        // Clica em voltar aos dados da vaga
+        fireEvent.click(screen.getByRole('button', { name: 'Voltar' }));
+
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('VAG-1')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Dev')).toBeInTheDocument();
+        });
+    });
+
+    it('deve permitir voltar para Dados da Vaga ao clicar no Stepper a partir do Match, mas não avançar ao clicar em etapas futuras', async () => {
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-123' });
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-123',
+                    vacancyCode: 'VAG-1',
+                    title: 'Dev',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'OPEN',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.queryAllByText('Carregando...')).toHaveLength(0);
+        });
+
+        // Na etapa 0 (Dados da Vaga), clicar na etapa 2 (Match) ou 3 (Alocação) no Stepper não deve avançar
+        expect(screen.queryByRole('button', { name: /Voltar para etapa 2/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Voltar para etapa 3/i })).not.toBeInTheDocument();
+
+        // Avança normalmente para o Match
+        fireEvent.click(screen.getByRole('button', { name: 'Avançar para Match' }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Ranking de Recursos')).toBeInTheDocument();
+        });
+
+        // No Match (etapa 1), a etapa 0 no Stepper agora é um botão de voltar
+        const stepperStep0 = screen.getByRole('button', { name: /Voltar para etapa 1: Dados da Vaga/i });
+        expect(stepperStep0).toBeInTheDocument();
+
+        // Clica na etapa 1 do Stepper para voltar
+        fireEvent.click(stepperStep0);
+
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('VAG-1')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Dev')).toBeInTheDocument();
+        });
+    });
+
+    it('deve abrir diretamente na etapa de Match (step 1) quando a vaga inicial tiver status SCREENING', async () => {
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-screening-1',
+                    vacancyCode: 'VAG-SCREEN',
+                    title: 'Dev Triagem',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'SCREENING',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={vi.fn()}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Ranking de Recursos')).toBeInTheDocument();
+        });
+
+        expect(screen.getByRole('button', { name: /Voltar para etapa 1: Dados da Vaga/i })).toBeInTheDocument();
+    });
+
+    it('deve abrir diretamente na etapa de Alocação (step 2) quando a vaga inicial tiver status ALLOCATING', async () => {
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-allocating-1',
+                    vacancyCode: 'VAG-ALLOC',
+                    title: 'Dev Alocando',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'ALLOCATING',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={vi.fn()}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Resumo da Vaga')).toBeInTheDocument();
+        });
+
+        expect(screen.getByRole('button', { name: /Voltar para etapa 2: Match de Recursos/i })).toBeInTheDocument();
+    });
+
+    it('deve salvar a vaga com status ALLOCATING ao clicar em Avançar para Alocação no Match', async () => {
+        const handleSave = vi.fn().mockResolvedValue({ id: 'vaga-123' });
+        vi.mocked(vagasApi.getMatches).mockResolvedValue({
+            content: [
+                {
+                    id: 'rec-1',
+                    name: 'Lucas Silveira',
+                    description: 'Senior Frontend',
+                    squadName: 'Squad A1',
+                    availability: 'available',
+                    matchScore: 96,
+                    rankingScore: 1,
+                    mainSkills: [],
+                },
+            ],
+            totalElements: 1,
+            totalPages: 1,
+            size: 5,
+            number: 0,
+        });
+
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-123',
+                    vacancyCode: 'VAG-1',
+                    title: 'Dev',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'PLENO',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'SCREENING',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                }}
+                saving={false}
+                onSave={handleSave}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByRole('checkbox', { name: 'Selecionar Lucas Silveira' })).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Selecionar Lucas Silveira' }));
+        fireEvent.click(screen.getByRole('button', { name: /Avançar para Alocação/i }));
+
+        await waitFor(() => {
+            expect(handleSave).toHaveBeenCalledWith(expect.objectContaining({
+                id: 'vaga-123',
+                status: 'ALLOCATING',
+                selectedCandidateIds: ['rec-1'],
+            }));
+            expect(screen.getByRole('button', { name: 'Confirmar Alocação de Lucas' })).toBeInTheDocument();
+        });
+    });
+
+    it('deve hidratar os candidatos selecionados via selectedCandidateIds ao reabrir vaga com status ALLOCATING', async () => {
+        localStorage.clear();
+        vi.mocked(vagasApi.getMatches).mockResolvedValue({
+            content: [
+                {
+                    id: 'rec-99',
+                    name: 'Marina Silva',
+                    description: 'Tech Lead',
+                    squadName: 'Squad Alpha',
+                    availability: 'available',
+                    matchScore: 92,
+                    rankingScore: 1,
+                    mainSkills: [],
+                },
+            ],
+            totalElements: 1,
+            totalPages: 1,
+            size: 100,
+            number: 0,
+        });
+
+        renderWithClient(
+            <VagaWizard
+                initial={{
+                    id: 'vaga-hydrated-1',
+                    vacancyCode: 'VAG-HYD',
+                    title: 'Dev Hidratado',
+                    projectId: 'proj-1',
+                    squadId: 'sq-1',
+                    experienceLevel: 'SENIOR',
+                    modality: 'REMOTO',
+                    recruiter: 'Recrutador',
+                    status: 'ALLOCATING',
+                    openingDate: '2026-11-20',
+                    skills: [
+                        { name: 'React', type: 'MANDATORY', minLevel: 'BASIC', importanceWeight: 100 },
+                    ],
+                    selectedCandidateIds: ['rec-99'],
+                }}
+                saving={false}
+                onSave={vi.fn()}
+                onCancel={vi.fn()}
+            />
+        );
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: 'Confirmar Alocação de Marina' })).toBeInTheDocument();
         });
     });
 });
