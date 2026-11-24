@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, PageHeader, Stepper, type StepperStep } from "@/components/ui";
+import { Button, FloatingActionButton, PageHeader, Stepper, type StepperStep } from "@/components/ui";
 import { getApiError } from "@/lib/axios";
 import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus, type Match } from "../../types/types";
 import { vagaSchema, type VagaFormData } from "../../validations/validations";
@@ -155,7 +155,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
     };
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-24">
             <PageHeader
                 title={isEdit ? "Editar Vaga" : "Cadastrar Vaga"}
                 subtitle={
@@ -168,32 +168,9 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 onBack={onCancel}
                 backLabel="Voltar para vagas"
                 actions={
-                    <>
-                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
-                            Cancelar
-                        </Button>
-                        {step === 0 && canEdit && (
-                            <Button
-                                type="button"
-                                variant="primary"
-                                loading={saving}
-                                onClick={methods.handleSubmit(onSubmit, onInvalid)}
-                            >
-                                {isEdit ? "Salvar alterações" : "Salvar e continuar"}
-                            </Button>
-                        )}
-                        {canChangeOnlyStatus && (
-                            <Button
-                                type="button"
-                                variant="primary"
-                                loading={saving}
-                                disabled={!onStatusChange || saving}
-                                onClick={() => onStatusChange?.(methods.getValues("status"))}
-                            >
-                                Salvar status
-                            </Button>
-                        )}
-                    </>
+                    <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
+                        Cancelar
+                    </Button>
                 }
             />
 
@@ -250,6 +227,23 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                     )}
                 </form>
             </FormProvider>
+
+            {step === 0 && canEdit && (
+                <FloatingActionButton
+                    label={isEdit ? "Salvar alterações" : "Salvar e continuar"}
+                    loading={saving}
+                    onClick={methods.handleSubmit(onSubmit, onInvalid)}
+                />
+            )}
+
+            {canChangeOnlyStatus && (
+                <FloatingActionButton
+                    label="Salvar status"
+                    loading={saving}
+                    disabled={!onStatusChange}
+                    onClick={() => onStatusChange?.(methods.getValues("status"))}
+                />
+            )}
         </div>
     );
 }
