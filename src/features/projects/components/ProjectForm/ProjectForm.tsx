@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, PageHeader, FloatingActionButton } from "@/components/ui";
 import type { Project, ProjectPayload } from "../../types/types";
 import {
     createProjectSchema,
@@ -72,27 +72,16 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-24">
             <PageHeader
                 title={isEdit ? "Editar Projeto" : "Cadastrar Projeto"}
                 subtitle="Preencha as informações do projeto"
                 onBack={onCancel}
                 backLabel="Voltar para projetos"
                 actions={
-                    <>
-                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
-                            Cancelar
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="primary"
-                            loading={saving}
-                            onClick={handleSubmit(onSubmit)}
-                            disabled={!canSave || saving}
-                        >
-                            {isEdit ? "Salvar alterações" : "Salvar"}
-                        </Button>
-                    </>
+                    <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
+                        Cancelar
+                    </Button>
                 }
             />
 
@@ -106,6 +95,13 @@ export function ProjectForm({ initial, existingProjects = [], saving, onSave, on
                     </form>
                 </FormProvider>
             </div>
+
+            <FloatingActionButton
+                label={isEdit ? "Salvar alterações" : "Salvar"}
+                loading={saving}
+                disabled={!canSave}
+                onClick={handleSubmit(onSubmit)}
+            />
         </div>
     );
 }

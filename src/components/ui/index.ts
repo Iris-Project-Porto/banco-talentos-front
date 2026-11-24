@@ -13,3 +13,4 @@ export * from "./Tag/Tag";
 export * from "./Pagination/Pagination";
 export * from "./PasswordRequirements/PasswordRequirements";
 export * from "./ProgressRing/ProgressRing";
+export * from "./FloatingActionButton/FloatingActionButton"

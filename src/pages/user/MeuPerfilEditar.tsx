@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { Button, Input, Select, Section } from "@/components/ui";
+import { Button, FloatingActionButton, Input, Select, Section } from "@/components/ui";
 import {
     StackInput,
     AREA_OPTIONS,
@@ -65,7 +65,7 @@ export default function MeuPerfilEditar() {
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-24">
             {!isFirstSubmit && (
                 <div className="flex items-center gap-2">
                     <Link
@@ -199,17 +199,8 @@ export default function MeuPerfilEditar() {
                 </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button
-                    type="button"
-                    variant="primary"
-                    loading={saving}
-                    disabled={saving}
-                    onClick={handleSave}
-                >
-                    {isFirstSubmit ? "Criar perfil" : "Salvar alterações"}
-                </Button>
-                {!isFirstSubmit && (
+            {!isFirstSubmit && (
+                <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Button
                         type="button"
                         variant="secondary"
@@ -218,8 +209,14 @@ export default function MeuPerfilEditar() {
                     >
                         Cancelar
                     </Button>
-                )}
-            </div>
+                </div>
+            )}
+
+            <FloatingActionButton
+                label={isFirstSubmit ? "Criar perfil" : "Salvar alterações"}
+                loading={saving}
+                onClick={handleSave}
+            />
         </div>
     );
 }

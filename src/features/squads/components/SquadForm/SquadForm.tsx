@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button, FloatingActionButton } from "@/components/ui";
 import type { Squad, SquadPayload } from "../../types/types";
 import {
     createSquadSchema,
@@ -90,7 +90,7 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-24">
             <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-3">
                     <button
@@ -115,18 +115,6 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
                     <Button type="button" variant="secondary" onClick={onCancel} disabled={saving}>
                         Cancelar
                     </Button>
-                    <Button
-                        type="button"
-                        variant="primary"
-                        loading={saving}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handleSubmit(onSubmit)(e);
-                        }}
-                        disabled={!canSave || saving}
-                    >
-                        {isEdit ? "Salvar alterações" : "Salvar"}
-                    </Button>
                 </div>
             </header>
 
@@ -150,6 +138,16 @@ export function SquadForm({ initial, existingSquads = [], saving, onSave, onCanc
                     </form>
                 </FormProvider>
             </div>
+
+            <FloatingActionButton
+                label={isEdit ? "Salvar alterações" : "Salvar"}
+                loading={saving}
+                disabled={!canSave}
+                onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)(e);
+                }}
+            />
         </div>
     );
 }
