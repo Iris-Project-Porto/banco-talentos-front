@@ -1,4 +1,5 @@
 import HistorySkillCard from "../HistorySkillCard/HistorySkillCard";
+import { EQUIPMENT_STATUS_OPTIONS } from "@/features/profiles/profile";
 import {
   formatHistoryValue,
   type Change,
@@ -11,6 +12,15 @@ interface Props {
   entityType: string;
   formattedDate: string;
   date: string;
+}
+
+function formatChangeValue(label: string, value: unknown): string {
+  if (label === "Status" && typeof value === "string") {
+    const statusOption = EQUIPMENT_STATUS_OPTIONS.find((option) => option.value === value);
+    if (statusOption) return statusOption.label;
+  }
+
+  return formatHistoryValue(value);
 }
 
 export default function HistoryChangeRow({
@@ -33,12 +43,12 @@ export default function HistoryChangeRow({
       <td className="max-w-sm whitespace-pre-wrap break-words px-4 py-4 text-sm text-gray-600">
         {change.label.endsWith("Skills") && change.oldValue !== null
           ? <HistorySkillCard value={change.oldValue} />
-          : formatHistoryValue(change.oldValue)}
+          : formatChangeValue(change.label, change.oldValue)}
       </td>
       <td className="max-w-sm whitespace-pre-wrap break-words px-4 py-4 text-sm font-medium text-gray-800">
         {change.label.endsWith("Skills") && change.newValue !== null
           ? <HistorySkillCard value={change.newValue} />
-          : formatHistoryValue(change.newValue)}
+          : formatChangeValue(change.label, change.newValue)}
       </td>
     </tr>
   );
