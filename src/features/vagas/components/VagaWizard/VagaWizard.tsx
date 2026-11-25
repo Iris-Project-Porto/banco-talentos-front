@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
 import { Button, FloatingActionButton, PageHeader, Stepper, type StepperStep } from "@/components/ui";
 import { getApiError } from "@/lib/axios";
 import { STATUS_ONLY_STATUSES, type JobPosting, type JobPostingPayload, type JobStatus, type Match } from "../../types/types";
@@ -39,15 +40,57 @@ interface Props {
     onAllocationSuccess?: () => void;
 }
 
+function getInitialStep(status?: string): VagaWizardStep {
+    if (status === "ALLOCATING") return 2;
+    if (status === "SCREENING") return 1;
+    return 0;
+}
+
 export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, onAllocationSuccess }: Props) {
-    const [step, setStep] = useState<VagaWizardStep>(0);
+    const [step, setStep] = useState<VagaWizardStep>(() => getInitialStep(initial.status));
     const [savedVagaId, setSavedVagaId] = useState(initial.id);
-    const [selectedMatches, setSelectedMatches] = useState<Match[]>([]);
+    const [selectedMatches, setSelectedMatches] = useState<Match[]>(() => {
+        const vagaId = initial.id;
+        if (vagaId) {
+            try {
+                const stored = localStorage.getItem(`vaga_selected_matches_${vagaId}`);
+                if (stored) return JSON.parse(stored);
+            } catch {}
+        }
+        return [];
+    });
     const [isAllocating, setIsAllocating] = useState(false);
+    const [isAdvancingToAllocation, setIsAdvancingToAllocation] = useState(false);
+
+    function handleSelectedMatchesChange(matches: Match[]) {
+        setSelectedMatches(matches);
+        const vagaId = savedVagaId ?? initial.id;
+        if (vagaId) {
+            try {
+                localStorage.setItem(`vaga_selected_matches_${vagaId}`, JSON.stringify(matches));
+            } catch {}
+        }
+    }
     const isEdit = Boolean(initial.id);
     const isFilled = isEdit && initial.status === "FILLED";
     const canEdit = isEdit ? EDITABLE_STATUSES.includes(initial.status || "") : true;
     const canChangeOnlyStatus = isEdit && STATUS_ONLY_STATUSES.includes(initial.status as JobStatus);
+
+    const initialCandidateIds = initial.selectedCandidateIds;
+    const { data: initialMatchesPage } = useQuery({
+        queryKey: ["vagas", initial.id, "matches-hydration", initialCandidateIds],
+        queryFn: () => vagasApi.getMatches(initial.id!, { page: 0, size: 100 }),
+        enabled: Boolean(initial.id && initialCandidateIds && initialCandidateIds.length > 0),
+    });
+
+    useEffect(() => {
+        if (!initialCandidateIds?.length || !initialMatchesPage?.content?.length) return;
+        const idSet = new Set(initialCandidateIds);
+        const hydrated = initialMatchesPage.content.filter((m) => idSet.has(m.id));
+        if (hydrated.length > 0) {
+            setSelectedMatches(hydrated);
+        }
+    }, [initialCandidateIds, initialMatchesPage]);
 
     const {
         data: filledAllocations = [],
@@ -79,21 +122,65 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
 
     const vagaDependencies = useVagaDependencies(selectedProjectId, selectedSquadId, methods.setValue);
 
-    async function onSubmit(data: VagaFormData) {
+    const [submittingAction, setSubmittingAction] = useState<"saveAndExit" | "advance" | null>(null);
+
+    async function onSubmit(data: VagaFormData, action: "saveAndExit" | "advance" = "advance") {
+        setSubmittingAction(action);
+        const targetStatus: JobStatus = action === "saveAndExit" ? "OPEN" : "SCREENING";
+        methods.setValue("status", targetStatus);
+
         const payload = {
             ...data,
+            status: targetStatus,
             description: data.description || "", requirements: data.requirements || "", notes: data.notes || "",
             openingDate: new Date(data.openingDate).toISOString(),
             closingDate: data.closingDate ? new Date(data.closingDate).toISOString() : undefined,
+            selectedCandidateIds: selectedMatches.length > 0 ? selectedMatches.map((m) => m.id) : (initial.selectedCandidateIds ?? []),
             id: savedVagaId ?? initial.id,
         };
 
         try {
             const saved = await onSave(payload);
             setSavedVagaId(saved.id);
-            setStep(1);
+            if (action === "saveAndExit") {
+                onCancel();
+            } else {
+                setStep(1);
+            }
         } catch {
-            // Erro tratado no pai (toast). Permanece no step 0.
+        } finally {
+            setSubmittingAction(null);
+        }
+    }
+
+    async function handleProceedToAllocation() {
+        const vagaIdToSave = savedVagaId ?? initial.id;
+        if (vagaIdToSave) {
+            setIsAdvancingToAllocation(true);
+            const currentData = methods.getValues();
+            methods.setValue("status", "ALLOCATING");
+            const payload = {
+                ...currentData,
+                status: "ALLOCATING" as JobStatus,
+                description: currentData.description || "",
+                requirements: currentData.requirements || "",
+                notes: currentData.notes || "",
+                openingDate: currentData.openingDate ? new Date(currentData.openingDate).toISOString() : new Date().toISOString(),
+                closingDate: currentData.closingDate ? new Date(currentData.closingDate).toISOString() : undefined,
+                selectedCandidateIds: selectedMatches.map((m) => m.id),
+                id: vagaIdToSave,
+            };
+
+            try {
+                const saved = await onSave(payload);
+                setSavedVagaId(saved.id);
+                setStep(2);
+            } catch {
+            } finally {
+                setIsAdvancingToAllocation(false);
+            }
+        } else {
+            setStep(2);
         }
     }
 
@@ -109,6 +196,9 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 startDate: allocation.startDate,
                 role: allocation.role.trim(),
             });
+            try {
+                localStorage.removeItem(`vaga_selected_matches_${savedVagaId}`);
+            } catch {}
             toast.success(`Alocação de ${allocation.resourceName} confirmada! Vaga preenchida.`);
             if (onAllocationSuccess) {
                 onAllocationSuccess();
@@ -165,16 +255,37 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                             ? "Avalie e selecione os candidatos compatíveis com a vaga"
                             : "Preencha as informações da vaga"
                 }
-                onBack={onCancel}
-                backLabel="Voltar para vagas"
+                onBack={step === 2 ? () => setStep(1) : step === 1 ? () => setStep(0) : onCancel}
+                backLabel={step === 2 ? "Voltar ao Match" : step === 1 ? "Voltar aos dados da vaga" : "Voltar para vagas"}
                 actions={
-                    <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
-                        Cancelar
-                    </Button>
+                    <>
+                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
+                            Cancelar
+                        </Button>
+                        {step === 0 && canEdit && (
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                loading={saving && submittingAction === "saveAndExit"}
+                                disabled={saving || isAllocating}
+                                onClick={methods.handleSubmit((data) => onSubmit(data, "saveAndExit"), onInvalid)}
+                            >
+                                {isEdit ? "Salvar alterações" : "Salvar"}
+                            </Button>
+                        )}
+                    </>
                 }
             />
 
-            <Stepper steps={VAGA_WIZARD_STEPS} currentStep={step} />
+            <Stepper
+                steps={VAGA_WIZARD_STEPS}
+                currentStep={step}
+                onStepClick={(target) => {
+                    if (target < step) {
+                        setStep(target as VagaWizardStep);
+                    }
+                }}
+            />
 
             {!canEdit && !canChangeOnlyStatus && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm">
@@ -196,7 +307,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
 
             <FormProvider {...methods}>
                 <form
-                    onSubmit={methods.handleSubmit(onSubmit, onInvalid)}
+                    onSubmit={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
                     className="flex flex-col gap-5"
                 >
                     {step === 0 && (
@@ -209,10 +320,12 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
 
                     {step === 1 && (
                         <MatchResources
-                            vagaId={savedVagaId}
+                            vagaId={savedVagaId ?? initial.id}
                             selectedMatches={selectedMatches}
-                            onSelectedMatchesChange={setSelectedMatches}
-                            onProceedToAllocation={() => setStep(2)}
+                            onSelectedMatchesChange={handleSelectedMatchesChange}
+                            onProceedToAllocation={handleProceedToAllocation}
+                            onBack={() => setStep(0)}
+                            isAdvancing={isAdvancingToAllocation}
                         />
                     )}
 
@@ -230,9 +343,11 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
 
             {step === 0 && canEdit && (
                 <FloatingActionButton
-                    label={isEdit ? "Salvar alterações" : "Salvar e continuar"}
-                    loading={saving}
-                    onClick={methods.handleSubmit(onSubmit, onInvalid)}
+                    label="Avançar para Match"
+                    icon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                    loading={saving && submittingAction === "advance"}
+                    disabled={saving || isAllocating}
+                    onClick={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
                 />
             )}
 
@@ -240,7 +355,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 <FloatingActionButton
                     label="Salvar status"
                     loading={saving}
-                    disabled={!onStatusChange}
+                    disabled={!onStatusChange || saving}
                     onClick={() => onStatusChange?.(methods.getValues("status"))}
                 />
             )}

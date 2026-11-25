@@ -5,6 +5,13 @@ interface Props {
     size?: number;
     strokeWidth?: number;
     className?: string;
+    color?: string;
+}
+
+export function getProgressColor(value: number): string {
+    if (value <= 33) return "text-red-500";
+    if (value <= 66) return "text-yellow-500";
+    return "text-emerald-500";
 }
 
 export function ProgressRing({
@@ -12,6 +19,7 @@ export function ProgressRing({
     size = 44,
     strokeWidth = 4,
     className,
+    color,
 }: Props) {
     const normalizedValue = Math.min(Math.max(value, 0), 100);
     const radius = (size - strokeWidth) / 2;
@@ -19,6 +27,7 @@ export function ProgressRing({
     const progressOffset = circumference * (1 - normalizedValue / 100);
     const valueSizeClass =
         size >= 72 ? "text-base" : size >= 56 ? "text-xs" : "text-2xs";
+    const progressColor = color || getProgressColor(normalizedValue);
 
     return (
         <div
@@ -47,7 +56,7 @@ export function ProgressRing({
                     strokeWidth={strokeWidth}
                 />
                 <circle
-                    className="text-status-success-text transition-[stroke-dashoffset] duration-500"
+                    className={twMerge("transition-[stroke-dashoffset] duration-500", progressColor)}
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
@@ -57,6 +66,7 @@ export function ProgressRing({
                     strokeLinecap="round"
                     strokeDasharray={circumference}
                     strokeDashoffset={progressOffset}
+                    data-testid="progress-ring-indicator"
                 />
             </svg>
             <span className={twMerge("absolute font-bold tabular-nums text-slate-900", valueSizeClass)}>

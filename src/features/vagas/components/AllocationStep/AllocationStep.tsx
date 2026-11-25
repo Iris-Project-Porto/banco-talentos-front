@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { Avatar, Button, Input } from "@/components/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Avatar, Button, Input, Tag } from "@/components/ui";
+import { profilesApi } from "@/features/profiles";
 import { isResourceAllocated, type Match } from "../../types/types";
 
 export interface AllocationResourceData {
@@ -52,6 +54,53 @@ export interface AllocationStepProps {
     onBack: () => void;
     onConfirm: (allocation: AllocationResourceData) => void;
     saving?: boolean;
+}
+
+function extractSkillNames(
+    skills?: Array<{ name?: string; skill?: { name?: string } } | string> | null
+): string[] {
+    if (!skills || !Array.isArray(skills)) return [];
+    return skills
+        .map((s) => {
+            if (typeof s === "string") return s;
+            return s.skill?.name || s.name || "";
+        })
+        .map((s) => s.trim())
+        .filter(Boolean);
+}
+
+function CandidateSkills({ match }: { match: Match }) {
+    const { data: profile, isLoading } = useQuery({
+        queryKey: ["profiles", match.id],
+        queryFn: () => profilesApi.getProfileById(match.id),
+        staleTime: 5 * 60 * 1000,
+        enabled: Boolean(match.id),
+    });
+
+    const profileSkillNames = extractSkillNames(profile?.skills || (match as any).skills);
+    const mainSkillNames = (match.mainSkills || []).map((ms) => ms.name).filter(Boolean);
+
+    const allSkills = profileSkillNames.length > 0 ? profileSkillNames : mainSkillNames;
+    const uniqueSkills = Array.from(new Set(allSkills));
+
+    return (
+        <div className="mt-3">
+            <p className="text-xs text-slate-400 font-medium mb-1.5">Skills do Candidato</p>
+            {isLoading && uniqueSkills.length === 0 ? (
+                <span className="text-xs text-slate-400">Carregando skills...</span>
+            ) : uniqueSkills.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                    {uniqueSkills.map((skill) => (
+                        <Tag key={skill} kind="skill">
+                            {skill}
+                        </Tag>
+                    ))}
+                </div>
+            ) : (
+                <span className="text-xs text-slate-400">Nenhuma skill informada</span>
+            )}
+        </div>
+    );
 }
 
 export function AllocationStep({
@@ -332,6 +381,8 @@ export function AllocationStep({
                                                 )}
                                             </div>
                                         </div>
+
+                                        <CandidateSkills match={match} />
                                     </div>
 
                                     <div
@@ -376,7 +427,7 @@ export function AllocationStep({
             {/* Ações Inferiores */}
             <div className="flex items-center justify-end gap-3 mt-4">
                 <Button type="button" variant="secondary" onClick={onBack} disabled={saving}>
-                    Voltar ao Match
+                    Voltar
                 </Button>
                 <Button
                     type="button"
