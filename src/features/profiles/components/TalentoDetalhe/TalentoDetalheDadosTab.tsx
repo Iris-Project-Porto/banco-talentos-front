@@ -1,4 +1,4 @@
-import { Button, Input, Select, Section } from "@/components/ui";
+import { Button, FloatingActionButton, Input, Select, Section } from "@/components/ui";
 import { AREA_OPTIONS, EXPERIENCE_OPTIONS, NIVEL_OPTIONS } from "../../profile";
 import type { ProfileFormState, UserProfile } from "../../types/profile";
 import { ContactAddressFields, type ProfileFormUpdater } from "./ContactAddressFields";
@@ -22,7 +22,7 @@ export function TalentoDetalheDadosTab({
     onSave,
 }: Props) {
     return (
-        <div className="flex max-w-3xl flex-col gap-4">
+        <div className="flex max-w-3xl flex-col gap-4 pb-24">
             <Section title="Matrícula e Status Geral">
                 <MatriculaStatusFields
                     form={form}
@@ -79,28 +79,26 @@ export function TalentoDetalheDadosTab({
                     placeholder="https://github.com/..."
                 />
             </Section>
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-                {isPendente && (
+
+            {isPendente && (
+                <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Button
                         type="button"
-                        variant="primary"
-                        onClick={() => onSave(true)}
+                        variant="secondary"
+                        onClick={() => onSave(false)}
                         loading={saving}
                         disabled={saving}
                     >
-                        {saving ? "Salvando..." : "Salvar e Ativar →"}
+                        {saving ? "Salvando..." : "Salvar alterações"}
                     </Button>
-                )}
-                <Button
-                    type="button"
-                    variant={isPendente ? "secondary" : "primary"}
-                    onClick={() => onSave(false)}
-                    loading={saving}
-                    disabled={saving}
-                >
-                    {saving ? "Salvando..." : "Salvar alterações"}
-                </Button>
-            </div>
+                </div>
+            )}
+
+            <FloatingActionButton
+                label={isPendente ? "Salvar e Ativar →" : "Salvar alterações"}
+                loading={saving}
+                onClick={() => onSave(isPendente)}
+            />
         </div>
     );
 }

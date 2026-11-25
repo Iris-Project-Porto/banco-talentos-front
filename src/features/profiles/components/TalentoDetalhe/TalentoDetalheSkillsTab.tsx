@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Section } from "@/components/ui";
+import { FloatingActionButton, Section } from "@/components/ui";
 import { skillsApi } from "@/features/skills";
 import { StackInput, type StackItem } from "../StackInput/StackInput";
 import type { ProfileFormState } from "../../types/profile";
@@ -38,7 +38,7 @@ export function TalentoDetalheSkillsTab({
     );
 
     return (
-        <div className="flex max-w-3xl flex-col gap-4">
+        <div className="flex max-w-3xl flex-col gap-4 pb-24">
             <Section title="Avaliação de Hard Skills (Admin)">
                 {skillsError && (
                     <p className="mb-2 text-sm text-red-600">
@@ -65,17 +65,12 @@ export function TalentoDetalheSkillsTab({
                     placeholder="Ex: Comunicação Assertiva, Trabalho em equipe e colaboração..."
                 />
             </Section>
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button
-                    type="button"
-                    variant="primary"
-                    onClick={onSave}
-                    loading={saving}
-                    disabled={saving}
-                >
-                    {saving ? "Salvando..." : "Salvar alterações"}
-                </Button>
-            </div>
+
+            <FloatingActionButton
+                label={saving ? "Salvando..." : "Salvar alterações"}
+                loading={saving}
+                onClick={onSave}
+            />
         </div>
     );
 }
