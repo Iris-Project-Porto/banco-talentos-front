@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { SelectResourcesModal } from "./SelectResourcesModal";
 import { profilesApi } from "@/features/profiles";
 
@@ -106,19 +105,11 @@ describe("SelectResourcesModal", () => {
         expect(names).toEqual(["Alice", "Zeca", "Ana Alocada", "Bruno Alocado"]);
     });
 
-    it("deve impedir seleção de recurso já vinculado (RN04 / Cenário 5)", async () => {
-        const user = userEvent.setup();
+    it("não deve exibir recursos já presentes em existingIds", async () => {
         renderModal({ existingIds: ["p-1"] });
 
-        await screen.findByText("Lucas Fernandes");
-
-        const row = screen.getByText("Lucas Fernandes").closest("tr")!;
-        expect(row).toHaveClass("opacity-60");
-        expect(within(row).getByRole("checkbox")).toBeDisabled();
-        expect(screen.getByText("Já vinculado")).toBeInTheDocument();
-
-        await user.click(row);
-        expect(toast.error).not.toHaveBeenCalled();
+        expect(await screen.findByText("Beatriz Lima")).toBeInTheDocument();
+        expect(screen.queryByText("Lucas Fernandes")).not.toBeInTheDocument();
     });
 
     it("deve desativar recursos já alocados e mostrar a squad ao lado do nome", async () => {
