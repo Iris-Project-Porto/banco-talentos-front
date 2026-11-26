@@ -265,12 +265,14 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                         {step === 0 && canEdit && (
                             <Button
                                 type="button"
-                                variant="secondary"
-                                loading={saving && submittingAction === "saveAndExit"}
+                                variant="primary"
+                                className="gap-2"
+                                loading={saving && submittingAction === "advance"}
                                 disabled={saving || isAllocating}
-                                onClick={methods.handleSubmit((data) => onSubmit(data, "saveAndExit"), onInvalid)}
+                                onClick={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
                             >
-                                {isEdit ? "Salvar alterações" : "Salvar"}
+                                <span>Avançar para Match</span>
+                                <ArrowRight className="h-4 w-4" aria-hidden="true" />
                             </Button>
                         )}
                     </>
@@ -324,7 +326,6 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                             selectedMatches={selectedMatches}
                             onSelectedMatchesChange={handleSelectedMatchesChange}
                             onProceedToAllocation={handleProceedToAllocation}
-                            onBack={() => setStep(0)}
                             isAdvancing={isAdvancingToAllocation}
                         />
                     )}
@@ -333,7 +334,6 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                         <AllocationStep
                             vaga={vagaSummary}
                             selectedMatches={selectedMatches}
-                            onBack={() => setStep(1)}
                             onConfirm={handleConfirmAllocation}
                             saving={isAllocating}
                         />
@@ -343,11 +343,10 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
 
             {step === 0 && canEdit && (
                 <FloatingActionButton
-                    label="Avançar para Match"
-                    icon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
-                    loading={saving && submittingAction === "advance"}
+                    label={isEdit ? "Salvar alterações" : "Salvar"}
+                    loading={saving && submittingAction === "saveAndExit"}
                     disabled={saving || isAllocating}
-                    onClick={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
+                    onClick={methods.handleSubmit((data) => onSubmit(data, "saveAndExit"), onInvalid)}
                 />
             )}
 
