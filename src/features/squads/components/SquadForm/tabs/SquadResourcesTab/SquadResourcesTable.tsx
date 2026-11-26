@@ -54,7 +54,7 @@ export function SquadResourcesTable({
                 {
                     key: "actions",
                     header: "Ações",
-                    align: "right" as const,
+                    className: "text-right",
                     render: (recurso: Recurso) => (
                         <div className="flex items-center justify-end gap-2">
                             {onEdit && (

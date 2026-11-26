@@ -115,7 +115,12 @@ export function SelectResourcesModal({
         selectedKeys: selectedIds,
         onToggleRow: toggleRow,
         onToggleAll: toggleAll,
-    }), [selectedIds, toggleRow, toggleAll]);
+        isRowDisabled: (recurso) => existingIds.includes(recurso.id),
+        getRowDisabledTooltip: (recurso) =>
+            existingIds.includes(recurso.id)
+                ? `O recurso "${recurso.name}" já está vinculado à squad`
+                : undefined,
+    }), [selectedIds, toggleRow, toggleAll, existingIds]);
 
     function handleConfirm() {
         const finalSelected = selectedRecursos.filter((r) => !existingIds.includes(r.id));

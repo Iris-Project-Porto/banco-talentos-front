@@ -33,7 +33,7 @@ export default function App() {
     <ErrorBoundary FallbackComponent={GlobalErrorFallback} onReset={() => window.location.reload()}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Toaster position="top-right" />
+          <Toaster position="top-center" />
           <RouterProvider router={router} />
         </AuthProvider>
       </QueryClientProvider>
