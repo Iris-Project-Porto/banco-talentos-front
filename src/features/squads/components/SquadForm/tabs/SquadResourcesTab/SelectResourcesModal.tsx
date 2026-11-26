@@ -51,13 +51,18 @@ export function SelectResourcesModal({
         }));
     }, [data?.content]);
 
+    const availableRecursos = useMemo(
+        () => allRecursos.filter((recurso) => !existingIds.includes(recurso.id)),
+        [allRecursos, existingIds],
+    );
+
     const sortedRecursos = useMemo(
-        () => [...allRecursos].sort((a, b) => {
+        () => [...availableRecursos].sort((a, b) => {
             const allocationOrder = Number(Boolean(a.allocationSquadId))
                 - Number(Boolean(b.allocationSquadId));
             return allocationOrder || a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" });
         }),
-        [allRecursos],
+        [availableRecursos],
     );
 
     const filteredRecursos = useMemo(() => {
