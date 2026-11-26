@@ -84,6 +84,28 @@ describe("SelectResourcesModal", () => {
         expect(screen.queryByText("Lucas Fernandes")).not.toBeInTheDocument();
     });
 
+    it("deve listar primeiro recursos sem squad e ordenar alfabeticamente em cada grupo", async () => {
+        vi.mocked(profilesApi.getAtivos).mockResolvedValue({
+            content: [
+                { ...mockProfiles[0], id: "p-1", name: "Bruno Alocado", allocationSquadId: "squad-1" },
+                { ...mockProfiles[0], id: "p-2", name: "Zeca" },
+                { ...mockProfiles[0], id: "p-3", name: "Ana Alocada", allocationSquadId: "squad-2" },
+                { ...mockProfiles[0], id: "p-4", name: "Alice" },
+            ],
+            totalPages: 1,
+            totalElements: 4,
+        } as never);
+
+        const { container } = renderModal();
+        expect(await screen.findByText("Alice")).toBeInTheDocument();
+
+        const names = Array.from(
+            container.querySelectorAll("tbody tr td:nth-child(2) span.font-medium"),
+        ).map((name) => name.textContent);
+
+        expect(names).toEqual(["Alice", "Zeca", "Ana Alocada", "Bruno Alocado"]);
+    });
+
     it("deve impedir seleção de recurso já vinculado (RN04 / Cenário 5)", async () => {
         const user = userEvent.setup();
         renderModal({ existingIds: ["p-1"] });
