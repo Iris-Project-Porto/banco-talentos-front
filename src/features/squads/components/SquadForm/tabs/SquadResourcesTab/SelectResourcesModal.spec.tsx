@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -90,11 +90,43 @@ describe("SelectResourcesModal", () => {
 
         await screen.findByText("Lucas Fernandes");
 
-        // Tentar selecionar a linha de Lucas (que já está em existingIds)
         const row = screen.getByText("Lucas Fernandes").closest("tr")!;
-        await user.click(row);
+        expect(row).toHaveClass("opacity-60");
+        expect(within(row).getByRole("checkbox")).toBeDisabled();
+        expect(screen.getByText("Já vinculado")).toBeInTheDocument();
 
-        expect(toast.error).toHaveBeenCalledWith('O recurso "Lucas Fernandes" já está vinculado à squad.');
+        await user.click(row);
+        expect(toast.error).not.toHaveBeenCalled();
+    });
+
+    it("deve desativar recursos já alocados e mostrar a squad ao lado do nome", async () => {
+        const user = userEvent.setup();
+        vi.mocked(profilesApi.getAtivos).mockResolvedValue({
+            content: [
+                {
+                    ...mockProfiles[0],
+                    allocationSquadId: "squad-1",
+                    allocationSquadName: "Squad Mobile",
+                },
+                mockProfiles[1],
+            ],
+            totalPages: 1,
+            totalElements: 2,
+        } as never);
+
+        renderModal();
+
+        expect(await screen.findByText("Alocado: Squad Mobile")).toBeInTheDocument();
+        const row = screen.getByText("Lucas Fernandes").closest("tr")!;
+        expect(row).toHaveClass("opacity-60");
+        expect(row).toHaveAttribute(
+            "title",
+            'O recurso "Lucas Fernandes" já está alocado na squad "Squad Mobile".',
+        );
+        expect(within(row).getByRole("checkbox")).toBeDisabled();
+
+        await user.click(row);
+        expect(screen.getByRole("button", { name: "Adicionar 0 recurso" })).toBeDisabled();
     });
 
     it("deve permitir selecionar e confirmar adição de novos recursos", async () => {
