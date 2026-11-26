@@ -51,16 +51,25 @@ export function SelectResourcesModal({
         }));
     }, [data?.content]);
 
+    const sortedRecursos = useMemo(
+        () => [...allRecursos].sort((a, b) => {
+            const allocationOrder = Number(Boolean(a.allocationSquadId))
+                - Number(Boolean(b.allocationSquadId));
+            return allocationOrder || a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" });
+        }),
+        [allRecursos],
+    );
+
     const filteredRecursos = useMemo(() => {
-        if (!search.trim()) return allRecursos;
+        if (!search.trim()) return sortedRecursos;
         const q = search.trim().toLowerCase();
-        return allRecursos.filter(
+        return sortedRecursos.filter(
             (r) =>
                 r.name.toLowerCase().includes(q) ||
                 r.email.toLowerCase().includes(q) ||
                 (r.jobTitle && r.jobTitle.toLowerCase().includes(q)),
         );
-    }, [allRecursos, search]);
+    }, [sortedRecursos, search]);
 
     const totalPages = Math.max(1, Math.ceil(filteredRecursos.length / PAGE_SIZE));
     const visibleRecursos = useMemo(() => {
