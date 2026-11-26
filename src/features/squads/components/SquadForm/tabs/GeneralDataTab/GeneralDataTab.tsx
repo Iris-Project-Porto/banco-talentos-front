@@ -20,9 +20,9 @@ export function GeneralDataTab({ isEdit, onNext }: Props) {
 
     return (
         <div className="p-6">
-            <div className="flex flex-col gap-6 max-w-3xl">
+            <div className="flex flex-col gap-6 w-full">
                 <Input
-                    label="Nome da Squad"
+                    label="Nome da Squad *"
                     placeholder="Digite o nome da squad"
                     {...register("name")}
                     error={errors.name?.message}
@@ -36,7 +36,7 @@ export function GeneralDataTab({ isEdit, onNext }: Props) {
                     />
                 )}
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-slate-700">Descrição</label>
+                    <label className="text-sm font-medium text-slate-700">Descrição *</label>
                     <textarea
                         placeholder="Descreva o propósito e os objetivos da squad"
                         rows={4}
@@ -50,14 +50,14 @@ export function GeneralDataTab({ isEdit, onNext }: Props) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
-                        label="Coordenador Porto"
+                        label="Coordenador Porto *"
                         placeholder="Nome do coordenador"
                         {...register("portoCoordinator")}
                         error={errors.portoCoordinator?.message}
                     />
 
                     <Input
-                        label="Gerente de Projeto"
+                        label="Gerente de Projeto *"
                         placeholder="Nome do gerente"
                         {...register("projectManager")}
                         error={errors.projectManager?.message}
