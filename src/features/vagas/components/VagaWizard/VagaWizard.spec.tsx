@@ -480,12 +480,12 @@ describe('Componente VagaWizard', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Avançar para Match' }));
 
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Voltar' })).not.toBeInTheDocument();
             expect(screen.getByText('Ranking de Recursos')).toBeInTheDocument();
         });
 
-        // Clica em voltar aos dados da vaga
-        fireEvent.click(screen.getByRole('button', { name: 'Voltar' }));
+        // Clica em voltar aos dados da vaga no cabeçalho
+        fireEvent.click(screen.getByRole('button', { name: 'Voltar aos dados da vaga' }));
 
         await waitFor(() => {
             expect(screen.getByDisplayValue('VAG-1')).toBeInTheDocument();

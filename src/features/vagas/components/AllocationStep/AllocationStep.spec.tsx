@@ -91,7 +91,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
-                onBack={vi.fn()}
                 onConfirm={vi.fn()}
             />
         );
@@ -116,7 +115,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[]}
-                onBack={vi.fn()}
                 onConfirm={vi.fn()}
             />
         );
@@ -131,7 +129,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
-                onBack={vi.fn()}
                 onConfirm={vi.fn()}
             />
         );
@@ -150,23 +147,16 @@ describe("AllocationStep Component", () => {
         expect(screen.queryByLabelText(/Dedicação/i)).not.toBeInTheDocument();
     });
 
-    it("deve disparar onBack ao clicar em Voltar", async () => {
-        const handleBack = vi.fn();
-        const user = userEvent.setup();
-
+    it("não deve renderizar o botão Voltar", () => {
         renderWithClient(
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
-                onBack={handleBack}
                 onConfirm={vi.fn()}
             />
         );
 
-        const backButton = screen.getByRole("button", { name: "Voltar" });
-        await user.click(backButton);
-
-        expect(handleBack).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole("button", { name: "Voltar" })).not.toBeInTheDocument();
     });
 
     it("deve exigir a seleção de 1 candidato entre múltiplos finalistas e disparar onConfirm apenas com ele", async () => {
@@ -177,7 +167,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={mockMatches}
-                onBack={vi.fn()}
                 onConfirm={handleConfirm}
             />
         );
@@ -217,7 +206,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[mockMatches[0]]}
-                onBack={vi.fn()}
                 onConfirm={handleConfirm}
             />
         );
@@ -269,7 +257,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={unorderedMatches}
-                onBack={vi.fn()}
                 onConfirm={vi.fn()}
             />
         );
@@ -290,7 +277,6 @@ describe("AllocationStep Component", () => {
             <AllocationStep
                 vaga={mockVaga}
                 selectedMatches={[mockMatches[0]]}
-                onBack={vi.fn()}
                 onConfirm={handleConfirm}
             />
         );
@@ -341,7 +327,6 @@ describe("AllocationStep Component", () => {
                 <AllocationStep
                     vaga={mockVaga}
                     selectedMatches={[allocatedMatch, availableMatch]}
-                    onBack={vi.fn()}
                     onConfirm={handleConfirm}
                 />
             );
@@ -368,7 +353,6 @@ describe("AllocationStep Component", () => {
                 <AllocationStep
                     vaga={mockVaga}
                     selectedMatches={[allocatedMatch]}
-                    onBack={vi.fn()}
                     onConfirm={vi.fn()}
                 />
             );
@@ -386,7 +370,6 @@ describe("AllocationStep Component", () => {
                 <AllocationStep
                     vaga={mockVaga}
                     selectedMatches={mockMatches}
-                    onBack={vi.fn()}
                     onConfirm={vi.fn()}
                 />
             );
