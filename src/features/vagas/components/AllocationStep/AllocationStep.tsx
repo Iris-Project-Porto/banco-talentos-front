@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Button, Input, Tag } from "@/components/ui";
+import { Avatar, FloatingActionButton, Input, Tag } from "@/components/ui";
 import { profilesApi } from "@/features/profiles";
 import { isResourceAllocated, type Match } from "../../types/types";
 
@@ -51,7 +51,6 @@ export interface AllocationStepProps {
         skills?: Array<{ name: string; type: "MANDATORY" | "DESIRABLE" }>;
     };
     selectedMatches: Match[];
-    onBack: () => void;
     onConfirm: (allocation: AllocationResourceData) => void;
     saving?: boolean;
 }
@@ -106,7 +105,6 @@ function CandidateSkills({ match }: { match: Match }) {
 export function AllocationStep({
     vaga,
     selectedMatches,
-    onBack,
     onConfirm,
     saving = false,
 }: AllocationStepProps) {
@@ -424,23 +422,16 @@ export function AllocationStep({
                 </div>
             )}
 
-            {/* Ações Inferiores */}
-            <div className="flex items-center justify-end gap-3 mt-4">
-                <Button type="button" variant="secondary" onClick={onBack} disabled={saving}>
-                    Voltar
-                </Button>
-                <Button
-                    type="button"
-                    variant="primary"
-                    disabled={!selectedMatch || isResourceAllocated(selectedMatch.availability)}
-                    loading={saving}
-                    onClick={handleConfirm}
-                >
-                    {selectedMatch
+            <FloatingActionButton
+                label={
+                    selectedMatch
                         ? `Confirmar Alocação de ${selectedMatch.name.split(" ")[0]}`
-                        : "Confirmar Alocação do Recurso"}
-                </Button>
-            </div>
+                        : "Confirmar Alocação do Recurso"
+                }
+                disabled={!selectedMatch || isResourceAllocated(selectedMatch.availability)}
+                loading={saving}
+                onClick={handleConfirm}
+            />
         </div>
     );
 }
