@@ -175,14 +175,14 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
             {suggestionsOpen && (
               <div
                 ref={suggestionRef}
-                className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                className="absolute z-20 top-full mt-1 left-0 right-0 max-h-[200px] bg-white border border-gray-200 rounded-lg shadow-lg overflow-y-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5"
               >
                 {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onMouseDown={() => selectSuggestion(s)}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+                    className="flex h-10 w-full shrink-0 items-center text-left px-3 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors"
                   >
                     {s}
                   </button>
