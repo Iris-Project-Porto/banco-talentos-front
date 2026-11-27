@@ -55,7 +55,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
             try {
                 const stored = localStorage.getItem(`vaga_selected_matches_${vagaId}`);
                 if (stored) return JSON.parse(stored);
-            } catch {}
+            } catch { }
         }
         return [];
     });
@@ -68,7 +68,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
         if (vagaId) {
             try {
                 localStorage.setItem(`vaga_selected_matches_${vagaId}`, JSON.stringify(matches));
-            } catch {}
+            } catch { }
         }
     }
     const isEdit = Boolean(initial.id);
@@ -198,7 +198,7 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
             });
             try {
                 localStorage.removeItem(`vaga_selected_matches_${savedVagaId}`);
-            } catch {}
+            } catch { }
             toast.success(`Alocação de ${allocation.resourceName} confirmada! Vaga preenchida.`);
             if (onAllocationSuccess) {
                 onAllocationSuccess();
@@ -258,24 +258,9 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
                 onBack={step === 2 ? () => setStep(1) : step === 1 ? () => setStep(0) : onCancel}
                 backLabel={step === 2 ? "Voltar ao Match" : step === 1 ? "Voltar aos dados da vaga" : "Voltar para vagas"}
                 actions={
-                    <>
-                        <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
-                            Cancelar
-                        </Button>
-                        {step === 0 && canEdit && (
-                            <Button
-                                type="button"
-                                variant="primary"
-                                className="gap-2"
-                                loading={saving && submittingAction === "advance"}
-                                disabled={saving || isAllocating}
-                                onClick={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
-                            >
-                                <span>Avançar para Match</span>
-                                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                        )}
-                    </>
+                    <Button type="button" variant="secondary" onClick={onCancel} disabled={saving || isAllocating}>
+                        Cancelar
+                    </Button>
                 }
             />
 
@@ -342,12 +327,25 @@ export function VagaWizard({ initial, saving, onSave, onStatusChange, onCancel, 
             </FormProvider>
 
             {step === 0 && canEdit && (
-                <FloatingActionButton
-                    label={isEdit ? "Salvar alterações" : "Salvar"}
-                    loading={saving && submittingAction === "saveAndExit"}
-                    disabled={saving || isAllocating}
-                    onClick={methods.handleSubmit((data) => onSubmit(data, "saveAndExit"), onInvalid)}
-                />
+                <div className="fixed bottom-6 right-6 z-40 flex max-w-[calc(100vw-3rem)] flex-wrap items-center justify-end gap-3">
+                    <FloatingActionButton
+                        floating={false}
+                        variant="secondary"
+                        label={isEdit ? "Salvar alterações" : "Salvar"}
+                        loading={saving && submittingAction === "saveAndExit"}
+                        disabled={saving || isAllocating}
+                        onClick={methods.handleSubmit((data) => onSubmit(data, "saveAndExit"), onInvalid)}
+                    />
+                    <FloatingActionButton
+                        floating={false}
+                        label="Avançar para Match"
+                        icon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                        iconPosition="right"
+                        loading={saving && submittingAction === "advance"}
+                        disabled={saving || isAllocating}
+                        onClick={methods.handleSubmit((data) => onSubmit(data, "advance"), onInvalid)}
+                    />
+                </div>
             )}
 
             {canChangeOnlyStatus && (
