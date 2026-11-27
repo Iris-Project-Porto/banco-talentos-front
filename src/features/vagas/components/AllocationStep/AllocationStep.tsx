@@ -24,18 +24,6 @@ const MODALITY_MAP: Record<string, string> = {
     PRESENCIAL: "Presencial",
 };
 
-const ROLE_SUGGESTIONS = [
-    "Tech Lead Frontend",
-    "Tech Lead Backend",
-    "Dev Frontend",
-    "Dev Backend",
-    "Dev Fullstack",
-    "QA Engineer",
-    "Designer UI/UX",
-    "Product Owner",
-    "Scrum Master",
-];
-
 export interface AllocationStepProps {
     vaga: {
         title?: string;
@@ -400,7 +388,7 @@ export function AllocationStep({
                                             <Input
                                                 aria-label="Cargo/função"
                                                 label="Cargo/função"
-                                                list="role-suggestions"
+                                                type="text"
                                                 placeholder="Ex: Tech Lead Frontend"
                                                 disabled={isAllocated}
                                                 value={item.role}
@@ -413,12 +401,6 @@ export function AllocationStep({
                             );
                         })}
                     </div>
-
-                    <datalist id="role-suggestions">
-                        {ROLE_SUGGESTIONS.map((role) => (
-                            <option key={role} value={role} />
-                        ))}
-                    </datalist>
                 </div>
             )}
 
