@@ -141,7 +141,7 @@ describe("AllocationStep Component", () => {
         const dateInputs = screen.getAllByLabelText(/Data Início/i);
         expect(dateInputs).toHaveLength(2);
 
-        const roleInputs = screen.getAllByLabelText(/Papel/i);
+        const roleInputs = screen.getAllByLabelText("Cargo/função");
         expect(roleInputs).toHaveLength(2);
 
         expect(screen.queryByLabelText(/Dedicação/i)).not.toBeInTheDocument();
@@ -174,7 +174,7 @@ describe("AllocationStep Component", () => {
         const initialConfirmBtn = screen.getByRole("button", { name: "Confirmar Alocação do Recurso" });
         expect(initialConfirmBtn).toBeDisabled();
 
-        const roleInputs = screen.getAllByLabelText(/Papel/i);
+        const roleInputs = screen.getAllByLabelText("Cargo/função");
         await user.clear(roleInputs[1]);
         await user.type(roleInputs[1], "Dev Fullstack Lead");
 
@@ -269,7 +269,7 @@ describe("AllocationStep Component", () => {
         ]);
     });
 
-    it("deve exibir erro e impedir confirmação quando papel ou data estiverem vazios", async () => {
+    it("deve exibir erro e impedir confirmação quando cargo/função ou data estiverem vazios", async () => {
         const handleConfirm = vi.fn();
         const user = userEvent.setup();
 
@@ -281,7 +281,7 @@ describe("AllocationStep Component", () => {
             />
         );
 
-        const roleInput = screen.getByLabelText(/Papel/i);
+        const roleInput = screen.getByLabelText("Cargo/função");
         await user.clear(roleInput);
 
         const dateInput = screen.getByLabelText(/Data Início/i);
@@ -290,7 +290,7 @@ describe("AllocationStep Component", () => {
         await user.click(screen.getByRole("button", { name: "Confirmar Alocação de Lucas" }));
 
         expect(screen.getByText("Informe a data de início")).toBeInTheDocument();
-        expect(screen.getByText("Informe o papel")).toBeInTheDocument();
+        expect(screen.getByText("Informe o cargo/função")).toBeInTheDocument();
         expect(handleConfirm).not.toHaveBeenCalled();
     });
 

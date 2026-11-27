@@ -73,7 +73,7 @@ export function FilledAllocationInfo({ allocations, loading = false, error = fal
                             <div className="min-w-0">
                                 <p className="text-sm font-bold text-slate-900 truncate">{alloc.resourceName}</p>
                                 <p className="text-xs text-slate-500 truncate">
-                                    Papel: <span className="font-semibold text-slate-700">{alloc.role}</span>
+                                    Cargo/função: <span className="font-semibold text-slate-700">{alloc.role}</span>
                                 </p>
                             </div>
                         </div>
