@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import type { Skill } from "@/features/skills";
 
 export interface StackItem {
@@ -39,10 +40,15 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
   const [selectedStack, setSelectedStack] = useState<string | null>(null);
   const [pendingLevel, setPendingLevel] = useState<number>(5);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
   const [editingStackName, setEditingStackName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsButtonRef = useRef<HTMLButtonElement>(null);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
+  const availableSuggestions = STACK_SUGGESTIONS.filter(
+    (s) => !value.find((v) => v.name.toLowerCase() === s.toLowerCase())
+  );
   const filtered = inputVal.trim()
     ? STACK_SUGGESTIONS.filter(
       (s) =>
@@ -50,6 +56,8 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
         !value.find((v) => v.name.toLowerCase() === s.toLowerCase())
     ).slice(0, 8)
     : [];
+  const suggestions = showAllSuggestions ? availableSuggestions : filtered;
+  const suggestionsOpen = showSuggestions && suggestions.length > 0;
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -58,7 +66,9 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
         suggestionRef.current &&
         !suggestionRef.current.contains(e.target as Node) &&
         inputRef.current &&
-        !inputRef.current.contains(e.target as Node)
+        !inputRef.current.contains(e.target as Node) &&
+        suggestionsButtonRef.current &&
+        !suggestionsButtonRef.current.contains(e.target as Node)
       ) {
         setShowSuggestions(false);
       }
@@ -71,6 +81,7 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
     setSelectedStack(name);
     setInputVal(name);
     setShowSuggestions(false);
+    setShowAllSuggestions(false);
   }
 
   function confirmAdd() {
@@ -122,29 +133,51 @@ export function StackInput({ skills, value, onChange, placeholder }: Props) {
               type="text"
               value={inputVal}
               onChange={(e) => {
-                setInputVal(e.target.value);
+                const nextInputValue = e.target.value;
+                setInputVal(nextInputValue);
                 setSelectedStack(null);
-                setShowSuggestions(true);
+                setShowAllSuggestions(false);
+                setShowSuggestions(Boolean(nextInputValue.trim()));
               }}
-              onFocus={() => setShowSuggestions(true)}
+              onFocus={() => {
+                if (inputVal.trim()) setShowSuggestions(true);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  if (filtered.length > 0 && !selectedStack) {
-                    selectSuggestion(filtered[0]);
+                  if (suggestions.length > 0 && !selectedStack) {
+                    selectSuggestion(suggestions[0]);
                   }
                 }
               }}
               placeholder={placeholder}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none bg-white border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+              className="w-full rounded-lg px-3 py-2 pr-10 text-sm outline-none bg-white border border-gray-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
             />
 
-            {showSuggestions && filtered.length > 0 && (
+            <button
+              ref={suggestionsButtonRef}
+              type="button"
+              aria-label="Mostrar todas as sugestões"
+              aria-expanded={suggestionsOpen}
+              onClick={() => {
+                const shouldOpen = !showSuggestions;
+                setShowSuggestions(shouldOpen);
+                setShowAllSuggestions(!inputVal.trim() && shouldOpen);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-pink-600 transition-colors"
+            >
+              <ChevronDown
+                size={18}
+                className={suggestionsOpen ? "rotate-180 transition-transform" : "transition-transform"}
+              />
+            </button>
+
+            {suggestionsOpen && (
               <div
                 ref={suggestionRef}
                 className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
               >
-                {filtered.map((s) => (
+                {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
