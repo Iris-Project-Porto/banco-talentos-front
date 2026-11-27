@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui";
+import { FloatingActionButton } from "@/components/ui";
 import type { ProfileFormState, UserProfile } from "../../types/profile";
 import type { ProfileFormUpdater } from "./ContactAddressFields";
 import { CorporateCard } from "./CorporateCard";
@@ -27,7 +27,7 @@ export function TalentoDetalheCorporativaTab({
     const showRegistrationDetails = form.registrationStatus !== "NOT_REQUIRED";
 
     return (
-        <div className="flex max-w-3xl flex-col gap-5">
+        <div className="flex max-w-3xl flex-col gap-5 pb-24">
             <CorporateCard title="Matrícula e Status Geral">
                 <MatriculaStatusFields
                     form={form}
@@ -56,11 +56,11 @@ export function TalentoDetalheCorporativaTab({
                 </>
             )}
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button type="button" variant="primary" onClick={onSave} loading={saving} disabled={saving}>
-                    {saving ? "Salvando..." : "Salvar alterações"}
-                </Button>
-            </div>
+            <FloatingActionButton
+                label={saving ? "Salvando..." : "Salvar alterações"}
+                loading={saving}
+                onClick={onSave}
+            />
         </div>
     );
 }
