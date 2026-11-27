@@ -38,13 +38,58 @@ describe('Componente StackInput', () => {
     });
 
     it('deve mostrar a lista de sugestões filtradas ao digitar um valor correspondente', () => {
-        render(<StackInput value={[]} onChange={vi.fn()} skills={hardSkills} placeholder={hardSkillsPlaceholder} />);
+        const skills: Skill[] = [
+            ...hardSkills,
+            {
+                id: 'python',
+                name: 'Python',
+                type: 'HARD',
+                active: true,
+                category: 'BACKEND',
+                resourcesCount: 0,
+                averageProficiency: 0,
+            },
+        ];
+        render(<StackInput value={[]} onChange={vi.fn()} skills={skills} placeholder={hardSkillsPlaceholder} />);
 
         const input = screen.getByPlaceholderText(hardSkillsPlaceholder);
         fireEvent.change(input, { target: { value: 'Rea' } });
 
         expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Python' })).not.toBeInTheDocument();
+        const suggestionsButton = screen.getByRole('button', { name: 'Mostrar todas as sugestões' });
+        expect(suggestionsButton).toHaveAttribute('aria-expanded', 'true');
+        expect(suggestionsButton.querySelector('svg')).toHaveClass('rotate-180');
         expect(screen.queryByText('Nível de conhecimento em')).not.toBeInTheDocument();
+
+        fireEvent.click(suggestionsButton);
+        expect(screen.queryByRole('button', { name: 'React' })).not.toBeInTheDocument();
+        expect(suggestionsButton).toHaveAttribute('aria-expanded', 'false');
+
+        fireEvent.click(suggestionsButton);
+        expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Python' })).not.toBeInTheDocument();
+    });
+
+    it('deve mostrar todas as sugestões ao clicar no chevron, sem aplicar o filtro de busca', () => {
+        const skills: Skill[] = [
+            ...hardSkills,
+            ...Array.from({ length: 9 }, (_, index) => ({
+                id: `skill-${index + 1}`,
+                name: `Skill ${index + 1}`,
+                type: 'HARD' as const,
+                active: true,
+                category: 'FRONTEND' as const,
+                resourcesCount: 0,
+                averageProficiency: 0,
+            })),
+        ];
+        render(<StackInput value={[]} onChange={vi.fn()} skills={skills} placeholder={hardSkillsPlaceholder} />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Mostrar todas as sugestões' }));
+
+        expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Skill 9' })).toBeInTheDocument();
     });
 
     it('deve exibir o nível e permitir adicionar somente após selecionar uma sugestão', () => {
