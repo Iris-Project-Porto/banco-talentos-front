@@ -1,5 +1,5 @@
-import { Button, Pagination } from "@/components/ui";
-import { Loader2, UsersRoundIcon } from "lucide-react";
+import { FloatingActionButton, Pagination } from "@/components/ui";
+import { ArrowRight, Loader2, UsersRoundIcon } from "lucide-react";
 import { MatchTable } from "../MatchTable/MatchTable";
 import { useEffect, useMemo, useState } from "react";
 import { MatchFilters } from "../MatchFilters/MatchFilters";
@@ -15,7 +15,6 @@ interface Props {
     selectedMatches?: Match[];
     onSelectedMatchesChange?: (matches: Match[]) => void;
     onProceedToAllocation?: () => void;
-    onBack?: () => void;
     isAdvancing?: boolean;
 }
 
@@ -24,7 +23,6 @@ export function MatchResources({
     selectedMatches = [],
     onSelectedMatchesChange,
     onProceedToAllocation,
-    onBack,
     isAdvancing = false,
 }: Props) {
     const [page, setPage] = useState(0);
@@ -176,40 +174,28 @@ export function MatchResources({
                         />
                     </div>
 
-                    {(onProceedToAllocation || onBack) && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-card">
-                            <div className="text-sm text-slate-600">
-                                {selectedMatches.length === 0 ? (
-                                    <span>Nenhum recurso selecionado para alocação</span>
-                                ) : (
-                                    <span className="font-semibold text-slate-800">
-                                        {selectedMatches.length} {selectedMatches.length === 1 ? "recurso selecionado" : "recursos selecionados"} para alocação
-                                    </span>
-                                )}
+                    {onProceedToAllocation && (
+                        <>
+                            <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-card">
+                                <div className="text-sm text-slate-600">
+                                    {selectedMatches.length === 0 ? (
+                                        <span>Nenhum recurso selecionado para alocação</span>
+                                    ) : (
+                                        <span className="font-semibold text-slate-800">
+                                            {selectedMatches.length} {selectedMatches.length === 1 ? "recurso selecionado" : "recursos selecionados"} para alocação
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                {onBack && (
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onClick={onBack}
-                                    >
-                                        Voltar
-                                    </Button>
-                                )}
-                                {onProceedToAllocation && (
-                                    <Button
-                                        type="button"
-                                        variant="primary"
-                                        loading={isAdvancing}
-                                        disabled={isAdvancing || selectedMatches.length === 0 || !selectedMatches.some((m) => !isResourceAllocated(m.availability))}
-                                        onClick={onProceedToAllocation}
-                                    >
-                                        Avançar para Alocação
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
+
+                            <FloatingActionButton
+                                label="Avançar para Alocação"
+                                icon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                                loading={isAdvancing}
+                                disabled={isAdvancing || selectedMatches.length === 0 || !selectedMatches.some((m) => !isResourceAllocated(m.availability))}
+                                onClick={onProceedToAllocation}
+                            />
+                        </>
                     )}
                 </div>
             )}
