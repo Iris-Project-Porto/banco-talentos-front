@@ -19,7 +19,7 @@ describe("FilledAllocationInfo Component", () => {
         expect(screen.getByText(/Vaga marcada manualmente como/i)).toBeInTheDocument();
     });
 
-    it("deve exibir o recurso alocado, papel, squad/projeto e data de início quando preenchida por alocação", () => {
+    it("deve exibir o recurso alocado, cargo/função, squad/projeto e data de início quando preenchida por alocação", () => {
         const mockAllocations: JobPostingAllocationResponse[] = [
             {
                 id: "alloc-1",

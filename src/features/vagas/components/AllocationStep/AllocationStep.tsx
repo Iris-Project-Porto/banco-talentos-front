@@ -184,7 +184,7 @@ export function AllocationStep({
             errors.startDate = "Informe a data de início";
         }
         if (!current.role.trim()) {
-            errors.role = "Informe o papel";
+            errors.role = "Informe o cargo/função";
         }
         if (errors.startDate || errors.role) {
             setFieldErrors(errors);
@@ -398,8 +398,8 @@ export function AllocationStep({
                                                 onChange={(e) => updateField(match, "startDate", e.target.value)}
                                             />
                                             <Input
-                                                aria-label="Papel"
-                                                label="Papel"
+                                                aria-label="Cargo/função"
+                                                label="Cargo/função"
                                                 list="role-suggestions"
                                                 placeholder="Ex: Tech Lead Frontend"
                                                 disabled={isAllocated}
