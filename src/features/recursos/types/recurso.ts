@@ -67,6 +67,8 @@ export interface Recurso {
   gerenteProjeto?: string;
   projetoAlocacao?: string;
   squadAlocacao?: string;
+  allocationSquadId?: string;
+  allocationSquadName?: string;
   createdAt?: string;
   updatedAt?: string;
 }

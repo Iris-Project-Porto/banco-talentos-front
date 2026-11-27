@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { SelectResourcesModal } from "./SelectResourcesModal";
 import { profilesApi } from "@/features/profiles";
 
@@ -84,17 +83,63 @@ describe("SelectResourcesModal", () => {
         expect(screen.queryByText("Lucas Fernandes")).not.toBeInTheDocument();
     });
 
-    it("deve impedir seleção de recurso já vinculado (RN04 / Cenário 5)", async () => {
-        const user = userEvent.setup();
+    it("deve listar primeiro recursos sem squad e ordenar alfabeticamente em cada grupo", async () => {
+        vi.mocked(profilesApi.getAtivos).mockResolvedValue({
+            content: [
+                { ...mockProfiles[0], id: "p-1", name: "Bruno Alocado", allocationSquadId: "squad-1" },
+                { ...mockProfiles[0], id: "p-2", name: "Zeca" },
+                { ...mockProfiles[0], id: "p-3", name: "Ana Alocada", allocationSquadId: "squad-2" },
+                { ...mockProfiles[0], id: "p-4", name: "Alice" },
+            ],
+            totalPages: 1,
+            totalElements: 4,
+        } as never);
+
+        const { container } = renderModal();
+        expect(await screen.findByText("Alice")).toBeInTheDocument();
+
+        const names = Array.from(
+            container.querySelectorAll("tbody tr td:nth-child(2) span.font-medium"),
+        ).map((name) => name.textContent);
+
+        expect(names).toEqual(["Alice", "Zeca", "Ana Alocada", "Bruno Alocado"]);
+    });
+
+    it("não deve exibir recursos já presentes em existingIds", async () => {
         renderModal({ existingIds: ["p-1"] });
 
-        await screen.findByText("Lucas Fernandes");
+        expect(await screen.findByText("Beatriz Lima")).toBeInTheDocument();
+        expect(screen.queryByText("Lucas Fernandes")).not.toBeInTheDocument();
+    });
 
-        // Tentar selecionar a linha de Lucas (que já está em existingIds)
+    it("deve desativar recursos já alocados e mostrar a squad ao lado do nome", async () => {
+        const user = userEvent.setup();
+        vi.mocked(profilesApi.getAtivos).mockResolvedValue({
+            content: [
+                {
+                    ...mockProfiles[0],
+                    allocationSquadId: "squad-1",
+                    allocationSquadName: "Squad Mobile",
+                },
+                mockProfiles[1],
+            ],
+            totalPages: 1,
+            totalElements: 2,
+        } as never);
+
+        renderModal();
+
+        expect(await screen.findByText("Alocado: Squad Mobile")).toBeInTheDocument();
         const row = screen.getByText("Lucas Fernandes").closest("tr")!;
-        await user.click(row);
+        expect(row).toHaveClass("opacity-60");
+        expect(row).toHaveAttribute(
+            "title",
+            'O recurso "Lucas Fernandes" já está alocado na squad "Squad Mobile".',
+        );
+        expect(within(row).getByRole("checkbox")).toBeDisabled();
 
-        expect(toast.error).toHaveBeenCalledWith('O recurso "Lucas Fernandes" já está vinculado à squad.');
+        await user.click(row);
+        expect(screen.getByRole("button", { name: "Adicionar 0 recurso" })).toBeDisabled();
     });
 
     it("deve permitir selecionar e confirmar adição de novos recursos", async () => {

@@ -27,13 +27,16 @@ export function SquadResourcesTable({
             header: "Recurso",
             render: (recurso: Recurso) => {
                 const isLinked = existingIds.includes(recurso.id);
+                const allocationLabel = recurso.allocationSquadId
+                    ? `Alocado: ${recurso.allocationSquadName || "outra squad"}`
+                    : undefined;
                 return (
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                             <span className="font-medium text-slate-900">{recurso.name}</span>
-                            {isLinked && (
+                            {(isLinked || allocationLabel) && (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    Já vinculado
+                                    {isLinked ? "Já vinculado" : allocationLabel}
                                 </span>
                             )}
                         </div>

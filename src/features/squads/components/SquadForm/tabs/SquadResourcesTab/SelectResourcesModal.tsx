@@ -41,6 +41,8 @@ export function SelectResourcesModal({
             email: p.email || "",
             jobTitle: p.jobTitle || "",
             photoUrl: p.photoUrl,
+            allocationSquadId: p.allocationSquadId,
+            allocationSquadName: p.allocationSquadName,
             status: p.status || "ACTIVE",
             statusRecurso: (p.resourceStatus as unknown as Recurso["statusRecurso"]) || "AVAILABLE",
             statusMatricula: (p.registrationStatus as unknown as Recurso["statusMatricula"]) || "NOT_REQUIRED",
@@ -49,16 +51,30 @@ export function SelectResourcesModal({
         }));
     }, [data?.content]);
 
+    const availableRecursos = useMemo(
+        () => allRecursos.filter((recurso) => !existingIds.includes(recurso.id)),
+        [allRecursos, existingIds],
+    );
+
+    const sortedRecursos = useMemo(
+        () => [...availableRecursos].sort((a, b) => {
+            const allocationOrder = Number(Boolean(a.allocationSquadId))
+                - Number(Boolean(b.allocationSquadId));
+            return allocationOrder || a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" });
+        }),
+        [availableRecursos],
+    );
+
     const filteredRecursos = useMemo(() => {
-        if (!search.trim()) return allRecursos;
+        if (!search.trim()) return sortedRecursos;
         const q = search.trim().toLowerCase();
-        return allRecursos.filter(
+        return sortedRecursos.filter(
             (r) =>
                 r.name.toLowerCase().includes(q) ||
                 r.email.toLowerCase().includes(q) ||
                 (r.jobTitle && r.jobTitle.toLowerCase().includes(q)),
         );
-    }, [allRecursos, search]);
+    }, [sortedRecursos, search]);
 
     const totalPages = Math.max(1, Math.ceil(filteredRecursos.length / PAGE_SIZE));
     const visibleRecursos = useMemo(() => {
@@ -71,10 +87,29 @@ export function SelectResourcesModal({
         setPage(0);
     }
 
-    const toggleRow = useCallback(
+    const isUnavailable = useCallback(
+        (recurso: Recurso) => existingIds.includes(recurso.id) || Boolean(recurso.allocationSquadId),
+        [existingIds],
+    );
+
+    const getUnavailableMessage = useCallback(
         (recurso: Recurso) => {
             if (existingIds.includes(recurso.id)) {
-                toast.error(`O recurso "${recurso.name}" já está vinculado à squad.`);
+                return `O recurso "${recurso.name}" já está vinculado à squad.`;
+            }
+
+            const squadName = recurso.allocationSquadName
+                ? ` "${recurso.allocationSquadName}"`
+                : "";
+            return `O recurso "${recurso.name}" já está alocado${squadName ? ` na squad${squadName}` : " em uma squad"}.`;
+        },
+        [existingIds],
+    );
+
+    const toggleRow = useCallback(
+        (recurso: Recurso) => {
+            if (isUnavailable(recurso)) {
+                toast.error(getUnavailableMessage(recurso));
                 return;
             }
 
@@ -84,12 +119,12 @@ export function SelectResourcesModal({
                     : [...prev, recurso],
             );
         },
-        [existingIds],
+        [getUnavailableMessage, isUnavailable],
     );
 
     const toggleAll = useCallback(
         (checked: boolean) => {
-            const selectableRows = visibleRecursos.filter((r) => !existingIds.includes(r.id));
+            const selectableRows = visibleRecursos.filter((recurso) => !isUnavailable(recurso));
             const selectableIds = selectableRows.map((r) => r.id);
 
             setSelectedRecursos((prev) =>
@@ -103,7 +138,7 @@ export function SelectResourcesModal({
                     : prev.filter((r) => !selectableIds.includes(r.id)),
             );
         },
-        [visibleRecursos, existingIds],
+        [visibleRecursos, isUnavailable],
     );
 
     const selectedIds = useMemo(
@@ -115,15 +150,12 @@ export function SelectResourcesModal({
         selectedKeys: selectedIds,
         onToggleRow: toggleRow,
         onToggleAll: toggleAll,
-        isRowDisabled: (recurso) => existingIds.includes(recurso.id),
-        getRowDisabledTooltip: (recurso) =>
-            existingIds.includes(recurso.id)
-                ? `O recurso "${recurso.name}" já está vinculado à squad`
-                : undefined,
-    }), [selectedIds, toggleRow, toggleAll, existingIds]);
+        isRowDisabled: isUnavailable,
+        getRowDisabledTooltip: getUnavailableMessage,
+    }), [selectedIds, toggleRow, toggleAll, isUnavailable, getUnavailableMessage]);
 
     function handleConfirm() {
-        const finalSelected = selectedRecursos.filter((r) => !existingIds.includes(r.id));
+        const finalSelected = selectedRecursos.filter((recurso) => !isUnavailable(recurso));
         onConfirm?.(finalSelected);
         onClose();
     }
