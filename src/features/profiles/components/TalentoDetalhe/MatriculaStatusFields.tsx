@@ -34,16 +34,16 @@ export function MatriculaStatusFields({ form, resourceStatus, updateField }: Pro
                 {showRegistrationDetails && (
                     <>
                         <Input
-                            label="Nº da Matrícula *"
-                            value={form.registrationNumber}
-                            onChange={(e) => updateField("registrationNumber", e.target.value)}
-                            placeholder="Nº da Matrícula"
-                        />
-                        <Input
                             label="Data da Solicitação *"
                             type="date"
                             value={form.registrationRequestedAt}
                             onChange={(e) => updateField("registrationRequestedAt", e.target.value)}
+                        />
+                        <Input
+                            label="Nº da Matrícula *"
+                            value={form.registrationNumber}
+                            onChange={(e) => updateField("registrationNumber", e.target.value)}
+                            placeholder="Nº da Matrícula"
                         />
                     </>
                 )}
